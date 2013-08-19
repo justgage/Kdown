@@ -1,0 +1,51 @@
+#downloads-list {
+    border:2px grey solid;
+    width:650px;
+    margin:20px;
+    padding:0px;
+}
+
+.category {
+    font-size:2em;
+    margin:0px;
+    padding:10px;
+    list-style: none;
+    border-bottom:1px lightgrey solid;
+}
+
+.download-item {
+    margin:0px;
+    padding:10px;
+    list-style: none;
+    border-bottom:1px lightgrey solid;
+}
+
+.download-item a {
+    color:black;
+}
+
+.lang-button {
+    float:right;
+}
+
+.file-info {
+    float:right;
+    background-color:lightgrey;
+    padding:3px 10px;
+    margin:1px 2px;
+}
+
+.lang-list {
+    margin: 10px;
+    padding:0;
+    display:none;
+    background-color:#F7F7F7;
+}
+
+.lang-list li {
+    float:left;
+    width:140px;
+    padding:5px;
+    border-left:solid lightgrey 1px;
+    list-style: none;
+}
