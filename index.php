@@ -20,13 +20,63 @@ include 'dl-functions.php';
 $json = '{ 
     "Applications & Forms":[
         {
-            "filename":"Customer Application.pdf",
+            "filename":"New Enrollment Form",
             "href":"files/",
-            "languages":{ "english":"files/Customer_USA.pdf", "spanish":"r" }
+            "languages":{ "Dansk":"#", "Deutsch":"#", "Eesti":"#", "English":"#", "Hrvatski":"#", "Magyar":"#", "Norsk":"#", "Polski":"#", "Pусский":"#", "Română":"#", "Slovenský":"#", "Slovensko":"#", "Srpski":"#", "Suomi":"#", "Svenska":"#", "Türkçe":"#", "Українська":"#" }
+            
         }, 
-
         {
-            "filename":"This is a file.pdf",
+            "filename":"Order Form",
+            "href":"files/",
+            "languages":{ "english":"#", "spanish":"#" }
+        }, 
+        {
+            "filename":"Change of Genealogy Request Form",
+            "href":"files/",
+            "languages":{ "Dansk":"#", "Deutsch":"#", "Eesti":"#", "English":"#", "Hrvatski":"#", "Magyar":"#", "Norsk":"#", "Polski":"#", "Pусский":"#", "Română":"#", "Slovenský":"#", "Slovensko":"#", "Srpski":"#", "Suomi":"#", "Svenska":"#", "Türkçe":"#", "Українська":"#" }
+        }, 
+        {
+            "filename":"Direct Deposit Form",
+            "href":"files/",
+            "languages":{ "english":"#"}
+        }, 
+        {
+            "filename":"Product Exchange or Replenishment Form",
+            "href":"files/",
+            "languages":{ "english":"#", "spanish":"#" }
+        }, 
+        {
+            "filename":"Return Product Form",
+            "href":"files/",
+            "languages":{ "english":"#", "spanish":"#" }
+        }, 
+        {
+            "filename":"Personal Information Update",
+            "href":"files/",
+            "languages":{ "english":"#", "spanish":"#" }
+        }, 
+        {
+            "filename":"Credit Card Payment Details and Authorization",
+            "href":"files/",
+            "languages":{ "english":"#", "spanish":"#" }
+        }, 
+        {
+            "filename":"Distributor Cancellation",
+            "href":"files/",
+            "languages":{ "english":"#", "spanish":"#" }
+        }, 
+        {
+            "filename":"Kyäni Policies and Procedures",
+            "href":"files/",
+            "languages":{ "english":"#", "spanish":"#" }
+        }, 
+        {
+            "filename":"Kyäni Policies and Procedures",
+            "href":"files/",
+            "languages":{ "english":"#", "spanish":"#" }
+        }, 
+        {
+            "filename":"Paygate Minimum Calculator",
             "href":"files/",
             "languages":{ "english":"#", "spanish":"#" }
         }, 
@@ -34,24 +84,18 @@ $json = '{
             "filename":"This is a file.pdf",
             "href":"files/",
             "languages":{ "english":"#", "spanish":"#" }
-        }, 
+        },
         {
-            "filename":"This is a file.pdf",
+            "filename":"New Enrollment Form",
             "href":"files/",
             "languages":{ "english":"#", "spanish":"#" }
-        }, 
-        {
-            "filename":"This is a file.pdf",
-            "href":"files/",
-            "languages":{ "english":"#", "spanish":"#" }
-        }, 
+        },
         {
             "filename":"This is a file.pdf",
             "href":"files/",
             "languages":{ "english":"#", "spanish":"#" }
         } 
     ],
-
     "Business Library":[
         {
             "filename":"This is a file.pdf",

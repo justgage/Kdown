@@ -10,33 +10,40 @@ function dl_list_display($json)
     echo '<h2>Categorys</h2>';
     echo '<ul>';
 
-    $i = 0; //used to index the categorys
 
-    foreach ($info as $cat => $list) {
-        $i++;
-        echo "<li><a href='#$i'>$cat</a></li>";
-    }
-    echo '</ul>';
-   
-    //display the main list of files
 
-    echo '<ul id="downloads-list">';
+    if ($info == null) {
+        echo "JSON is invalid";
+    } else {
 
-    $i = 0;  //used to index the categorys
+        $i = 0; //used to index the categorys
 
-    foreach ($info as $cat => $list) {
-
-        $i++;
-        echo '<ul>';
-        echo "<li class='category'><a name='$i'>$cat</a></li>";
-
-        foreach ($list as $item) {
-            dl_item($item);
+        foreach ($info as $cat => $list) {
+            $i++;
+            echo "<li><a href='#$i'>$cat</a></li>";
         }
-
         echo '</ul>';
+
+        //display the main list of files
+
+        echo '<ul id="downloads-list">';
+
+        $i = 0;  //used to index the categorys
+
+        foreach ($info as $cat => $list) {
+
+            $i++;
+            echo '<ul>';
+            echo "<li class='category'><a name='$i'>$cat</a></li>";
+
+            foreach ($list as $item) {
+                dl_item($item);
+            }
+
+            echo '</ul>';
+        }
+        echo '<ul>';
     }
-    echo '<ul>';
 }
 
 function dl_item($item) {
