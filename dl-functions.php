@@ -6,23 +6,9 @@ function dl_list_display($json)
 
     $info = json_decode($json, true);
 
-    //display a category list
-    echo '<h2>Categorys</h2>';
-    echo '<ul>';
-
-
-
     if ($info == null) {
         echo "JSON is invalid";
     } else {
-
-        $i = 0; //used to index the categorys
-
-        foreach ($info as $cat => $list) {
-            $i++;
-            echo "<li><a href='#$i'>$cat</a></li>";
-        }
-        echo '</ul>';
 
         //display the main list of files
 
@@ -33,16 +19,19 @@ function dl_list_display($json)
         foreach ($info as $cat => $list) {
 
             $i++;
-            echo '<ul>';
-            echo "<li class='category'><a name='$i'>$cat</a></li>";
+            echo "<li class='category'><a href='#i'>$cat <span class='num-results'></span> </a>";
+
+            echo "<ul class='cat-list'>";
 
             foreach ($list as $item) {
                 dl_item($item);
             }
+            echo "<li class='none-found'>None Fould</li>";
+            echo "</ul>
+                </li>";
 
-            echo '</ul>';
         }
-        echo '<ul>';
+        echo '</ul>';
     }
 }
 

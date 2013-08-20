@@ -153,6 +153,12 @@ $(function() {
             $(this).parent().children(".lang-list").slideToggle();
             });
 
+        //this will toggle the category when clicked
+        $(".category a").click(function(){
+                console.log('click');
+                $(this).parent().children(".cat-list").slideToggle();
+            });
+
         var searchtext = "";
 
         $("#file-search").focus();
@@ -165,30 +171,43 @@ $(function() {
             // get users search term
             searchtext = $(this).val().toUpperCase();
 
+
             if (searchtext.length > 0) {
                 $(".download-item").hide();
 
 
-                $(".download-item").each(function() {
+                $(".category").each(function() {
+                    numFound = 0;
+                    console.log(numFound);
+                    $(this).find(".download-item").each(function() {
+                        // this will get an uppercase string to search in.
+                        var haystack = $(this).find("a").text().toUpperCase();
 
+                        var isFound = haystack.indexOf(searchtext);
 
-                    // this will get an uppercase string to search in.
-                    var haystack = $(this).find("a").text().toUpperCase();
+                        if (isFound !== -1) {
+                            numFound++;
+                            $(this).show();
+                        }
 
-                    var isFound = haystack.indexOf(searchtext);
+                    });
 
-                    if (isFound > -1) {
-                        numFound++;
-                        $(this).show();
+                    $(this).find(".num-results").html( "(" + numFound + ")");
+
+                    if (numFound === 0) {
+                        $(this).find(".none-found").show();
+                    } else {
+                        $(this).find(".none-found").hide();
                     }
-
                 });
 
 
             }
             else
             {
+                $(this).find(".num-results").html("");
                 $(".download-item").show();
+                $(".none-found").hide();
             
             }
 

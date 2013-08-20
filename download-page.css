@@ -5,6 +5,8 @@
     padding:0px;
 }
 
+
+
 .category {
     font-size:2em;
     margin:0px;
@@ -35,6 +37,19 @@
     margin:1px 2px;
 }
 
+.cat-list {
+    display:none;
+    font-size:0.5em;
+    background-color:#F5F5F5;
+    margin:0;
+    padding:0;
+}
+
+.none-found {
+    display:none;
+    list-style: none;
+}
+
 .lang-list {
     margin: 10px;
     padding:0;
@@ -44,7 +59,7 @@
 
 .lang-list li {
     float:left;
-    width:140px;
+    width:130px;
     padding:5px;
     border-left:solid lightgrey 1px;
     list-style: none;
