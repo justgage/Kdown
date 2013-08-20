@@ -24,6 +24,10 @@ $(function() {
         {
             var market = $(this).val()
 
+            //empty the list of items
+            $('#downloads-list').html("<li>Loading...</li>");
+
+
             console.log(market);
 
             $.ajax({
@@ -52,18 +56,47 @@ $(function() {
         });
 
     function reload_downloads_list( json ) {
+
+
+        var html = "";
+
         //go through each category
         for (var i = 0, l = json.categorys.length; i < l; i ++) {
             var cat = json.categorys[i];
             console.log("CAT:  " + cat.name);
 
+            // add a category
+            html = html + '<li class="category"> <a href="#i">' + cat.name + '<span class="num-results">(...)</span> </a>'
+                + '<ul class="cat-list"> ';
 
             // go through each file
             for (var j = 0, ll = cat.files.length; j < ll; j ++) {
                 var file = cat.files[j];
                 console.log("   FILE: " + file.filename);
+
+                //add an menu item
+                html = html + '<li class="download-item">'
+                    + '<a target="_blank" href="files/">' + file.filename + '</a>'
+                    + '<input type="button" name="lang-button" class="lang-button" value="translate">'
+                    + '<p class="file-info">'+ file.filetype + '</p>'
+                    + '<br style="clear:both;">'
+                    + '<ul class="lang-list">';
+
+                //end lang list
+                html = html + '</ul></li>';
+                    
+
             }
+
+            //close category
+            html = html + '</ul>';
         }
+
+        $('#downloads-list').html(html);
+
+        bindClick();
+        allDocsCount();
+        
 
     }
 
@@ -83,9 +116,14 @@ $(function() {
     });
 
     //this will toggle the category when clicked
-    $(".category a").click(function(){
-        $(this).parent().children(".cat-list").slideToggle();
-    });
+    function bindClick(){
+        $( ".category" ).on("click", "a", function(){
+            console.log("clicked on a category");
+            $(this).parent().children(".cat-list").slideToggle();
+        });
+    }
+
+    bindClick();
 
 
     //this will get the input's value
