@@ -1,14 +1,38 @@
 <?php
 
 
+
+function market_dropdown($json) {
+    $markets = json_decode($json, true);
+
+    echo "<select name='market' id='market-select'>";
+        
+    foreach ($markets as $market => $inside) {
+        $url=urlencode($market);
+        echo "<option value='$url'><a href='index.php?market=$url'>$market</a></option>";
+    }
+
+    echo "</select>";
+}
+
 function dl_list_display($json)
 {
 
-    $info = json_decode($json, true);
+    $markets = json_decode($json, true);
 
-    if ($info == null) {
+    if ($markets == null) {
         echo "JSON is invalid";
     } else {
+
+        $info;
+
+        if (isset($_GET['market']) &&  isset($markets[$_GET['market']])) {
+            $info = $markets[$_GET['market']];
+
+        }
+        else {
+            $info = $markets['USA / CANADA'];
+        }
 
         //display the main list of files
 
@@ -19,14 +43,14 @@ function dl_list_display($json)
         foreach ($info as $cat => $list) {
 
             $i++;
-            echo "<li class='category'><a href='#i'>$cat <span class='num-results'></span> </a>";
+            echo "<li class='category'><a href='#i'>$cat <span class='num-results'>(...)</span> </a>";
 
             echo "<ul class='cat-list'>";
 
             foreach ($list as $item) {
                 dl_item($item);
             }
-            echo "<li class='none-found'>None Fould</li>";
+            echo "<li class='none-found'> No Search Results </li>";
             echo "</ul>
                 </li>";
 
