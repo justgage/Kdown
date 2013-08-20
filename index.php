@@ -20,17 +20,15 @@
 
 <h3>Market <?php market_dropdown($json); ?></h3>
 
+<h3>Categorys</h3>
 <div> 
-<form action="#" method="get" accept-charset="utf-8">
-    
-    Filter <input type="text" name="search" id="file-search" value="" />
-<input type="submit" name="submit" id="submit-button" />
-        <a href="#"  id="clear-button" >clear</a>
-
+    <form action="#" method="get" accept-charset="utf-8">
+        
+        Filter <input type="text" name="search" id="file-search" value="" />
+    <input type="submit" name="submit" id="submit-button" />
+            <a href="#"  id="clear-button" >clear</a>
 </form>
 </div>
-
-<h3>Categorys</h3>
 <?php dl_list_display($json); ?>
 
 

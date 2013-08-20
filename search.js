@@ -1,6 +1,10 @@
+/**
+ * This is my fancy filtering script for the downloads page 
+ * written in javascript using JQUERY
+ *
+ * -Gage Peterson justgage@gmail.com
+ */
 $(function() {
-
-
         var searchtext = "";
         var numFound = 0;
         $("#file-search").focus();
