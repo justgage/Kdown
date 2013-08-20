@@ -81,3 +81,14 @@
     border-left:solid lightgrey 1px;
     list-style: none;
 }
+
+#dl-filter {
+    text-size:18px;
+    margin: 10px 40px;
+
+}
+
+#file-search  {
+    width:200px;
+
+}
