@@ -1,18 +1,10 @@
-#downloads-header {
+#downloads-list {
+    border:2px grey solid;
+    width:650px;
     margin:20px;
     padding:0px;
-    width:650px;
-    border-left:2px grey solid;
-    border-right:2px grey solid;
 }
 
-#downloads-list {
-    padding:0px;
-    margin:0px;
-    width:650px;
-    border-left:2px grey solid;
-    border-right:2px grey solid;
-}
 
 .category {
     font-size:1.5em;
@@ -48,23 +40,15 @@
 }
 
 
-.lang-button, .file-info {
+.lang-button {
+    float:right;
+}
+
+.file-info {
     float:right;
     background-color:lightgrey;
     padding:3px 10px;
     margin:1px 2px;
-}
-
-.lang-button {
-    background-color:darkblue;
-    width:100px;
-    text-align:right;
-    color:white;
-}
-
-.lang-button:hover {
-    cursor:pointer;
-    background-color blue;
 }
 
 .cat-list {
@@ -100,21 +84,11 @@
 
 #dl-filter {
     text-size:18px;
-    padding: 10px 10px;
-    margin:0;
-    width:630px;
-    border-bottom:solid lightgrey 2px;
-    border-left:2px grey solid;
-    border-right:2px grey solid;
-    border-top:2px grey solid;
+    margin: 10px 40px;
 
 }
 
 #file-search  {
     width:200px;
 
-}
-
-#hide-all-button {
-    float:right
 }

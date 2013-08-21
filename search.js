@@ -1,114 +1,93 @@
-
 /**
- * This is my fancy filtering script for the downloads page
+ * This is my fancy filtering script for the downloads page 
  * written in javascript using JQUERY
  *
  * -Gage Peterson justgage@gmail.com
- *
  */
-$(function () {
-
-
-
+$(function() {
     var searchtext = "";
     var numFound = 0;
-    $("#file-search").focus();
+    //$("#file-search").focus();
 
-    /***************************************************************************
-     * FUNCTION: This will update the amount of documents in each category
-     */
-
+    //set total number of documents 
     function allDocsCount() {
-        $(".category").each(function () {
+        $(".category").each(function() {
             numFound = $(this).find(".download-item").length;
-            $(this).find(".num-results").html("(" + numFound + ")");
+            $(this).find(".num-results").html( "(" + numFound + ")");
 
         });
     }
 
     allDocsCount();
 
-    /***************************************************************************
-     * FUNCTION this will rebind the clicks after changed html
-     */
+    $("#market-select").change(function()
+        {
+            var market = $(this).val()
 
-    function bindClick() {
+            //empty the list of items
+            $('#downloads-list').html("<li>Loading...</li>");
 
-        ///bind click to 
-        $(".category").on("click", "a", function () {
-            console.log("clicked on a category");
-            $(this).parent().children(".cat-list").slideToggle();
+
+            console.log(market);
+
+            $.ajax({
+                url:"download-api.php",
+                data: {
+                    market:"Europe"
+                },
+                type:"POST",
+                dataType:"json",
+                success: function( json ) {
+                    console.log(json);
+
+                    reload_downloads_list( json );
+
+                    console.log(json.categorys[0].name)
+                },
+                error: function( xhr, status ) {
+                    console.log("ajax failed");
+                },
+                complete: function( xhr, status ) {
+                    //console.log("ajax complete");
+                }
+
+
+            });
         });
-        
-        //Show the translations when you click the button
-        $(".lang-button").click(function () {
-            $(this).parent().children(".lang-list").slideToggle();
-            $(this).find(".arrow").slideToggle();
-        });
 
-        //clears when you push the clear button
-        $(".clear-button").click(function () {
-            $("#file-search").val('');
-            $("#file-search").focus();
-            allDocsCount();
-            $(".download-item").show();
-            $(".none-found").hide();
-        });
-    }
+    function reload_downloads_list( json ) {
 
-    bindClick();
 
-    /***************************************************************************
-     * FUNCTION  this will reload the categorys
-     * which is used in the ajax call when the market is changed
-     */
-
-    function reload_downloads_list(json) {
         var html = "";
 
         //go through each category
-        var l = json.categorys.length
-
-        for (var i = 0; i < l; i++) {
-            console.log("STARTING CAT:" + i + " out of " + l );
+        for (var i = 0, l = json.categorys.length; i < l; i ++) {
             var cat = json.categorys[i];
             console.log("CAT:  " + cat.name);
 
             // add a category
-            html = html + '<li class="category"> <a href="#">' 
-            + cat.name 
-            + '<span class="num-results">(...)</span> </a>' 
-            + '<ul class="cat-list"> ';
+            html = html + '<li class="category"> <a href="#i">' + cat.name + '<span class="num-results">(...)</span> </a>'
+                + '<ul class="cat-list"> ';
 
             // go through each file
-            console.log("length" + cat.files.length)
-            for (var j = 0, ll = cat.files.length; j < ll; j++) {
+            for (var j = 0, ll = cat.files.length; j < ll; j ++) {
                 var file = cat.files[j];
-                //console.log("   FILE: " + file.filename);
+                console.log("   FILE: " + file.filename);
 
                 //add an menu item
-                html = html + '<li class="download-item">' 
-                + '<a target="_blank" href="files/">' + file.filename + '</a>' 
-                + '<p class="lang-button">  <span class="arrow">&dArr;</span>Translations</p>' 
-                + '<p class="file-info">' + file.filetype + '</p>' 
-                + '<br style="clear:both;">' + '<ul class="lang-list">';
+                html = html + '<li class="download-item">'
+                    + '<a target="_blank" href="files/">' + file.filename + '</a>'
+                    + '<input type="button" name="lang-button" class="lang-button" value="translate">'
+                    + '<p class="file-info">'+ file.filetype + '</p>'
+                    + '<br style="clear:both;">'
+                    + '<ul class="lang-list">';
 
-                //languages list
-                for (var k = 0, z = file.languages.length; k < z; k ++) {
-                    var langFile = file.languages[k];
-
-                    html = html + '<li><a href="'+ langFile["url"] + '">' + langFile["name"] + '</a></li>';
-                }
-
-                html += '<br style="clear:both;">';
-
-                html = html + '</ul></li>'; //end lang list
-
+                //end lang list
+                html = html + '</ul></li>';
+                    
 
             }
 
-            html += "<li class='none-found'> No Search Results <a href='#'  class='clear-button' >clear</a> </li>";
-            
             //close category
             html = html + '</ul>';
         }
@@ -117,67 +96,39 @@ $(function () {
 
         bindClick();
         allDocsCount();
+        
 
     }
 
-    function ajax_market(market) {
-        //empty the list of items
 
-        $('#downloads-list').html("<li class='none-found'>Loading...</li>");
-
-        console.log("OPTION = " + market)
-
-
-        $.ajax({
-            url: "download-api.php",
-            data: {
-                market: market
-            },
-            type: "POST",
-            dataType: "json",
-            success: function (json) {
-                console.log(json);
-
-                reload_downloads_list(json);
-
-                console.log(json.categorys[0].name)
-            },
-            error: function (xhr, status) {
-                console.log("ajax failed");
-            },
-            complete: function (xhr, status) {
-                //console.log("ajax complete");
-            }
-        });
-
-    }
-
-    $("#market-select").change(
-        function () {
-            var market = $(this).val()
-
-            ajax_market(market);
-
-        });
-
-
-
+    //Show the translations when you click the button
+    $(".lang-button").click(function(){
+        $(this).parent().children(".lang-list").slideToggle();
+    });
 
     //clear the search and put cursor in the box
-
-    $("#hide-all-button").click(function () {
-        $(".lang-list").hide();
-        $(".cat-list").hide();
-        $(".arrow").show();
+    $("#clear-button").click(function(){
+        $("#file-search").val('');
+        $("#file-search").focus();
+        allDocsCount();
+        $(".download-item").show();
         $(".none-found").hide();
     });
 
+    //this will toggle the category when clicked
+    function bindClick(){
+        $( ".category" ).on("click", "a", function(){
+            console.log("clicked on a category");
+            $(this).parent().children(".cat-list").slideToggle();
+        });
+    }
+
+    bindClick();
+
 
     //this will get the input's value
-    $("#file-search").keyup(function () {
+    $("#file-search").keyup(function() {
 
-        $(".lang-list").hide();
-        $(".arrow").show();
         $(".cat-list").show();
 
         var numFound = 0;
@@ -190,9 +141,9 @@ $(function () {
             $(".download-item").hide();
 
 
-            $(".category").each(function () {
+            $(".category").each(function() {
                 numFound = 0;
-                $(this).find(".download-item").each(function () {
+                $(this).find(".download-item").each(function() {
                     // this will get an uppercase string to search in.
                     var haystack = $(this).find("a").text().toUpperCase();
 
@@ -205,7 +156,7 @@ $(function () {
 
                 });
 
-                $(this).find(".num-results").html("(" + numFound + ")");
+                $(this).find(".num-results").html( "(" + numFound + ")");
 
                 if (numFound === 0) {
                     $(this).find(".none-found").show();
@@ -215,7 +166,9 @@ $(function () {
             });
 
 
-        } else {
+        }
+        else
+        {
             allDocsCount();
             $(".download-item").show();
             $(".none-found").hide();
