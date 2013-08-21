@@ -2,7 +2,8 @@
 
 $response = array();
 
-if (isset($_POST['market'])) {
+if( isset($_POST['market']) ) 
+{
     $json = file_get_contents("info.json");
     $markets = json_decode($json, true);
 
