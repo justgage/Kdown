@@ -5,11 +5,11 @@
 function market_dropdown($json) {
     $markets = json_decode($json, true);
 
-    echo "<select name='market' option='Europe' id='market-select'>";
+    echo "<select name='market' id='market-select'>";
         
     foreach ($markets as $market => $inside) {
         $url=urlencode($market);
-        echo "<option value='$market'><a href='index.php?market=$url'>$market</a></option>";
+        echo "<option value='$url'><a href='index.php?market=$url'>$market</a></option>";
     }
 
     echo "</select>";
@@ -64,7 +64,7 @@ function dl_item($item) {
             <li class="download-item">
                 <a target="_blank" href="<?=$item['href']?>"><?=$item['filename']?></a>
                 <input type="button" name="lang-button" class="lang-button"  value="translate" />
-                <p class="file-info"><?=$item['filetype']?></p>
+                <p class="file-info">pdf</p>
                 <br style="clear:both;" />
                 <ul class="lang-list">
                     <?php 

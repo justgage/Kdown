@@ -20,16 +20,12 @@
 
 <h3>Market <?php market_dropdown($json); ?></h3>
 
-<div id="ajax-test">
-this will be replaced
-</div>
-
 <h3>Categorys</h3>
-<div id="dl-filter"> 
+<div> 
     <form action="#" method="get" accept-charset="utf-8">
         
         Filter <input type="text" name="search" id="file-search" value="" />
-    <input type="submit" id="submit-button" />
+    <input type="submit" name="submit" id="submit-button" />
             <a href="#"  id="clear-button" >clear</a>
 </form>
 </div>
@@ -40,9 +36,9 @@ this will be replaced
 
 <noscript>
 <style type="text/css" media="all">
-    .lang-list {
-        display:block;
-    }
+.lang-list {
+    display:block;
+}
 </style>
 </noscript>
 
