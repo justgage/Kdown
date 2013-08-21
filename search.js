@@ -97,14 +97,34 @@ $(function () {
                 + '<p class="file-info">' + file.filetype + '</p>' 
                 + '<br style="clear:both;">' + '<ul class="lang-list">';
 
+                var langNum = 0;
+
                 //languages list
+                html += "<table><tbody>";
                 for (var k = 0, z = file.languages.length; k < z; k ++) {
                     var langFile = file.languages[k];
 
-                    html = html + '<li><a href="'+ langFile["url"] + '">' + langFile["name"] + '</a></li>';
+
+                    if (langFile['url'] !== "#") {
+                        var filename = "----";
+                        if (langFile['url'].indexOf("/") !== -1) {
+                            filename = decodeURIComponent(langFile['url'].slice(langFile['url'].lastIndexOf("/") + 1));
+                        }
+                        html += '<tr><td>' + langFile["name"] + '</td><td>:<a href="'+ langFile["url"] + '">'  + filename + '</a></td></tr>';
+
+                        langNum++;
+                    }
+
+
                 }
 
-                html += '<br style="clear:both;">';
+                html += "</table></tbody>";
+
+                if (langNum == 0) {
+                    html += "<li>No Translations</li>";
+
+                }
+
 
                 html = html + '</ul></li>'; //end lang list
 

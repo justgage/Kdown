@@ -113,13 +113,16 @@
 }
 
 .lang-list li {
-    float:left;
-    width:120px;
     padding:5px;
     margin:0 10px;
     border-left:solid lightgrey 1px;
     list-style: none;
 }
+
+.lang-list table {
+    margin-left:20px;
+}
+
 
 #dl-filter {
     text-size:18px;
@@ -141,3 +144,5 @@
 #hide-all-button {
     float:right
 }
+
+

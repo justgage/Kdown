@@ -4,14 +4,14 @@
             "name":"Applications & Forms",
             "files":[
                 {
-                    "filename":"Kyäni Policies and Procedures",
+                    "filename":"Kyani Order Form ",
                     "href":"files/",
                     "filetype":"txt",
                     "languages":[ 
-                        { "name":"Dansk", "url":"#" },
-                        { "name":"Deutsch", "url":"#" },
+                        { "name":"Japanese", "url":"https://na.kyani.net/downloads/Applications/22%20Order%20Form-08.13-EN-HK.pdf" },
+                        { "name":"Chinese", "url":"https://na.kyani.net/downloads/Applications/02%20%E4%BC%9A%E5%91%98%E6%B6%88%E8%B4%B9%E8%B4%AD%E8%B4%A7%E8%A1%A8%E6%A0%BC-08.13-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-CN.pdf" },
                         { "name":"Eesti", "url":"#" },
-                        { "name":"English", "url":"#" },
+                        { "name":"English", "url":"https://na.kyani.net/downloads/Applications/EN-order-form.pdf" },
                         { "name":"Hrvatski", "url":"#" },
                         { "name":"Magyar", "url":"#" },
                         { "name":"Norsk", "url":"#" },
