@@ -37,13 +37,12 @@ $(function () {
         ///bind click to 
         $(".category").on("click", "a", function () {
             console.log("clicked on a category");
-            $(this).parent().children(".cat-list").slideToggle();
+            $(this).parent().find(".cat-list").slideToggle(400);
         });
         
         //Show the translations when you click the button
         $(".lang-button").click(function () {
-            $(this).parent().children(".lang-list").slideToggle();
-            $(this).find(".arrow").slideToggle();
+            $(this).parent().find(".lang-list").slideToggle(400);
         });
 
         //clears when you push the clear button
@@ -113,7 +112,9 @@ $(function () {
             html = html + '</ul>';
         }
 
+        $('#downloads-list').hide();
         $('#downloads-list').html(html);
+        $('#downloads-list').fadeIn();
 
         bindClick();
         allDocsCount();
