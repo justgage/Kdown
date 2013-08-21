@@ -32,16 +32,15 @@
 
 
 .download-item {
-    margin:0;
-    padding:0;
+    margin:0px;
+    padding:10px;
     list-style: none;
     border-bottom:1px lightgrey solid;
 }
 
 .download-item a {
     color:black;
-    padding:6px;
-    line-height:2;
+    padding-bottom:6px;
 }
 
 .num-results {
@@ -52,16 +51,8 @@
 .lang-button, .file-info {
     float:right;
     background-color:lightgrey;
-    padding:3px 15px;
-    margin:0;
-    height:1.5em;
-}
-
-.file-info { width:24px;}
-
-.lang-button:hover {
-    cursor:pointer;
-    background-color blue;
+    padding:3px 10px;
+    margin:1px 2px;
 }
 
 .lang-button {
@@ -71,6 +62,10 @@
     color:white;
 }
 
+.lang-button:hover {
+    cursor:pointer;
+    background-color blue;
+}
 
 .cat-list {
     display:none;
@@ -88,11 +83,8 @@
     font-style:italic;
 }
 
-.lang-list a {
-    line-height:1;
-}
 .lang-list {
-    margin: 0;
+    margin: 10px;
     padding:0;
     display:none;
     background-color:#F7F7F7;
@@ -100,9 +92,8 @@
 
 .lang-list li {
     float:left;
-    width:120px;
+    width:130px;
     padding:5px;
-    margin:0 10px;
     border-left:solid lightgrey 1px;
     list-style: none;
 }
