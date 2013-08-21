@@ -64,7 +64,7 @@ function dl_item($item) {
 ?>
             <li class="download-item">
                 <a target="_blank" href="<?=$item['href']?>"><?=$item['filename']?></a>
-                <p class="lang-button"><span class="arrow">&dArr;</span>Translations</p>
+                <p class="lang-button">Translations</p>
                 <p class="file-info"><?=$item['filetype']?></p>
                 <br style="clear:both;" />
                 <ul class="lang-list">

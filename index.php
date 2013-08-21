@@ -20,17 +20,17 @@
 
 <h3>Market <?php market_dropdown($json); ?></h3>
 
+<h2>Categorys</h2>
 <div id="dl-filter"> 
     <form action="#" method="get" accept-charset="utf-8">
         
         Quick Find <input type="text" name="search" id="file-search" value="" />
-    <input type="submit" id="submit-button" />
             <a href="#"  class="clear-button" >clear</a>
 <a href="#"  id="hide-all-button" >close all</a>
 </form>
 </div>
-<?php dl_list_display($json); ?>
-
+<ul id="downloads-list"> </ul>
+<div class="dl-footer"> </div>
 <script type="text/javascript" src="/jquery.min.js" ></script>
 
 <script type="text/javascript" charset="utf-8">

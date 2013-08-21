@@ -6,6 +6,13 @@
     border-right:2px grey solid;
 }
 
+.dl-footer {
+    width:650px;
+    border-bottom:2px grey solid;
+    border-left:2px grey solid;
+    border-right:2px grey solid;
+}
+
 #downloads-list {
     padding:0px;
     margin:0px;
@@ -32,7 +39,9 @@
 
 
 .download-item {
-    margin:0;
+    font-family:sans-serif;
+    font-size:13px;
+    margin:10px;
     padding:0;
     list-style: none;
     border-bottom:1px lightgrey solid;
@@ -51,6 +60,7 @@
 
 .lang-button, .file-info {
     float:right;
+    text-align:center;
     background-color:lightgrey;
     padding:3px 15px;
     margin:0;
@@ -59,23 +69,23 @@
 
 .file-info { width:24px;}
 
-.lang-button:hover {
-    cursor:pointer;
-    background-color blue;
-}
 
 .lang-button {
     background-color:darkblue;
-    width:100px;
-    text-align:right;
+    width:76px;
     color:white;
+}
+
+.lang-button-hover {
+    background-color:blue;
+    cursor:pointer;
 }
 
 
 .cat-list {
     display:none;
     font-size:0.7em;
-    background-color:#F5F5F5;
+    /* background-color:#F5F5F5; */
     margin:0;
     padding:0;
 }

@@ -232,10 +232,7 @@
                     "filename":"This is a file.pdf",
                     "href":"files/",
                     "filetype":"pdf",
-                    "languages":[ 
-                        { "name":"Dansk", "url":"#" },
-                        { "name":"Deutsch", "url":"#" }
-                        ]
+                    "languages":[ { "name":"Dansk", "url":"#" }, { "name":"Deutsch", "url":"#" } ]
                 } 
                     
             ]
@@ -271,37 +268,37 @@
                     "filename":"Kyäni Policies and Procedures",
                     "href":"files/",
                     "filetype":"pdf",
-                    "languages":{ "english":"#", "spanish":"#" }
+                    "languages":{"name":"english", "url":"#"}
                 }, 
                 {
                     "filename":"Kyäni Policies and Procedures",
                     "href":"files/",
                     "filetype":"pdf",
-                    "languages":{ "english":"#", "spanish":"#" }
+                    "languages":[ { "name":"Dansk", "url":"#" }, { "name":"Deutsch", "url":"#" } ]
                 }, 
                 {
                     "filename":"Paygate Minimum Calculator",
                     "href":"files/",
                     "filetype":"pdf",
-                    "languages":{ "english":"#", "spanish":"#" }
+                    "languages":[ { "name":"Dansk", "url":"#" }, { "name":"Deutsch", "url":"#" } ]
                 }, 
                 {
                     "filename":"This is a file.pdf",
                     "href":"files/",
                     "filetype":"pdf",
-                    "languages":{ "english":"#", "spanish":"#" }
+                    "languages":[ { "name":"Dansk", "url":"#" }, { "name":"Deutsch", "url":"#" } ]
                 },
                 {
                     "filename":"New Enrollment Form",
                     "href":"files/",
                     "filetype":"pdf",
-                    "languages":{ "english":"#", "spanish":"#" }
+                    "languages":[ { "name":"Dansk", "url":"#" }, { "name":"Deutsch", "url":"#" } ]
                 },
                 {
                     "filename":"This is a file.pdf",
                     "href":"files/",
                     "filetype":"pdf",
-                    "languages":{ "english":"#", "spanish":"#" }
+                    "languages":[ { "name":"Dansk", "url":"#" }, { "name":"Deutsch", "url":"#" } ]
                 } 
                     ]
         },
@@ -312,43 +309,43 @@
                     "filename":"Kyäni Policies and Procedures",
                     "href":"files/",
                     "filetype":"pdf",
-                    "languages":{ "english":"#", "spanish":"#" }
+                    "languages":[ { "name":"Dansk", "url":"#" }, { "name":"Deutsch", "url":"#" } ]
                 }, 
                 {
                     "filename":"Kyäni Policies and Procedures",
                     "href":"files/",
                     "filetype":"pdf",
-                    "languages":{ "english":"#", "spanish":"#" }
+                    "languages":[ { "name":"Dansk", "url":"#" }, { "name":"Deutsch", "url":"#" } ]
                 }, 
                 {
                     "filename":"Kyäni Policies and Procedures",
                     "href":"files/",
                     "filetype":"pdf",
-                    "languages":{ "english":"#", "spanish":"#" }
+                    "languages":[ { "name":"Dansk", "url":"#" }, { "name":"Deutsch", "url":"#" } ]
                 }, 
                 {
                     "filename":"Paygate Minimum Calculator",
                     "href":"files/",
                     "filetype":"pdf",
-                    "languages":{ "english":"#", "spanish":"#" }
+                    "languages":[ { "name":"Dansk", "url":"#" }, { "name":"Deutsch", "url":"#" } ]
                 }, 
                 {
                     "filename":"This is a file.pdf",
                     "href":"files/",
                     "filetype":"pdf",
-                    "languages":{ "english":"#", "spanish":"#" }
+                    "languages":[ { "name":"Dansk", "url":"#" }, { "name":"Deutsch", "url":"#" } ]
                 },
                 {
                     "filename":"New Enrollment Form",
                     "href":"files/",
                     "filetype":"pdf",
-                    "languages":{ "english":"#", "spanish":"#" }
+                    "languages":[ { "name":"Dansk", "url":"#" }, { "name":"Deutsch", "url":"#" } ]
                 },
                 {
                     "filename":"This is a file.pdf",
                     "href":"files/",
                     "filetype":"pdf",
-                    "languages":{ "english":"#", "spanish":"#" }
+                    "languages":[ { "name":"Dansk", "url":"#" }, { "name":"Deutsch", "url":"#" } ]
                 } 
             ]
         }],
@@ -480,43 +477,43 @@
                     "filename":"Kyäni Policies and Procedures",
                     "href":"files/",
                     "filetype":"pdf",
-                    "languages":{ "english":"#", "spanish":"#" }
+                    "languages":[ { "name":"Dansk", "url":"#" }, { "name":"Deutsch", "url":"#" } ]
                 }, 
                 {
                     "filename":"Kyäni Policies and Procedures",
                     "href":"files/",
                     "filetype":"pdf",
-                    "languages":{ "english":"#", "spanish":"#" }
+                    "languages":[ { "name":"Dansk", "url":"#" }, { "name":"Deutsch", "url":"#" } ]
                 }, 
                 {
                     "filename":"Kyäni Policies and Procedures",
                     "href":"files/",
                     "filetype":"pdf",
-                    "languages":{ "english":"#", "spanish":"#" }
+                    "languages":[ { "name":"Dansk", "url":"#" }, { "name":"Deutsch", "url":"#" } ]
                 }, 
                 {
                     "filename":"Paygate Minimum Calculator",
                     "href":"files/",
                     "filetype":"pdf",
-                    "languages":{ "english":"#", "spanish":"#" }
+                    "languages":[ { "name":"Dansk", "url":"#" }, { "name":"Deutsch", "url":"#" } ]
                 }, 
                 {
                     "filename":"This is a file.pdf",
                     "href":"files/",
                     "filetype":"pdf",
-                    "languages":{ "english":"#", "spanish":"#" }
+                    "languages":[ { "name":"Dansk", "url":"#" }, { "name":"Deutsch", "url":"#" } ]
                 },
                 {
                     "filename":"New Enrollment Form",
                     "href":"files/",
                     "filetype":"pdf",
-                    "languages":{ "english":"#", "spanish":"#" }
+                    "languages":[ { "name":"Dansk", "url":"#" }, { "name":"Deutsch", "url":"#" } ]
                 },
                 {
                     "filename":"This is a file.pdf",
                     "href":"files/",
                     "filetype":"pdf",
-                    "languages":{ "english":"#", "spanish":"#" }
+                    "languages":[ { "name":"Dansk", "url":"#" }, { "name":"Deutsch", "url":"#" } ]
                 } 
                     ]
         },
@@ -527,43 +524,43 @@
                     "filename":"Kyäni Policies and Procedures",
                     "href":"files/",
                     "filetype":"pdf",
-                    "languages":{ "english":"#", "spanish":"#" }
+                    "languages":[ { "name":"Dansk", "url":"#" }, { "name":"Deutsch", "url":"#" } ]
                 }, 
                 {
                     "filename":"Kyäni Policies and Procedures",
                     "href":"files/",
                     "filetype":"pdf",
-                    "languages":{ "english":"#", "spanish":"#" }
+                    "languages":[ { "name":"Dansk", "url":"#" }, { "name":"Deutsch", "url":"#" } ]
                 }, 
                 {
                     "filename":"Kyäni Policies and Procedures",
                     "href":"files/",
                     "filetype":"pdf",
-                    "languages":{ "english":"#", "spanish":"#" }
+                    "languages":[ { "name":"Dansk", "url":"#" }, { "name":"Deutsch", "url":"#" } ]
                 }, 
                 {
                     "filename":"Paygate Minimum Calculator",
                     "href":"files/",
                     "filetype":"pdf",
-                    "languages":{ "english":"#", "spanish":"#" }
+                    "languages":[ { "name":"Dansk", "url":"#" }, { "name":"Deutsch", "url":"#" } ]
                 }, 
                 {
                     "filename":"This is a file.pdf",
                     "href":"files/",
                     "filetype":"pdf",
-                    "languages":{ "english":"#", "spanish":"#" }
+                    "languages":[ { "name":"Dansk", "url":"#" }, { "name":"Deutsch", "url":"#" } ]
                 },
                 {
                     "filename":"New Enrollment Form",
                     "href":"files/",
                     "filetype":"pdf",
-                    "languages":{ "english":"#", "spanish":"#" }
+                    "languages":[ { "name":"Dansk", "url":"#" }, { "name":"Deutsch", "url":"#" } ]
                 },
                 {
                     "filename":"This is a file.pdf",
                     "href":"files/",
                     "filetype":"pdf",
-                    "languages":{ "english":"#", "spanish":"#" }
+                    "languages":[ { "name":"Dansk", "url":"#" }, { "name":"Deutsch", "url":"#" } ]
                 } 
             ]
         }]

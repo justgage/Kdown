@@ -53,6 +53,11 @@ $(function () {
             $(".download-item").show();
             $(".none-found").hide();
         });
+
+        $(".lang-button").hover(function() {
+            console.log("hover!");
+            $(this).toggleClass("lang-button-hover");
+        });
     }
 
     bindClick();
@@ -88,7 +93,7 @@ $(function () {
                 //add an menu item
                 html = html + '<li class="download-item">' 
                 + '<a target="_blank" href="files/">' + file.filename + '</a>' 
-                + '<p class="lang-button">  <span class="arrow">&dArr;</span>Translations</p>' 
+                + '<p class="lang-button">Translations</p>' 
                 + '<p class="file-info">' + file.filetype + '</p>' 
                 + '<br style="clear:both;">' + '<ul class="lang-list">';
 
@@ -153,6 +158,7 @@ $(function () {
 
     }
 
+
     $("#market-select").change(
         function () {
             var market = $(this).val()
@@ -160,6 +166,8 @@ $(function () {
             ajax_market(market);
 
         });
+
+    ajax_market($("#market-select").val());
 
 
 
