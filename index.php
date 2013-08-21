@@ -18,9 +18,9 @@
 <div id="main_content">
 <h1>Downloads page</h1>
 
-<h3>Market <?php market_dropdown($json); ?></h3>
+<h2>Market <?php market_dropdown($json); ?></h2>
 
-<h2>Categorys</h2>
+<h3>Categorys</h3>
 <div id="dl-filter"> 
     <form action="#" method="get" accept-charset="utf-8">
         

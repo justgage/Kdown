@@ -22,7 +22,7 @@
 }
 
 .category {
-    font-size:1.5em;
+    font-size:20px;
     margin:0px;
     padding:10px;
     list-style: none;
@@ -60,24 +60,28 @@
 
 .lang-button, .file-info {
     float:right;
-    text-align:center;
+    text-align:left;
     background-color:lightgrey;
-    padding:3px 15px;
+    padding:4px 15px;
+    line-height: 1.4; 
     margin:0;
-    height:1.5em;
 }
 
 .file-info { width:24px;}
 
 
 .lang-button {
-    background-color:darkblue;
-    width:76px;
+    width:82px;
     color:white;
+    background-color:darkgrey;
+    background-image: url("files/arrow_down.png");
+    background-position: 90px 6px;
+    background-repeat: no-repeat;
+    color: black;
 }
 
 .lang-button-hover {
-    background-color:blue;
+    background-color:lightblue;
     cursor:pointer;
 }
 

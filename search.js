@@ -79,7 +79,7 @@ $(function () {
             console.log("CAT:  " + cat.name);
 
             // add a category
-            html = html + '<li class="category"> <a href="#">' 
+            html = html + '<li class="category"> <a href="#aaa">' 
             + cat.name 
             + '<span class="num-results">(...)</span> </a>' 
             + '<ul class="cat-list"> ';
