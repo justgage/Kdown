@@ -5,7 +5,8 @@
 function market_dropdown($json) {
     $markets = json_decode($json, true);
 
-    echo "<select name='market' option='Europe' id='market-select'>";
+    //TODO make this select the local market
+    echo "<select name='market' option='USA / CANADA' id='market-select'>";
         
     foreach ($markets as $market => $inside) {
         $url=urlencode($market);
@@ -40,17 +41,17 @@ function dl_list_display($json)
 
         $i = 0;  //used to index the categorys
 
-        foreach ($info as $cat => $list) {
+        foreach ( $info as $cat ) {
 
             $i++;
-            echo "<li class='category'><a href='#i'>$cat <span class='num-results'>(...)</span> </a>";
+            echo "<li class='category'><a href='#i'>{$cat['name']} <span class='num-results'>(...)</span> </a>";
 
             echo "<ul class='cat-list'>";
 
-            foreach ($list as $item) {
+            foreach ($cat['files'] as $item) {
                 dl_item($item);
             }
-            echo "<li class='none-found'> No Search Results </li>";
+            echo "<li class='none-found'> No Search Results <a href='#'  class='clear-button' >clear</a> </li>";
             echo "</ul>
                 </li>";
 
@@ -63,14 +64,15 @@ function dl_item($item) {
 ?>
             <li class="download-item">
                 <a target="_blank" href="<?=$item['href']?>"><?=$item['filename']?></a>
-                <input type="button" name="lang-button" class="lang-button"  value="translate" />
+                <p class="lang-button"><span class="arrow">&dArr;</span>Translations</p>
                 <p class="file-info"><?=$item['filetype']?></p>
                 <br style="clear:both;" />
                 <ul class="lang-list">
                     <?php 
-                        foreach ( $item['languages'] as $name => $url ) {
+                        foreach ( $item['languages'] as $lang  ) {
                             
-                           echo "<li><a href='$url'>$name</a></li>";
+                           echo "<li><a href='{$lang['url']}'>{$lang['name']}</a></li>";
+
                         }
                     ?>
                     <br style="clear:both;" />

@@ -20,31 +20,18 @@
 
 <h3>Market <?php market_dropdown($json); ?></h3>
 
-<div id="ajax-test">
-this will be replaced
-</div>
-
-<h3>Categorys</h3>
 <div id="dl-filter"> 
     <form action="#" method="get" accept-charset="utf-8">
         
-        Filter <input type="text" name="search" id="file-search" value="" />
+        Quick Find <input type="text" name="search" id="file-search" value="" />
     <input type="submit" id="submit-button" />
-            <a href="#"  id="clear-button" >clear</a>
+            <a href="#"  class="clear-button" >clear</a>
+<a href="#"  id="hide-all-button" >close all</a>
 </form>
 </div>
 <?php dl_list_display($json); ?>
 
-
 <script type="text/javascript" src="/jquery.min.js" ></script>
-
-<noscript>
-<style type="text/css" media="all">
-    .lang-list {
-        display:block;
-    }
-</style>
-</noscript>
 
 <script type="text/javascript" charset="utf-8">
 <?php include 'search.js' ?>

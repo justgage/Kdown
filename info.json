@@ -7,7 +7,271 @@
                     "filename":"Kyäni Policies and Procedures",
                     "href":"files/",
                     "filetype":"txt",
-                    "languages":{ "Dansk":"#", "Deutsch":"#", "Eesti":"#", "English":"#", "Hrvatski":"#", "Magyar":"#", "Norsk":"#", "Polski":"#", "Pусский":"#", "Română":"#", "Slovenský":"#", "Slovensko":"#", "Srpski":"#", "Suomi":"#", "Svenska":"#", "Türkçe":"#", "Українська":"#" }
+                    "languages":[ 
+                        { "name":"Dansk", "url":"#" },
+                        { "name":"Deutsch", "url":"#" },
+                        { "name":"Eesti", "url":"#" },
+                        { "name":"English", "url":"#" },
+                        { "name":"Hrvatski", "url":"#" },
+                        { "name":"Magyar", "url":"#" },
+                        { "name":"Norsk", "url":"#" },
+                        { "name":"Polski", "url":"#" },
+                        { "name":"Pусский", "url":"#" },
+                        { "name":"Română", "url":"#" },
+                        { "name":"Slovenský", "url":"#" },
+                        { "name":"Slovensko", "url":"#" },
+                        { "name":"Srpski", "url":"#" },
+                        { "name":"Suomi", "url":"#" },
+                        { "name":"Svenska", "url":"#" },
+                        { "name":"Türkçe", "url":"#" },
+                        { "name":"Українська", "url":"#" }
+                        ]
+                }, 
+                {
+                    "filename":"Kyäni Policies and Procedures",
+                    "href":"files/",
+                    "filetype":"pdf",
+                    "languages":[ 
+                        { "name":"Dansk", "url":"#" },
+                        { "name":"Deutsch", "url":"#" },
+                        { "name":"Eesti", "url":"#" },
+                        { "name":"English", "url":"#" },
+                        { "name":"Hrvatski", "url":"#" },
+                        { "name":"Magyar", "url":"#" },
+                        { "name":"Norsk", "url":"#" },
+                        { "name":"Polski", "url":"#" },
+                        { "name":"Pусский", "url":"#" },
+                        { "name":"Română", "url":"#" },
+                        { "name":"Slovenský", "url":"#" },
+                        { "name":"Slovensko", "url":"#" },
+                        { "name":"Srpski", "url":"#" },
+                        { "name":"Suomi", "url":"#" },
+                        { "name":"Svenska", "url":"#" },
+                        { "name":"Türkçe", "url":"#" },
+                        { "name":"Українська", "url":"#" }
+                        ]
+                }, 
+                {
+                    "filename":"Paygate Minimum Calculator",
+                    "href":"files/",
+                    "filetype":"pdf",
+                    "languages":[ 
+                        { "name":"Dansk", "url":"#" },
+                        { "name":"Deutsch", "url":"#" },
+                        { "name":"Eesti", "url":"#" },
+                        { "name":"English", "url":"#" },
+                        { "name":"Hrvatski", "url":"#" },
+                        { "name":"Magyar", "url":"#" },
+                        { "name":"Norsk", "url":"#" },
+                        { "name":"Polski", "url":"#" },
+                        { "name":"Pусский", "url":"#" },
+                        { "name":"Română", "url":"#" },
+                        { "name":"Slovenský", "url":"#" },
+                        { "name":"Slovensko", "url":"#" },
+                        { "name":"Srpski", "url":"#" },
+                        { "name":"Suomi", "url":"#" },
+                        { "name":"Svenska", "url":"#" },
+                        { "name":"Türkçe", "url":"#" },
+                        { "name":"Українська", "url":"#" }
+                        ]
+                }, 
+                {
+                    "filename":"This is a file.pdf",
+                    "href":"files/",
+                    "filetype":"pdf",
+                    "languages":[ 
+                        { "name":"Dansk", "url":"#" },
+                        { "name":"Deutsch", "url":"#" },
+                        { "name":"Eesti", "url":"#" },
+                        { "name":"English", "url":"#" },
+                        { "name":"Hrvatski", "url":"#" },
+                        { "name":"Magyar", "url":"#" },
+                        { "name":"Norsk", "url":"#" },
+                        { "name":"Polski", "url":"#" },
+                        { "name":"Pусский", "url":"#" },
+                        { "name":"Română", "url":"#" },
+                        { "name":"Slovenský", "url":"#" },
+                        { "name":"Slovensko", "url":"#" },
+                        { "name":"Srpski", "url":"#" },
+                        { "name":"Suomi", "url":"#" },
+                        { "name":"Svenska", "url":"#" },
+                        { "name":"Türkçe", "url":"#" },
+                        { "name":"Українська", "url":"#" }
+                        ]
+                },
+                {
+                    "filename":"New Enrollment Form",
+                    "href":"files/",
+                    "filetype":"pdf",
+                    "languages":[ 
+                        { "name":"Dansk", "url":"#" },
+                        { "name":"Deutsch", "url":"#" }
+                        ]
+                },
+                {
+                    "filename":"This is a file.pdf",
+                    "href":"files/",
+                    "filetype":"pdf",
+                    "languages":[ 
+                        { "name":"Dansk", "url":"#" },
+                        { "name":"Deutsch", "url":"#" }
+                        ]
+                } 
+                    
+            ]
+        },
+        {
+            "name":"Business Library",
+            "files":[
+                {
+                    "filename":"Kyäni Policies and Procedures",
+                    "href":"files/",
+                    "filetype":"txt",
+                    "languages":[ 
+                        { "name":"Dansk", "url":"#" },
+                        { "name":"Deutsch", "url":"#" },
+                        { "name":"Eesti", "url":"#" },
+                        { "name":"English", "url":"#" },
+                        { "name":"Hrvatski", "url":"#" },
+                        { "name":"Magyar", "url":"#" },
+                        { "name":"Norsk", "url":"#" },
+                        { "name":"Polski", "url":"#" },
+                        { "name":"Pусский", "url":"#" },
+                        { "name":"Română", "url":"#" },
+                        { "name":"Slovenský", "url":"#" },
+                        { "name":"Slovensko", "url":"#" },
+                        { "name":"Srpski", "url":"#" },
+                        { "name":"Suomi", "url":"#" },
+                        { "name":"Svenska", "url":"#" },
+                        { "name":"Türkçe", "url":"#" },
+                        { "name":"Українська", "url":"#" }
+                        ]
+                }, 
+                {
+                    "filename":"Kyäni Policies and Procedures",
+                    "href":"files/",
+                    "filetype":"pdf",
+                    "languages":[ 
+                        { "name":"Dansk", "url":"#" },
+                        { "name":"Deutsch", "url":"#" },
+                        { "name":"Eesti", "url":"#" },
+                        { "name":"English", "url":"#" },
+                        { "name":"Hrvatski", "url":"#" },
+                        { "name":"Magyar", "url":"#" },
+                        { "name":"Norsk", "url":"#" },
+                        { "name":"Polski", "url":"#" },
+                        { "name":"Pусский", "url":"#" },
+                        { "name":"Română", "url":"#" },
+                        { "name":"Slovenský", "url":"#" },
+                        { "name":"Slovensko", "url":"#" },
+                        { "name":"Srpski", "url":"#" },
+                        { "name":"Suomi", "url":"#" },
+                        { "name":"Svenska", "url":"#" },
+                        { "name":"Türkçe", "url":"#" },
+                        { "name":"Українська", "url":"#" }
+                        ]
+                }, 
+                {
+                    "filename":"Paygate Minimum Calculator",
+                    "href":"files/",
+                    "filetype":"pdf",
+                    "languages":[ 
+                        { "name":"Dansk", "url":"#" },
+                        { "name":"Deutsch", "url":"#" },
+                        { "name":"Eesti", "url":"#" },
+                        { "name":"English", "url":"#" },
+                        { "name":"Hrvatski", "url":"#" },
+                        { "name":"Magyar", "url":"#" },
+                        { "name":"Norsk", "url":"#" },
+                        { "name":"Polski", "url":"#" },
+                        { "name":"Pусский", "url":"#" },
+                        { "name":"Română", "url":"#" },
+                        { "name":"Slovenský", "url":"#" },
+                        { "name":"Slovensko", "url":"#" },
+                        { "name":"Srpski", "url":"#" },
+                        { "name":"Suomi", "url":"#" },
+                        { "name":"Svenska", "url":"#" },
+                        { "name":"Türkçe", "url":"#" },
+                        { "name":"Українська", "url":"#" }
+                        ]
+                }, 
+                {
+                    "filename":"This is a file.pdf",
+                    "href":"files/",
+                    "filetype":"pdf",
+                    "languages":[ 
+                        { "name":"Dansk", "url":"#" },
+                        { "name":"Deutsch", "url":"#" },
+                        { "name":"Eesti", "url":"#" },
+                        { "name":"English", "url":"#" },
+                        { "name":"Hrvatski", "url":"#" },
+                        { "name":"Magyar", "url":"#" },
+                        { "name":"Norsk", "url":"#" },
+                        { "name":"Polski", "url":"#" },
+                        { "name":"Pусский", "url":"#" },
+                        { "name":"Română", "url":"#" },
+                        { "name":"Slovenský", "url":"#" },
+                        { "name":"Slovensko", "url":"#" },
+                        { "name":"Srpski", "url":"#" },
+                        { "name":"Suomi", "url":"#" },
+                        { "name":"Svenska", "url":"#" },
+                        { "name":"Türkçe", "url":"#" },
+                        { "name":"Українська", "url":"#" }
+                        ]
+                },
+                {
+                    "filename":"New Enrollment Form",
+                    "href":"files/",
+                    "filetype":"pdf",
+                    "languages":[ 
+                        { "name":"Dansk", "url":"#" },
+                        { "name":"Deutsch", "url":"#" }
+                        ]
+                },
+                {
+                    "filename":"This is a file.pdf",
+                    "href":"files/",
+                    "filetype":"pdf",
+                    "languages":[ 
+                        { "name":"Dansk", "url":"#" },
+                        { "name":"Deutsch", "url":"#" }
+                        ]
+                } 
+                    
+            ]
+        },
+        {
+            "name":"Premotion & News",
+            "files":[
+                {
+                    "filename":"Kyäni Policies and Procedures",
+                    "href":"files/",
+                    "filetype":"pdf",
+                    "languages":[ 
+                        { "name":"Dansk", "url":"#" },
+                        { "name":"Deutsch", "url":"#" },
+                        { "name":"Eesti", "url":"#" },
+                        { "name":"English", "url":"#" },
+                        { "name":"Hrvatski", "url":"#" },
+                        { "name":"Magyar", "url":"#" },
+                        { "name":"Norsk", "url":"#" },
+                        { "name":"Polski", "url":"#" },
+                        { "name":"Pусский", "url":"#" },
+                        { "name":"Română", "url":"#" },
+                        { "name":"Slovenský", "url":"#" },
+                        { "name":"Slovensko", "url":"#" },
+                        { "name":"Srpski", "url":"#" },
+                        { "name":"Suomi", "url":"#" },
+                        { "name":"Svenska", "url":"#" },
+                        { "name":"Türkçe", "url":"#" },
+                        { "name":"Українська", "url":"#" }
+                        ]
+                }, 
+                {
+                    "filename":"Kyäni Policies and Procedures",
+                    "href":"files/",
+                    "filetype":"pdf",
+                    "languages":{ "english":"#", "spanish":"#" }
                 }, 
                 {
                     "filename":"Kyäni Policies and Procedures",
@@ -42,10 +306,28 @@
                     ]
         },
         {
-            "name":"Business Library",
-            "files":[
+            "name":"Training",
+            "files": [
                 {
-                    "filename":"This is a file.pdf",
+                    "filename":"Kyäni Policies and Procedures",
+                    "href":"files/",
+                    "filetype":"pdf",
+                    "languages":{ "english":"#", "spanish":"#" }
+                }, 
+                {
+                    "filename":"Kyäni Policies and Procedures",
+                    "href":"files/",
+                    "filetype":"pdf",
+                    "languages":{ "english":"#", "spanish":"#" }
+                }, 
+                {
+                    "filename":"Kyäni Policies and Procedures",
+                    "href":"files/",
+                    "filetype":"pdf",
+                    "languages":{ "english":"#", "spanish":"#" }
+                }, 
+                {
+                    "filename":"Paygate Minimum Calculator",
                     "href":"files/",
                     "filetype":"pdf",
                     "languages":{ "english":"#", "spanish":"#" }
@@ -55,33 +337,142 @@
                     "href":"files/",
                     "filetype":"pdf",
                     "languages":{ "english":"#", "spanish":"#" }
-                }, 
+                },
                 {
-                    "filename":"This is a file.pdf",
+                    "filename":"New Enrollment Form",
                     "href":"files/",
                     "filetype":"pdf",
                     "languages":{ "english":"#", "spanish":"#" }
-                }, 
-                {
-                    "filename":"This is a file.pdf",
-                    "href":"files/",
-                    "filetype":"pdf",
-                    "languages":{ "english":"#", "spanish":"#" }
-                }, 
-                {
-                    "filename":"This is a file.pdf",
-                    "href":"files/",
-                    "filetype":"pdf",
-                    "languages":{ "english":"#", "spanish":"#" }
-                }, 
+                },
                 {
                     "filename":"This is a file.pdf",
                     "href":"files/",
                     "filetype":"pdf",
                     "languages":{ "english":"#", "spanish":"#" }
                 } 
-                    ]
-        }, 
+            ]
+        }],
+    "USA / CANADA":[
+        {
+            "name":"Business Library",
+            "files":[
+                {
+                    "filename":"Kyäni Policies and Procedures",
+                    "href":"files/",
+                    "filetype":"txt",
+                    "languages":[ 
+                        { "name":"Dansk", "url":"#" },
+                        { "name":"Deutsch", "url":"#" },
+                        { "name":"Eesti", "url":"#" },
+                        { "name":"English", "url":"#" },
+                        { "name":"Hrvatski", "url":"#" },
+                        { "name":"Magyar", "url":"#" },
+                        { "name":"Norsk", "url":"#" },
+                        { "name":"Polski", "url":"#" },
+                        { "name":"Pусский", "url":"#" },
+                        { "name":"Română", "url":"#" },
+                        { "name":"Slovenský", "url":"#" },
+                        { "name":"Slovensko", "url":"#" },
+                        { "name":"Srpski", "url":"#" },
+                        { "name":"Suomi", "url":"#" },
+                        { "name":"Svenska", "url":"#" },
+                        { "name":"Türkçe", "url":"#" },
+                        { "name":"Українська", "url":"#" }
+                        ]
+                }, 
+                {
+                    "filename":"Kyäni Policies and Procedures",
+                    "href":"files/",
+                    "filetype":"pdf",
+                    "languages":[ 
+                        { "name":"Dansk", "url":"#" },
+                        { "name":"Deutsch", "url":"#" },
+                        { "name":"Eesti", "url":"#" },
+                        { "name":"English", "url":"#" },
+                        { "name":"Hrvatski", "url":"#" },
+                        { "name":"Magyar", "url":"#" },
+                        { "name":"Norsk", "url":"#" },
+                        { "name":"Polski", "url":"#" },
+                        { "name":"Pусский", "url":"#" },
+                        { "name":"Română", "url":"#" },
+                        { "name":"Slovenský", "url":"#" },
+                        { "name":"Slovensko", "url":"#" },
+                        { "name":"Srpski", "url":"#" },
+                        { "name":"Suomi", "url":"#" },
+                        { "name":"Svenska", "url":"#" },
+                        { "name":"Türkçe", "url":"#" },
+                        { "name":"Українська", "url":"#" }
+                        ]
+                }, 
+                {
+                    "filename":"Paygate Minimum Calculator",
+                    "href":"files/",
+                    "filetype":"pdf",
+                    "languages":[ 
+                        { "name":"Dansk", "url":"#" },
+                        { "name":"Deutsch", "url":"#" },
+                        { "name":"Eesti", "url":"#" },
+                        { "name":"English", "url":"#" },
+                        { "name":"Hrvatski", "url":"#" },
+                        { "name":"Magyar", "url":"#" },
+                        { "name":"Norsk", "url":"#" },
+                        { "name":"Polski", "url":"#" },
+                        { "name":"Pусский", "url":"#" },
+                        { "name":"Română", "url":"#" },
+                        { "name":"Slovenský", "url":"#" },
+                        { "name":"Slovensko", "url":"#" },
+                        { "name":"Srpski", "url":"#" },
+                        { "name":"Suomi", "url":"#" },
+                        { "name":"Svenska", "url":"#" },
+                        { "name":"Türkçe", "url":"#" },
+                        { "name":"Українська", "url":"#" }
+                        ]
+                }, 
+                {
+                    "filename":"This is a file.pdf",
+                    "href":"files/",
+                    "filetype":"pdf",
+                    "languages":[ 
+                        { "name":"Dansk", "url":"#" },
+                        { "name":"Deutsch", "url":"#" },
+                        { "name":"Eesti", "url":"#" },
+                        { "name":"English", "url":"#" },
+                        { "name":"Hrvatski", "url":"#" },
+                        { "name":"Magyar", "url":"#" },
+                        { "name":"Norsk", "url":"#" },
+                        { "name":"Polski", "url":"#" },
+                        { "name":"Pусский", "url":"#" },
+                        { "name":"Română", "url":"#" },
+                        { "name":"Slovenský", "url":"#" },
+                        { "name":"Slovensko", "url":"#" },
+                        { "name":"Srpski", "url":"#" },
+                        { "name":"Suomi", "url":"#" },
+                        { "name":"Svenska", "url":"#" },
+                        { "name":"Türkçe", "url":"#" },
+                        { "name":"Українська", "url":"#" }
+                        ]
+                },
+                {
+                    "filename":"New Enrollment Form",
+                    "href":"files/",
+                    "filetype":"pdf",
+                    "languages":[ 
+                        { "name":"Dansk", "url":"#" },
+                        { "name":"Deutsch", "url":"#" }
+                        ]
+                },
+                {
+                    "filename":"This is a file.pdf",
+                    "href":"files/",
+                    "filetype":"pdf",
+                    "languages":[ 
+                        { "name":"Dansk", "url":"#" },
+                        { "name":"Deutsch", "url":"#" }
+                        ]
+                } 
+                    
+            ]
+        },
         {
             "name":"Premotion & News",
             "files":[
@@ -175,138 +566,5 @@
                     "languages":{ "english":"#", "spanish":"#" }
                 } 
             ]
-        }],
-        "USA / CANADA":{
-            "Applications & Forms":[
-                {
-                    "filename":"New Enrollment Form",
-                    "href":"files/",
-                    "filetype":"pdf",
-                    "languages":{ "Dansk":"#", "Deutsch":"#", "Eesti":"#", "English":"#", "Hrvatski":"#", "Magyar":"#", "Norsk":"#", "Polski":"#", "Pусский":"#", "Română":"#", "Slovenský":"#", "Slovensko":"#", "Srpski":"#", "Suomi":"#", "Svenska":"#", "Türkçe":"#", "Українська":"#" }
-
-                }, 
-                {
-                    "filename":"Order Form",
-                    "href":"files/",
-                    "filetype":"pdf",
-                    "languages":{ "english":"#", "spanish":"#" }
-                }, 
-                {
-                    "filename":"Change of Genealogy Request Form",
-                    "href":"files/",
-                    "filetype":"pdf",
-                    "languages":{ "Dansk":"#", "Deutsch":"#", "Eesti":"#", "English":"#", "Hrvatski":"#", "Magyar":"#", "Norsk":"#", "Polski":"#", "Pусский":"#", "Română":"#", "Slovenský":"#", "Slovensko":"#", "Srpski":"#", "Suomi":"#", "Svenska":"#", "Türkçe":"#", "Українська":"#" }
-                }, 
-                {
-                    "filename":"Direct Deposit Form",
-                    "href":"files/",
-                    "filetype":"pdf",
-                    "languages":{ "english":"#"}
-                }, 
-                {
-                    "filename":"Product Exchange or Replenishment Form",
-                    "href":"files/",
-                    "filetype":"pdf",
-                    "languages":{ "english":"#", "spanish":"#" }
-                }, 
-                {
-                    "filename":"Return Product Form",
-                    "href":"files/",
-                    "filetype":"pdf",
-                    "languages":{ "english":"#", "spanish":"#" }
-                }, 
-                {
-                    "filename":"Personal Information Update",
-                    "href":"files/",
-                    "filetype":"pdf",
-                    "languages":{ "english":"#", "spanish":"#" }
-                }, 
-                {
-                    "filename":"Credit Card Payment Details and Authorization",
-                    "href":"files/",
-                    "filetype":"pdf",
-                    "languages":{ "english":"#", "spanish":"#" }
-                }, 
-                {
-                    "filename":"Distributor Cancellation",
-                    "href":"files/",
-                    "filetype":"pdf",
-                    "languages":{ "english":"#", "spanish":"#" }
-                }, 
-                {
-                    "filename":"Kyäni Policies and Procedures",
-                    "href":"files/",
-                    "filetype":"pdf",
-                    "languages":{ "english":"#", "spanish":"#" }
-                }, 
-                {
-                    "filename":"Kyäni Policies and Procedures",
-                    "href":"files/",
-                    "filetype":"pdf",
-                    "languages":{ "english":"#", "spanish":"#" }
-                }, 
-                {
-                    "filename":"Paygate Minimum Calculator",
-                    "href":"files/",
-                    "filetype":"pdf",
-                    "languages":{ "english":"#", "spanish":"#" }
-                }, 
-                {
-                    "filename":"This is a file.pdf",
-                    "href":"files/",
-                    "filetype":"pdf",
-                    "languages":{ "english":"#", "spanish":"#" }
-                },
-                {
-                    "filename":"New Enrollment Form",
-                    "href":"files/",
-                    "filetype":"pdf",
-                    "languages":{ "english":"#", "spanish":"#" }
-                },
-                {
-                    "filename":"This is a file.pdf",
-                    "href":"files/",
-                    "filetype":"pdf",
-                    "languages":{ "english":"#", "spanish":"#" }
-                } 
-                    ],
-            "Business Library":[
-                        {
-                            "filename":"This is a file.pdf",
-                            "href":"files/",
-                            "filetype":"pdf",
-                            "languages":{ "english":"#", "spanish":"#" }
-                        }, 
-                        {
-                            "filename":"This is a file.pdf",
-                            "href":"files/",
-                            "filetype":"pdf",
-                            "languages":{ "english":"#", "spanish":"#" }
-                        }, 
-                        {
-                            "filename":"This is a file.pdf",
-                            "href":"files/",
-                            "filetype":"pdf",
-                            "languages":{ "english":"#", "spanish":"#" }
-                        }, 
-                        {
-                            "filename":"This is a file.pdf",
-                            "href":"files/",
-                            "filetype":"pdf",
-                            "languages":{ "english":"#", "spanish":"#" }
-                        }, 
-                        {
-                            "filename":"This is a file.pdf",
-                            "href":"files/",
-                            "filetype":"pdf",
-                            "languages":{ "english":"#", "spanish":"#" }
-                        }, 
-                        {
-                            "filename":"This is a file.pdf",
-                            "href":"files/",
-                            "filetype":"pdf",
-                            "languages":{ "english":"#", "spanish":"#" }
-                        } 
-                            ] 
-        }
+        }]
 }
