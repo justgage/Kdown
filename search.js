@@ -8,8 +8,6 @@
  */
 $(function () {
 
-
-
     var searchtext = "";
     var numFound = 0;
     $("#file-search").focus();
@@ -29,29 +27,30 @@ $(function () {
     allDocsCount();
 
     /***************************************************************************
-     * FUNCTION this will rebind the clicks after changed html
+     * FUNCTION this will rebind clicks and other events after changed html
      */
 
     function bindClick() {
 
-        ///bind click to 
+        ///bind click to categories opening and closing
         $(".category").on("click", "a", function () {
             console.log("clicked on a category");
-            $(this).parent().find(".cat-list").slideToggle(400);
+            $(this).parent().find(".cat-list").slideToggle(300);
         });
         
         //Show the translations when you click the button
         $(".lang-button").click(function () {
-            $(this).parent().find(".lang-list").slideToggle(400);
+            $(this).parent().find(".lang-list").slideToggle(200);
         });
 
         //clears when you push the clear button
         $(".clear-button").click(function () {
             $("#file-search").val('');
             $("#file-search").focus();
-            allDocsCount();
             $(".download-item").show();
             $(".none-found").hide();
+
+            allDocsCount();
         });
 
         $(".lang-button").hover(function() {
@@ -63,7 +62,7 @@ $(function () {
     bindClick();
 
     /***************************************************************************
-     * FUNCTION  this will reload the categorys
+     * FUNCTION  this will reload the categories
      * which is used in the ajax call when the market is changed
      */
 
@@ -71,17 +70,17 @@ $(function () {
         var html = "";
 
         //go through each category
-        var l = json.categorys.length
+        var l = json.categories.length;
 
         for (var i = 0; i < l; i++) {
             console.log("STARTING CAT:" + i + " out of " + l );
-            var cat = json.categorys[i];
+            var cat = json.categories[i];
             console.log("CAT:  " + cat.name);
 
             // add a category
-            html = html + '<li class="category"> <a href="#aaa">' 
-            + cat.name 
-            + '<span class="num-results">(...)</span> </a>' 
+            html = html + '<li class="category"> <a class="cat-title" href="#aaa">'
+            + cat.name
+            + '<span class="num-results">(...)</span> </a>'
             + '<ul class="cat-list"> ';
 
             // go through each file
@@ -91,11 +90,11 @@ $(function () {
                 //console.log("   FILE: " + file.filename);
 
                 //add an menu item
-                html = html + '<li class="download-item">' 
-                + '<a target="_blank" href="files/">' + file.filename + '</a>' 
-                + '<p class="lang-button">Translations</p>' 
-                + '<p class="file-info">' + file.filetype + '</p>' 
-                + '<br style="clear:both;">' + '<ul class="lang-list">';
+                html +=  '<li class="download-item">'
+                + '<a target="_blank" href="files/">' + file.filename + "." + file.filetype + '</a>'
+                + '<p class="lang-button">[ Translations ]</p>'
+                + '<br style="display:inline; clear:both;" />'
+                + '<ul class="lang-list">';
 
                 var langNum = 0;
 
@@ -110,7 +109,7 @@ $(function () {
                         if (langFile['url'].indexOf("/") !== -1) {
                             filename = decodeURIComponent(langFile['url'].slice(langFile['url'].lastIndexOf("/") + 1));
                         }
-                        html += '<tr><td>' + langFile["name"] + '</td><td>:<a href="'+ langFile["url"] + '">'  + filename + '</a></td></tr>';
+                        html += '<tr><td>' + langFile["name"] + '</td><td><a href="'+ langFile["url"] + '">'  + filename + '</a></td></tr>';
 
                         langNum++;
                     }
@@ -147,9 +146,10 @@ $(function () {
     }
 
     function ajax_market(market) {
-        //empty the list of items
 
+        //empty the list of items
         $('#downloads-list').html("<li class='none-found'>Loading...</li>");
+        $('.none-found').show();
 
         console.log("OPTION = " + market)
 
@@ -166,13 +166,45 @@ $(function () {
 
                 reload_downloads_list(json);
 
-                console.log(json.categorys[0].name)
+                console.log(json.categories[0].name)
             },
             error: function (xhr, status) {
-                console.log("ajax failed");
+                $('#downloads-list').html("<li class='none-found'>Sorry Loading List Failed... Please refresh and try again<br /><small>" + status + "</small></li>");
+                $('.none-found').show();
             },
             complete: function (xhr, status) {
                 //console.log("ajax complete");
+            }
+        });
+
+    }
+
+    function ajax_all(market) {
+
+        //empty the list of items
+        $('#downloads-list').html("<li class='none-found'>Loading...</li>");
+
+        console.log("OPTION = " + market)
+
+
+        $.ajax({
+            url: "download-api.php",
+            data: {
+                market: "all-list"
+            },
+            type: "POST",
+            dataType: "json",
+            success: function (json) {
+
+                console.log(json);
+
+                /*TODO something json */
+
+            },
+            error: function (xhr, status) {
+                $('#downloads-list').html("<li class='none-found'>Sorry Loading List Failed... Please refresh and try again</li>");
+            },
+            complete: function (xhr, status) {
             }
         });
 
@@ -195,10 +227,20 @@ $(function () {
     //clear the search and put cursor in the box
 
     $("#hide-all-button").click(function () {
-        $(".lang-list").hide();
-        $(".cat-list").hide();
-        $(".arrow").show();
-        $(".none-found").hide();
+
+       
+        // if all are visible hide them
+        if ($('.cat-list:visible').length !==  0) {
+            $(".lang-list").hide();
+            $(".cat-list").hide();
+            $(".none-found").hide();
+        }
+        else { // if all are hidden show
+            $(".cat-list").show();
+            $("#file-search").val('');
+            $(".download-item").show();
+            $(".none-found").hide();
+        }
     });
 
 

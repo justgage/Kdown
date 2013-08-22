@@ -1,0 +1,55 @@
+
+#downloads-list, #dl-filter  {
+    width:500px;
+}
+
+.cat-list {
+    display:none;
+}
+
+
+.none-found {
+    display:none;
+}
+
+.lang-list {
+    display:none;
+}
+
+.category .cat-title {
+    font-size:1.5em
+}
+
+#dl-filter {
+    font-size:1.5em;
+}
+
+.lang-list table tbody tr td {
+    padding:2px !important;
+    font-size:0.8em;
+}
+
+.lang-list table {
+    margin:0 !important;
+}
+
+.lang-button {
+    text-decoration:underline;
+    float:right;
+    font-size:1em;
+    padding:0;
+    margin:0;
+}
+
+.lang-button-hover {
+    color: #F28D1F;
+    cursor:pointer;
+}
+
+#hide-all-button {
+    float:right;
+}
+
+#file-search {
+    width:50%
+}

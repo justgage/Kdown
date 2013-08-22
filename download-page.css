@@ -14,11 +14,24 @@
 }
 
 #downloads-list {
-    padding:0px;
-    margin:0px;
+    padding:0px !important;
+    margin:0px !important;
     width:650px;
     border-left:2px grey solid;
     border-right:2px grey solid;
+    font-size:12px;
+}
+
+#downloads-list ul li {
+    background:none !important;
+    margin:0;
+    padding:0;
+}
+
+#downloads-list ul li ul p {
+    background:none !important;
+    margin:0;
+    padding:0;
 }
 
 .category {
@@ -50,7 +63,7 @@
 .download-item a {
     color:black;
     padding:6px;
-    line-height:2;
+    //line-height:2;
 }
 
 .num-results {
@@ -70,6 +83,7 @@
 .file-info { width:24px;}
 
 
+/*
 .lang-button {
     width:82px;
     color:white;
@@ -79,6 +93,7 @@
     background-repeat: no-repeat;
     color: black;
 }
+*/
 
 .lang-button-hover {
     background-color:lightblue;
@@ -106,6 +121,7 @@
     line-height:1;
 }
 .lang-list {
+    font-size:80%;
     margin: 0;
     padding:0;
     display:none;
@@ -115,7 +131,7 @@
 .lang-list li {
     padding:5px;
     margin:0 10px;
-    border-left:solid lightgrey 1px;
+    //border-left:solid lightgrey 1px;
     list-style: none;
 }
 
@@ -123,9 +139,13 @@
     margin-left:20px;
 }
 
+.lang-list td {
+    margin:0;
+}
+
 
 #dl-filter {
-    text-size:18px;
+    font-size:12px;
     padding: 10px 10px;
     margin:0;
     width:630px;
