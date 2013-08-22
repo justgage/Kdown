@@ -80,26 +80,27 @@ $(function () {
             // add a category
             html = html + '<li class="category"> <a class="cat-title" href="#aaa">'
             + cat.name
-            + '<span class="num-results">(...)</span> </a>'
+            + ' <span class="num-results">(...)</span> </a>'
             + '<ul class="cat-list"> ';
 
             // go through each file
             console.log("length" + cat.files.length)
             for (var j = 0, ll = cat.files.length; j < ll; j++) {
                 var file = cat.files[j];
-                //console.log("   FILE: " + file.filename);
 
                 //add an menu item
                 html +=  '<li class="download-item">'
-                + '<a target="_blank" href="files/">' + file.filename + "." + file.filetype + '</a>'
-                + '<p class="lang-button">[ Translations ]</p>'
-                + '<br style="display:inline; clear:both;" />'
+                + '<a target="_blank" href="files/">' + file.filename + "." + file.filetype + '</a>';
+
+                var temp = "";
+                
+                temp += '<span class="lang-button">  [ Translations ### ]</span>'
                 + '<ul class="lang-list">';
 
                 var langNum = 0;
 
                 //languages list
-                html += "<table><tbody>";
+                temp += "<table><tbody>";
                 for (var k = 0, z = file.languages.length; k < z; k ++) {
                     var langFile = file.languages[k];
 
@@ -109,7 +110,7 @@ $(function () {
                         if (langFile['url'].indexOf("/") !== -1) {
                             filename = decodeURIComponent(langFile['url'].slice(langFile['url'].lastIndexOf("/") + 1));
                         }
-                        html += '<tr><td>' + langFile["name"] + '</td><td><a href="'+ langFile["url"] + '">'  + filename + '</a></td></tr>';
+                        temp += '<tr><td>' + langFile["name"] + '</td><td><a href="'+ langFile["url"] + '">'  + filename + '</a></td></tr>';
 
                         langNum++;
                     }
@@ -117,15 +118,17 @@ $(function () {
 
                 }
 
-                html += "</table></tbody>";
+                temp += "</table></tbody>";
+                temp += '</ul></li>'; //end lang list
 
-                if (langNum == 0) {
-                    html += "<li>No Translations</li>";
+                console.log(langNum)
 
+                if (langNum !== 0) {
+                    temp = temp.replace("###", langNum);
+                    html += temp;
                 }
 
 
-                html = html + '</ul></li>'; //end lang list
 
 
             }

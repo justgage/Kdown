@@ -34,14 +34,14 @@
 }
 
 .lang-button {
-    text-decoration:underline;
-    float:right;
     font-size:1em;
     padding:0;
     margin:0;
+    padding-left:20px;
 }
 
 .lang-button-hover {
+    text-decoration:underline;
     color: #F28D1F;
     cursor:pointer;
 }
