@@ -1,40 +1,65 @@
-
 /**
- * This is my fancy filtering script for the downloads page
- * written in javascript using JQUERY
+ * This is my fancy script to render and filter the downloads page
+ * written in javascript using the jQuery library.
  *
  * -Gage Peterson justgage@gmail.com
  *
  */
+
 $(function () {
 
-    var searchtext = "";
-    var numFound = 0;
-    $("#file-search").focus();
+    "use strict";
+    /***
+     * my download ui object
+     */
+    var dl_ui = {};
+
+    /***
+     * this handles the translations
+     */
+
+    dl_ui.trans = (function() {
+        var trans = {};
+
+        $("#dl_ui_translate p").each(function() {
+            trans[ $(this).attr('translate') ] = $(this).text();
+        });
+
+        $("#t_downloads").html(trans['Downloads Page']);
+        $("#t_market").html(trans['Market']);
+        $("#t_cat").html(trans['Categorys']);
+        $("#t_quick_find").html(trans['Quick Find']);
+        $("#t_clear").html(trans['clear']);
+        $("#t_show_all").html(trans['hide / show all']);
+
+        return trans;
+    })();
+
+
+
+
+
+    console.log(dl_ui.trans);
 
     /***************************************************************************
      * FUNCTION: This will update the amount of documents in each category
      */
 
-    function allDocsCount() {
-        $(".category").each(function () {
-            numFound = $(this).find(".download-item").length;
+    dl_ui.countDocs = function() {
+        $("li.category").each(function () {
+            var numFound = $(this).find(".download-item").length;
             $(this).find(".num-results").html("(" + numFound + ")");
 
         });
-    }
-
-    allDocsCount();
+    };
 
     /***************************************************************************
      * FUNCTION this will rebind clicks and other events after changed html
      */
-
-    function bindClick() {
+    dl_ui.bind = function(){
 
         ///bind click to categories opening and closing
         $(".category").on("click", "a", function () {
-            console.log("clicked on a category");
             $(this).parent().find(".cat-list").slideToggle(300);
         });
         
@@ -50,67 +75,76 @@ $(function () {
             $(".download-item").show();
             $(".none-found").hide();
 
-            allDocsCount();
+            dl_ui.countDocs();
         });
 
         $(".lang-button").hover(function() {
-            console.log("hover!");
             $(this).toggleClass("lang-button-hover");
         });
-    }
+    };
 
-    bindClick();
 
     /***************************************************************************
-     * FUNCTION  this will reload the categories
+     * reload_downloads_list
+     *
+     * this will reload the categories
      * which is used in the ajax call when the market is changed
+     *
+     * This contains all the html for the list, which is horrible but I don't
+     * know what else to do.
+     * *************************************************************************
      */
-
-    function reload_downloads_list(json) {
-        var html = "";
+    dl_ui.reload = function(json) {
+        var html = "",
+            i = 0,
+            l = json.categories.length;
 
         //go through each category
-        var l = json.categories.length;
-
-        for (var i = 0; i < l; i++) {
-            console.log("STARTING CAT:" + i + " out of " + l );
+        for ( ; i < l; i++ ) {
             var cat = json.categories[i];
-            console.log("CAT:  " + cat.name);
 
             // add a category
-            html = html + '<li class="category"> <a class="cat-title" href="#aaa">'
-            + cat.name
-            + ' <span class="num-results">(...)</span> </a>'
-            + '<ul class="cat-list"> ';
+            html += '<li class="category"> <a class="cat-title" href="#aaa">';
+            html += cat.name;
+            html += ' <span class="num-results">(...)</span> </a>';
+            html += '<ul class="cat-list"> ';
 
-            // go through each file
-            console.log("length" + cat.files.length)
-            for (var j = 0, ll = cat.files.length; j < ll; j++) {
-                var file = cat.files[j];
+            var j = 0, 
+                ll = cat.files.length;
 
+            //go through each file 
+            for (; j < ll; j++) {
+
+                var k = 0,
+                    file = cat.files[j],
+                    lll = file.languages.length,
+                    temp = "",  
+                    langNum = 0;
+                    
                 //add an menu item
-                html +=  '<li class="download-item">'
-                + '<a target="_blank" href="files/">' + file.filename + "." + file.filetype + '</a>';
+                html +=  '<li class="download-item">';
+                html += '<a target="_blank" href="files/">';
+                html += file.filename + "." + file.filetype + '</a>';
 
-                var temp = "";
                 
-                temp += '<span class="lang-button">  [ Translations ### ]</span>'
-                + '<ul class="lang-list">';
+                temp += '<span class="lang-button">  [ ' + dl_ui.trans['Translations']  + ' ### ]</span>';
+                temp += '<ul class="lang-list">';
 
-                var langNum = 0;
 
                 //languages list
                 temp += "<table><tbody>";
-                for (var k = 0, z = file.languages.length; k < z; k ++) {
+                    
+                // each language in the list
+                for (; k < lll; k ++) {
                     var langFile = file.languages[k];
 
 
-                    if (langFile['url'] !== "#") {
+                    if (langFile.url !== "#") {
                         var filename = "----";
-                        if (langFile['url'].indexOf("/") !== -1) {
-                            filename = decodeURIComponent(langFile['url'].slice(langFile['url'].lastIndexOf("/") + 1));
+                        if (langFile.url.indexOf("/") !== -1) {
+                            filename = decodeURIComponent(langFile.url.slice(langFile.url.lastIndexOf("/") + 1));
                         }
-                        temp += '<tr><td>' + langFile["name"] + '</td><td><a href="'+ langFile["url"] + '">'  + filename + '</a></td></tr>';
+                        temp += '<tr><td>' + langFile.name + '</td><td><a href="'+ langFile.url + '">'  + filename + '</a></td></tr>';
 
                         langNum++;
                     }
@@ -121,19 +155,13 @@ $(function () {
                 temp += "</table></tbody>";
                 temp += '</ul></li>'; //end lang list
 
-                console.log(langNum)
-
                 if (langNum !== 0) {
                     temp = temp.replace("###", langNum);
                     html += temp;
                 }
-
-
-
-
             }
 
-            html += "<li class='none-found'> No Search Results <a href='#'  class='clear-button' >clear</a> </li>";
+            html += "<li class='none-found'>" + dl_ui.trans["no files found"] + "<a href='#'  class='clear-button' > " + dl_ui.trans["clear"] + "</a> </li>";
             
             //close category
             html = html + '</ul>';
@@ -143,92 +171,82 @@ $(function () {
         $('#downloads-list').html(html);
         $('#downloads-list').fadeIn();
 
-        bindClick();
-        allDocsCount();
+        dl_ui.bind();
+        dl_ui.countDocs();
 
-    }
+    };
 
-    function ajax_market(market) {
-
-        //empty the list of items
-        $('#downloads-list').html("<li class='none-found'>Loading...</li>");
-        $('.none-found').show();
-
-        console.log("OPTION = " + market)
-
-
-        $.ajax({
-            url: "download-api.php",
-            data: {
-                market: market
-            },
-            type: "POST",
-            dataType: "json",
-            success: function (json) {
-                console.log(json);
-
-                reload_downloads_list(json);
-
-                console.log(json.categories[0].name)
-            },
-            error: function (xhr, status) {
-                $('#downloads-list').html("<li class='none-found'>Sorry Loading List Failed... Please refresh and try again<br /><small>" + status + "</small></li>");
-                $('.none-found').show();
-            },
-            complete: function (xhr, status) {
-                //console.log("ajax complete");
-            }
-        });
-
-    }
-
-    function ajax_all(market) {
+    /***
+     * -NOTE- This function is to find a flat list of files but is currently unused.
+     **/
+    dl_ui.ajax_files_only = function(market) {
 
         //empty the list of items
         $('#downloads-list').html("<li class='none-found'>Loading...</li>");
 
-        console.log("OPTION = " + market)
 
 
         $.ajax({
-            url: "download-api.php",
+            url: "dl_api.php",
             data: {
                 market: "all-list"
             },
             type: "POST",
             dataType: "json",
             success: function (json) {
-
                 console.log(json);
-
-                /*TODO something json */
-
             },
-            error: function (xhr, status) {
-                $('#downloads-list').html("<li class='none-found'>Sorry Loading List Failed... Please refresh and try again</li>");
+            error: function ( nothing, another,  error) {
+                $('#downloads-list').html("<h3>" + dl_ui.trans["loading error"]+ "</h3><li>ERROR: <em>" + error + "</em></li>");
             },
-            complete: function (xhr, status) {
-            }
         });
 
-    }
+    };
+
+    /***
+     * Uses ajax to dynamically change 
+     * the downloads list to a market
+     */
+    dl_ui.ajax_load =  function(market) {
+
+        //empty the list of items
+        $('#downloads-list').html("<li class='none-found'> " + dl_ui.trans["Loading"]  + "</li>");
+        $('.none-found').show();
 
 
+
+        $.ajax({
+            url: "dl_api.php",
+            data: {
+                market: market
+            },
+            type: "POST",
+            dataType: "json",
+            success: function (json) {
+
+                //IT WORKED! Reload the ui.
+                dl_ui.reload(json);
+            },
+            error: function ( nothing, another,  error) {
+                $('#downloads-list').html("<h3>" + dl_ui.trans["loading error"]+ "</h3><li>ERROR: <em>" + error + "</em></li>");
+                $('.none-found').show();
+            },
+        });
+    };
+    dl_ui.ajax_load($("#market-select").val());
+
+    // bind drop down to the ajax loading
     $("#market-select").change(
         function () {
-            var market = $(this).val()
+            var market = $(this).val();
 
-            ajax_market(market);
+            dl_ui.ajax_load(market);
 
         });
 
-    ajax_market($("#market-select").val());
-
-
-
-
-    //clear the search and put cursor in the box
-
+    /***
+     *clear the search and put cursor in the box
+    */
     $("#hide-all-button").click(function () {
 
        
@@ -246,8 +264,10 @@ $(function () {
         }
     });
 
-
-    //this will get the input's value
+    /***
+     * This is the search engine. Whenever there is a 
+     * key up then it filters out the results
+     */
     $("#file-search").keyup(function () {
 
         $(".lang-list").hide();
@@ -257,8 +277,7 @@ $(function () {
         var numFound = 0;
 
         // get users search term
-        searchtext = $(this).val().toUpperCase();
-
+        var searchtext = $(this).val().toUpperCase();
 
         if (searchtext.length > 0) {
             $(".download-item").hide();
@@ -288,12 +307,10 @@ $(function () {
                 }
             });
 
-
-        } else {
-            allDocsCount();
+        } else { // if no search term
+            dl_ui.countDocs();
             $(".download-item").show();
             $(".none-found").hide();
-
         }
 
     });

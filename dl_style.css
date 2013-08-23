@@ -51,5 +51,10 @@
 }
 
 #file-search {
-    width:50%
+    width:200px;
 }
+
+#dl_ui_translate {
+    display:none;
+}
+
