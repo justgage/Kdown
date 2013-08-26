@@ -101,7 +101,7 @@ $(function () {
 
             // add a category
             html += '<li class="category"> ';
-            html += ' <a class="cat-title" href="#aaa"><span class="num-results">...</span>&nbsp;&nbsp;';
+            html += '<a class="cat-title" href="#aaa"><span class="num-results">...</span>&nbsp;&nbsp;';
             html += cat.name;
             html += ' </a><ul class="cat-list"> ';
 
@@ -261,12 +261,14 @@ $(function () {
             $(".lang-list").hide();
             $(".cat-list").hide();
             $(".none-found").hide();
+            dl_ui.countDocs();
         }
         else { // if all are hidden show
             $(".cat-list").show();
             $("#file-search").val('');
             $(".download-item").show();
             $(".none-found").hide();
+            dl_ui.countDocs();
         }
     });
 
