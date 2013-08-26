@@ -1,4 +1,5 @@
 #IDEAS
+- Filter by language
 - Tagging system
     - PROS
         - If strict and treated as strict things then it would be ok.
