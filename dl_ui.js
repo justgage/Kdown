@@ -101,7 +101,7 @@ $(function () {
 
             // add a category
             html += '<li class="category"> ';
-            html += ' <a class="cat-title" href="#aaa"><span class="num-results">...</span>&nbsp;&nbsp;';
+            html += '<a class="cat-title" href="#aaa"><span class="num-results">...</span>&nbsp;&nbsp;';
             html += cat.name;
             html += ' </a><ul class="cat-list"> ';
 
