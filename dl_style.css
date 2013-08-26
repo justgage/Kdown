@@ -10,6 +10,9 @@
 
 .none-found {
     display:none;
+    color:lightgrey;
+    background-image:none !important;
+    font-style:italic;
 }
 
 .lang-list {

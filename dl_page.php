@@ -21,16 +21,16 @@
 
 
 <div id="dl_ui_translate">
-    <p translate="Downloads Page">Downlodo¨</p>
-    <p translate="Market">Marketos</p>
-    <p translate="Categorys">Categoros</p>
-    <p translate="clear">clearo</p>
-    <p translate="hide / show all">hideo / showo all</p>
-    <p translate="Translations">Translationoes˚</p>
-    <p translate="Quick Find">Quicko Findo</p>
-    <p translate="no files found">Sorryo no Findo</p>
-    <p translate="Loading">Loading-o</p>
-    <p translate="loading error">Sorry there was a error, please refresh the page.</p>
+    <p translate="Downloads Page">Download Page</p>
+    <p translate="Market">Market</p>
+    <p translate="Categorys">Categorys</p>
+    <p translate="clear">clear</p>
+    <p translate="hide / show all">hide / show all</p>
+    <p translate="Translations">Translations</p>
+    <p translate="Quick Find">Quick Find</p>
+    <p translate="no files found">Sorry no files found!</p>
+    <p translate="Loading">Loading</p>
+    <p translate="loading error">Sorry there was an error loading the list</p>
 </div>
 
 

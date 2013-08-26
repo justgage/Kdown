@@ -12,7 +12,7 @@ $(function () {
     /***
      * my download ui object
      */
-    var dl_ui = {};
+    var dl_ui = dl_ui || {};
 
     /***
      * this handles the translations
@@ -36,11 +36,6 @@ $(function () {
     })();
 
 
-
-
-
-    console.log(dl_ui.trans);
-
     /***************************************************************************
      * FUNCTION: This will update the amount of documents in each category
      */
@@ -62,7 +57,7 @@ $(function () {
         $(".category").on("click", "a", function () {
             $(this).parent().find(".cat-list").slideToggle(300);
         });
-        
+         
         //Show the translations when you click the button
         $(".lang-button").click(function () {
             $(this).parent().find(".lang-list").slideToggle(200);
@@ -95,6 +90,7 @@ $(function () {
      * *************************************************************************
      */
     dl_ui.reload = function(json) {
+        console.log(json);
         var html = "",
             i = 0,
             l = json.categories.length;
@@ -104,60 +100,65 @@ $(function () {
             var cat = json.categories[i];
 
             // add a category
-            html += '<li class="category"> <a class="cat-title" href="#aaa">';
+            html += '<li class="category"> ';
+            html += ' <a class="cat-title" href="#aaa"><span class="num-results">...</span>&nbsp;&nbsp;';
             html += cat.name;
-            html += ' <span class="num-results">(...)</span> </a>';
-            html += '<ul class="cat-list"> ';
+            html += ' </a><ul class="cat-list"> ';
 
-            var j = 0, 
+            var j = 0,
                 ll = cat.files.length;
 
-            //go through each file 
+            //go through each file
             for (; j < ll; j++) {
 
                 var k = 0,
                     file = cat.files[j],
-                    lll = file.languages.length,
-                    temp = "",  
+                    temp = "",
                     langNum = 0;
-                    
+
+
                 //add an menu item
                 html +=  '<li class="download-item">';
                 html += '<a target="_blank" href="files/">';
                 html += file.filename + "." + file.filetype + '</a>';
 
-                
-                temp += '<span class="lang-button">  [ ' + dl_ui.trans['Translations']  + ' ### ]</span>';
-                temp += '<ul class="lang-list">';
+                if (file.languages) {
+
+                    var lll = file.languages.length;
 
 
-                //languages list
-                temp += "<table><tbody>";
-                    
-                // each language in the list
-                for (; k < lll; k ++) {
-                    var langFile = file.languages[k];
+                    temp += '<span class="lang-button">  [ ' + dl_ui.trans['Translations']  + ' ### ]</span>';
+                    temp += '<ul class="lang-list">';
 
 
-                    if (langFile.url !== "#") {
-                        var filename = "----";
-                        if (langFile.url.indexOf("/") !== -1) {
-                            filename = decodeURIComponent(langFile.url.slice(langFile.url.lastIndexOf("/") + 1));
+                    //languages list
+                    temp += "<table><tbody>";
+
+                    // each language in the list
+                    for (; k < lll; k ++) {
+                        var langFile = file.languages[k];
+
+
+                        if (langFile.url !== "#") {
+                            var filename = "----";
+                            if (langFile.url.indexOf("/") !== -1) {
+                                filename = decodeURIComponent(langFile.url.slice(langFile.url.lastIndexOf("/") + 1));
+                            }
+                            temp += '<tr><td>' + langFile.name + '</td><td><a href="'+ langFile.url + '">'  + filename + '</a></td></tr>';
+
+                            langNum++;
                         }
-                        temp += '<tr><td>' + langFile.name + '</td><td><a href="'+ langFile.url + '">'  + filename + '</a></td></tr>';
 
-                        langNum++;
+
                     }
 
+                    temp += "</table></tbody>";
+                    temp += '</ul></li>'; //end lang list
 
-                }
-
-                temp += "</table></tbody>";
-                temp += '</ul></li>'; //end lang list
-
-                if (langNum !== 0) {
-                    temp = temp.replace("###", langNum);
-                    html += temp;
+                    if (langNum !== 0) {
+                        temp = temp.replace("###", langNum);
+                        html += temp;
+                    }
                 }
             }
 
@@ -176,13 +177,48 @@ $(function () {
 
     };
 
+    
+    /***
+     * Uses ajax to dynamically change
+     * the downloads list to a market
+     */
+    dl_ui.ajax_load =  function(market) {
+
+        //empty the list of items
+        $('#downloads-list').html("<li class='loading'><img alt='%' src='/files/ticker.gif' />Loading...</li>");
+        $('.none-found').show();
+
+
+
+        $.ajax({
+            url: "dl_api.php",
+            data: {
+                market: market
+            },
+            type: "POST",
+            dataType: "json",
+            success: function (json) {
+
+                //IT WORKED! Reload the ui.
+
+                setTimeout(function() {dl_ui.reload(json)}, 500);
+            },
+            error: function ( nothing, another,  error) {
+                $('#downloads-list').html("<h3>" + dl_ui.trans["loading error"]+ "</h3><li>ERROR: <em>" + error + "</em></li>");
+                $('.none-found').show();
+            },
+        });
+    };
+    dl_ui.ajax_load($("#market-select").val());
+
     /***
      * -NOTE- This function is to find a flat list of files but is currently unused.
      **/
+     /*
     dl_ui.ajax_files_only = function(market) {
 
         //empty the list of items
-        $('#downloads-list').html("<li class='none-found'>Loading...</li>");
+        $('#downloads-list').html("<li class='loading'><img alt='%' src='/files/ticker.gif' />Loading...</li>");
 
 
 
@@ -202,38 +238,8 @@ $(function () {
         });
 
     };
+    */
 
-    /***
-     * Uses ajax to dynamically change 
-     * the downloads list to a market
-     */
-    dl_ui.ajax_load =  function(market) {
-
-        //empty the list of items
-        $('#downloads-list').html("<li class='none-found'> " + dl_ui.trans["Loading"]  + "</li>");
-        $('.none-found').show();
-
-
-
-        $.ajax({
-            url: "dl_api.php",
-            data: {
-                market: market
-            },
-            type: "POST",
-            dataType: "json",
-            success: function (json) {
-
-                //IT WORKED! Reload the ui.
-                dl_ui.reload(json);
-            },
-            error: function ( nothing, another,  error) {
-                $('#downloads-list').html("<h3>" + dl_ui.trans["loading error"]+ "</h3><li>ERROR: <em>" + error + "</em></li>");
-                $('.none-found').show();
-            },
-        });
-    };
-    dl_ui.ajax_load($("#market-select").val());
 
     // bind drop down to the ajax loading
     $("#market-select").change(
@@ -265,7 +271,7 @@ $(function () {
     });
 
     /***
-     * This is the search engine. Whenever there is a 
+     * This is the search engine. Whenever there is a
      * key up then it filters out the results
      */
     $("#file-search").keyup(function () {
@@ -278,8 +284,10 @@ $(function () {
 
         // get users search term
         var searchtext = $(this).val().toUpperCase();
+        var searchtext = searchtext.split(" ");
 
-        if (searchtext.length > 0) {
+        //if the search term is not empty
+        if (searchtext[0].length > 0) {
             $(".download-item").hide();
 
 
@@ -288,10 +296,19 @@ $(function () {
                 $(this).find(".download-item").each(function () {
                     // this will get an uppercase string to search in.
                     var haystack = $(this).find("a").text().toUpperCase();
+                    var isFound = -1;
 
-                    var isFound = haystack.indexOf(searchtext);
-
-                    if (isFound !== -1) {
+                    // this checks each search term 
+                    for (var i = 0, l = searchtext.length; i < l; i ++) {
+                        
+                        var term = searchtext[i];
+                        if (haystack.indexOf(term) !== -1 ) {
+                            isFound++;
+                        }
+                    }
+                    
+                    //found each search term in the text
+                    if (isFound === (searchtext.length - 1) ) {
                         numFound++;
                         $(this).show();
                     }
