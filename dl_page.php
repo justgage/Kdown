@@ -27,7 +27,7 @@
     <p translate="clear">clear</p>
     <p translate="hide / show all">hide / show all</p>
     <p translate="Translations">Translations</p>
-    <p translate="Quick Find">Quick Find</p>
+    <p translate="Search">Search</p>
     <p translate="no files found">Sorry no files found!</p>
     <p translate="Loading">Loading</p>
     <p translate="loading error">Sorry there was an error loading the list</p>

@@ -19,8 +19,12 @@
     display:none;
 }
 
+.category {
+    background-image:none !important;
+}
+
 .category .cat-title {
-    font-size:1.5em
+    font-size:1.5em;
 }
 
 #dl-filter {
