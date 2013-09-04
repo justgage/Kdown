@@ -14,30 +14,6 @@ $(function () {
      */
     var dl_ui = dl_ui || {};
 
-    /*
-     *   list of dl_ui functions
-     *
-     *   dl_ui.trans()
-     *      replace translations and load them into an object for easy getting later
-     *
-     *   dl_ui.countDocs()
-     *      count docs in each category
-     *
-     *   dl_ui.bind()
-     *      rebind clicks on html change
-     *
-     *   dl_ui.ajax_load(market)
-     *      Uses ajax to load the categorys (usually bound to a market dropdonw)
-     *      loads with loadJSON function below
-     *
-     *   dl_ui.loadJSON(json)
-     *      populate categorys with a json object holding the info 
-     *
-     *   dl_ui.searchBind(textbox, searchItems, noneMessage, category) 
-     *      Will bind the filtering search box to a textbox
-     */
-
-
     /***
      * this handles the translations
      */
@@ -45,6 +21,7 @@ $(function () {
     dl_ui.trans = (function() {
         var trans = {};
 
+        //put them into an object called trans
         $("#dl_ui_translate p").each(function() {
             trans[ $(this).attr('translate') ] = $(this).text();
         });
@@ -104,6 +81,8 @@ $(function () {
 
 
     /***************************************************************************
+     * reload_downloads_list
+     *
      * this will reload the categories
      * which is used in the ajax call when the market is changed
      *
@@ -111,14 +90,15 @@ $(function () {
      * know what else to do.
      * *************************************************************************
      */
-    dl_ui.loadJSON = function(json) {
+    dl_ui.reload = function(json) {
+        console.log(json);
         var html = "",
             i = 0,
-            l = json.cats.length;
+            l = json.categories.length;
 
         //go through each category
         for ( ; i < l; i++ ) {
-            var cat = json.cats[i];
+            var cat = json.categories[i];
 
             // add a category
             html += '<li class="category"> ';
@@ -214,17 +194,27 @@ $(function () {
         $('#downloads-list').html("<li class='loading'><img alt='%' src='/files/ticker.gif' />Loading...</li>");
         $('.none-found').show();
 
-        //load using post method
-        $.post("dl_api.php", { "market":market },  function(json){ 
-            dl_ui.loadJSON(json); // it worked!
-        }, "json")
-            .fail(function() { //if request failed!
+
+
+        $.ajax({
+            url: "dl_api.php",
+            data: {
+                market: market
+            },
+            type: "POST",
+            dataType: "json",
+            success: function (json) {
+
+                //IT WORKED! Reload the ui.
+
+                setTimeout(function() {dl_ui.reload(json)}, 500);
+            },
+            error: function ( nothing, another,  error) {
                 $('#downloads-list').html("<h3>" + dl_ui.trans["loading error"]+ "</h3><li>ERROR: <em>" + error + "</em></li>");
                 $('.none-found').show();
-            });
-
+            },
+        });
     };
-
     dl_ui.ajax_load($("#market-select").val());
 
     /***
