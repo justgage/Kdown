@@ -27,9 +27,9 @@
 $response = array();
 
 // this will grab the whole market. 
-if( isset($_POST['market'])== true ||  isset($_POST['category']) == false ) 
+if( isset($_POST['market'])== true && isset($_POST['cat']) == false ) 
 {
-    $json = file_get_contents("info.json");
+    $json = file_get_contents("files/info.json");
     $markets = json_decode($json, true);
 
     // this will return a flat list of the files 
@@ -58,17 +58,38 @@ if( isset($_POST['market'])== true ||  isset($_POST['category']) == false )
         else { $response = array("error" => true); }
     }
 } //this will grab one category.
-elseif( isset($_POST['market']) == true ||  isset($_POST['category']) == true ) 
+elseif( isset($_POST['market']) == true && isset($_POST['cat']) == true ) 
 {
-    $json = file_get_contents("info.json");
+    $json = file_get_contents("files/info.json");
     $markets = json_decode($json, true);
 
-    $list = array( "cat" => $markets[ $_POST['category'] ] );
+    $found = false;
 
-    $response = array_merge(array("error" => false, $list));
+    foreach ($markets[$_POST['market']] as $cat) {
+        if ($cat["name"] == $_POST['cat'])
+        {
+            $found = $cat["files"];
+            break;
+        }
+    }
+
+    if ($found != false)
+    {
+        $response = array_merge(array("error" => false, "cats" => $found));
+    }
+    else
+    { $response = array_merge(array("error" => true, "mess" => "The category was not found")); }
 
 }
-else { $response = array("error" => true); /* if the data was sent wrong */ }
+elseif( isset($_POST['cat-list']) == true)
+{
+    $json = file_get_contents("files/info.json");
+    $markets = json_decode($json, true);
+
+    $response = array("error" => false, "list" => $markets["cat-list"]);
+
+}
+else { $response = array("error" => true, "mess" => "no market POST value was sent"); /* if the data was sent wrong */ }
 
 
 // respond to the request. 
