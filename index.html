@@ -91,33 +91,31 @@ height:35px;
                 </select>
 
             </div>
-            <div id="dl_table">
+            <div id="dl_table" >
+                <div id="dl_loading" style="display:none;" >
+                    Loading the downloads...
+                </div>
                 <table>
-                    <tr>
-                        <th>star</th>
-                        <th>File name</th>
-                        <th>Language</th>
-                        <th>Download</th>
+                    <thead>
+                        <tr>
+                            <th>star</th>
+                            <th>File name</th>
+                            <th>Language</th>
+                            <th>Download</th>
+                        </tr>
+                    </thead>
+                    <!-- NOTE: these classes are used in the code to select them please don't change them -->
+                    <tbody>
+                    <tr style="display:none;" id="table_copy">
+                        <td class="table_star">...</td>
+                        <td class="table_name"><a href="#">...</a></td>
+                        <td class="table_lang">...</td>
+                        <td class="table_dl_link"><a href="#">Download</a></td>
                     </tr>
-                    <tr>
-                        <td>*star*</td>
-                        <td>This is an item</td>
-                        <td>English</td>
-                        <td><a href="#">Download</a></td>
-                    </tr>
-                    <tr>
-                        <td>*star*</td>
-                        <td>This is an item</td>
-                        <td>English</td>
-                        <td><a href="#">Download</a></td>
-                    </tr>
-                    <tr>
-                        <td>*star*</td>
-                        <td>This is an item</td>
-                        <td>English</td>
-                        <td><a href="#">Download</a></td>
-                    </tr>
+                    </tbody>
                 </table>
+                <p class="center"><a href="#top">Back to top</a></p>
+                
             </div>
         </div>
     </div>

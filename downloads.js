@@ -57,8 +57,8 @@ $(document).ready(function() {
         var market = $(dl_ui.SEL_MARKET).val();
         var cat = $(dl_ui.SEL_CAT_CURRENT   ).text();
         //empty the list of items
-        $("#dl_table").html("<p class='center'>Downloads list loading...</p>");
-        $(".none-found").show();
+
+        $("dl_loading").show();
 
         //load using post method
         $.post("api.php", { "market":market, "cat":cat },  function (json) {
@@ -72,6 +72,8 @@ $(document).ready(function() {
     };
 
     dl_ui.loadJSON = function (json) {
+
+        $('.table_row').remove();
 
         $("#lang_select").html("");
 
@@ -90,36 +92,37 @@ $(document).ready(function() {
 
         }
 
-        //load the template and hide the table
-        $("#dl_table").hide().load("table.html", function () {
+        //make a copy and get rid of it
+        var row = $("#table_copy").clone();
 
-            //make a copy and get rid of it
-            var row = $("#table_copy"); row.remove();
+        $(row).removeAttr('id');
+        $(row).attr('class', 'table_row' );
+        $(row).show();
 
-            // if the category exists in the data
-            if (json.cat) {
-                for (var i = 0, l = json.cat.length; i < l; i ++) {
+        // if the category exists in the data
+        if (json.cat) {
+            for (var i = 0, l = json.cat.length; i < l; i ++) {
 
-                    var file = json.cat[i];
-                    var newRow = row.clone();
-                    $("#dl_table table").append(newRow);
+                var file = json.cat[i];
+                var newRow = row.clone();
+                $("#dl_table table").append(newRow);
 
-                    //Put the files information into the new row in the table
-                    $(newRow).find(".table_star").text( "*" );
-                    $(newRow).find(".table_name a").text( file.filename ).attr("href", "single.php?id=" + encodeURIComponent( file.id ));
-                    $(newRow).find(".table_lang").text("---");
-                    $(newRow).find(".table_dl_link a").attr("href", file.href);
+                //Put the files information into the new row in the table
+                $(newRow).find(".table_star").text( "*" );
+                $(newRow).find(".table_name a").text( file.filename ).attr("href", "single.php?id=" + encodeURIComponent( file.id ));
+                $(newRow).find(".table_lang").text("---");
+                $(newRow).find(".table_dl_link a").attr("href", file.href);
 
-                    if (i % 2 === 0) {
-                        $(newRow).addClass("table_row_even");
-                    }
-
+                if (i % 2 === 0) {
+                    $(newRow).addClass("table_row_even");
                 }
-                $('#dl_table').fadeIn();
-            }
-            else {console.log("ERROR:" + json.mess);}
 
-        });
+            }
+            $("dl_loading").hide();
+            $('#dl_table').fadeIn();
+        }
+        else {console.log("ERROR:" + json.mess);}
+
 
 
 
