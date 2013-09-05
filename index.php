@@ -9,43 +9,88 @@
 
 #dl_table table td {
     border-bottom:solid lightgrey 1px;
-    padding:0 5px;
+    padding:2px 5px;
+}
+
+
+.table_star, .table_lang, .table_dl_link {
+    text-align:center;
 }
 
 #dl_table table {
-    width:600px;
-    border:solid lightgrey 1px;
+    width:690px;
+    /* border:solid lightgrey 1px; */
+    border-collapse:collapse;
+    margin-bottom:1em;
 }
+
+#dl_table th {
+    background-color:#E0E0E0;
+
+height:35px;
+}
+
+#dl_wrapper {
+    font-size:14px;
+}
+
+#dl_controls {
+    padding:20px;
+    font-size:1.5em;
+}
+
+#dl_controls span {
+    margin-left:20px;
+}
+
+.table_row_even {
+    background:#F5F5F5;
+}
+
 </style>
 </head>
 <body>
 <div class="center">
+<a name="top"></a> <!-- for the link to go back to the top -->
     <div id="vertical_nav">
         <ul>
             <li><a href="#">Category</a></li>
         </ul>
     </div>
     <div id="main_content">
+        <div style="display:none;" id="dl_ui_translate">
+            <p translate="Downloads Page">Download Page</p>
+            <p translate="Market">Market</p>
+            <p translate="Categorys">Categorys</p>
+            <p translate="Translations">Translations</p>
+            <p translate="Search">Search</p>
+            <p translate="no files found">Sorry no files found!</p>
+            <p translate="Loading">Loading</p>
+            <p translate="loading error">Sorry there was an error loading the list</p>
+        </div>
         <div id="dl_search">
-            <span>Search all files</span>
+            <span>Search</span>
             <input type="text" name="dl_search" id="dl_search_box" value="" />
             <input type="button" value="Go" />
         </div>
         <div id="dl_wrapper">
-            <h2>Downloads</h2>
+            <h1>Downloads</h1>
 
-            <span>Market</span>
-            <select name="market" id="market_select">
-                <option value="USA / CANADA">USA / CANADA</option>
-                <option value="Europe">Europe</option>
-            </select>
+            <div id="dl_controls">
 
-            <span>Translations</span>
-            <select name="market" id="dl_market">
-                <option value="en">English</option>
-                <option value="es">Spanish</option>
-            </select>
+                <span>Market</span>
+                <select name="market" id="market_select">
+                    <option value="USA / CANADA">USA / CANADA</option>
+                    <option value="Europe">Europe</option>
+                </select>
 
+                <span>Translations</span>
+                <select name="market" id="lang_select">
+                    <option value="en">English</option>
+                    <option value="es">Spanish</option>
+                </select>
+
+            </div>
             <div id="dl_table">
                 <table>
                     <tr>
