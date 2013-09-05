@@ -1,0 +1,46 @@
+
+#dl_search {
+    float:right;
+}
+
+#dl_table table td {
+    border-bottom:solid lightgrey 1px;
+    padding:2px 5px;
+}
+
+
+.table_star, .table_lang, .table_dl_link {
+    text-align:center;
+}
+
+#dl_table table {
+    width:690px;
+    /* border:solid lightgrey 1px; */
+    border-collapse:collapse;
+    margin-bottom:1em;
+}
+
+#dl_table th {
+    background-color:#E0E0E0;
+
+height:35px;
+}
+
+#dl_wrapper {
+    font-size:14px;
+}
+
+#dl_controls {
+    padding:20px;
+    font-size:1.5em;
+}
+
+#dl_controls span {
+    margin-left:20px;
+}
+
+.table_row_even {
+    background:#F5F5F5;
+}
+
+

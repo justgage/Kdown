@@ -79,15 +79,19 @@ elseif( isset($_POST['market']) == true && isset($_POST['cat']) == true )
     { $response = array("error" => true, "mess" => "The category was not found"); }
 
 }
-elseif( isset($_POST['cat-list']) == true)
+else // if no input return list of categorys and list of markets
 {
     $json = file_get_contents("files/info.json");
     $markets = json_decode($json, true);
-
-    $response = array("error" => false, "mess" => "Returning master list of Categorys", "list" => $markets["cat-list"]);
-
+    $list = array();
+    $cats = $markets["cat-list"];
+    foreach ($markets as $market => $in) {
+        if ($market != "cat-list") {
+            $list[] = $market;
+        }
+    }
+    $response = array("error" => false, "mess" => "Returning list of markets and categorys", "markets" => $list, "cats" => $cats);
 }
-else { $response = array("error" => true, "mess" => "No market POST value was sent"); /* if the data was sent wrong */ }
 
 
 // respond to the request. 

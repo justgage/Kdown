@@ -2,52 +2,7 @@
 <head>
 <link rel="stylesheet" href="https://na.kyani.net/include/css/cool_blue.2.css" type="text/css" media="screen" />
 <link rel="stylesheet" href="https://na.kyani.net/include/css/backoffice.css" type="text/css" media="screen" />
-<style type="text/css" media="all">
-#dl_search {
-    float:right;
-}
-
-#dl_table table td {
-    border-bottom:solid lightgrey 1px;
-    padding:2px 5px;
-}
-
-
-.table_star, .table_lang, .table_dl_link {
-    text-align:center;
-}
-
-#dl_table table {
-    width:690px;
-    /* border:solid lightgrey 1px; */
-    border-collapse:collapse;
-    margin-bottom:1em;
-}
-
-#dl_table th {
-    background-color:#E0E0E0;
-
-height:35px;
-}
-
-#dl_wrapper {
-    font-size:14px;
-}
-
-#dl_controls {
-    padding:20px;
-    font-size:1.5em;
-}
-
-#dl_controls span {
-    margin-left:20px;
-}
-
-.table_row_even {
-    background:#F5F5F5;
-}
-
-</style>
+<link rel="stylesheet" href="dl.css" type="text/css" media="screen" />
 </head>
 <body>
 <div class="center">
@@ -61,6 +16,7 @@ height:35px;
         <div id="dl_search">
             <span>Search</span>
             <input type="text" name="dl_search" id="dl_search_box" value="" />
+            <!-- Translate the "go" below -->
             <input type="button" value="Go" />
         </div>
         <div id="dl_wrapper">
@@ -69,16 +25,10 @@ height:35px;
             <div id="dl_controls">
 
                 <span>Market</span>
-                <select name="market" id="market_select">
-                    <option value="USA / CANADA">USA / CANADA</option>
-                    <option value="Europe">Europe</option>
-                </select>
+                <select name="market" id="market_select"> </select>
 
                 <span>Translations</span>
-                <select name="market" id="lang_select">
-                    <option value="en">English</option>
-                    <option value="es">Spanish</option>
-                </select>
+                <select name="market" id="lang_select"> </select>
 
             </div>
             <div id="dl_table" >
@@ -94,7 +44,7 @@ height:35px;
                             <th>Download</th>
                         </tr>
                     </thead>
-                    <!-- NOTE: these classes are used in the code to select them please don't change them -->
+                    <!-- this is a template for the table, it will be changed on execution -->
                     <tbody>
                     <tr style="display:none;" id="table_copy">
                         <td class="table_star">...</td>
@@ -109,7 +59,6 @@ height:35px;
             </div>
         </div>
     </div>
-</div>
 </div>
 <script type="text/javascript" src="files/jquery.min.js" ></script>
 <script type="text/javascript" src="downloads.js" ></script>

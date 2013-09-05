@@ -21,19 +21,34 @@ $(document).ready(function() {
         });
     }
 
-    //load category list
-    $.post("api.php", { "cat-list":""},  function (json) {
-
+    //load category and markets
+    $.post("api.php", {}, function (json) {
 
         var item = $("#vertical_nav li"); $(item).remove();
 
-        for (var i = 0, l = json.list.length; i < l; i ++) {
+
+        for (var i = 0, l = json.cats.length; i < l; i ++) {
             var temp = item.clone(); 
+            $(temp).find("a").text(json.cats[i])
             var menu_item = $("#vertical_nav ul").append(temp);
-            $("#vertical_nav a").last().text(json.list[i]);
         }
 
-        $("#vertical_nav li").first().attr("class", dl_ui.SEL_CAT_CURRENT   .slice(1));
+        var option = $("<option value=''></option>");
+
+        //change the markets dropdown
+        for (var i = 0, l = json.markets.length; i < l; i ++) {
+            var v = json.markets[i];
+
+            var clone = option.clone();
+
+            $(clone).text( v );
+            $(clone).attr("value", v );
+
+            $("#market_select").append(clone);
+
+        }
+
+        $("#vertical_nav li").first().attr("class", dl_ui.SEL_CAT_CURRENT.slice(1));
         dl_ui.bind();
         dl_ui.ajax_load();
 
@@ -48,7 +63,6 @@ $(document).ready(function() {
         dl_ui.ajax_load();
     });
 
-
     /***
      * This is a function that will 
      */
@@ -62,6 +76,7 @@ $(document).ready(function() {
 
         //load using post method
         $.post("api.php", { "market":market, "cat":cat },  function (json) {
+            console.log("Ajax worked!");
             dl_ui.loadJSON(json); // it worked!
         }, "json")
         .fail(function () {
@@ -122,9 +137,6 @@ $(document).ready(function() {
             $('#dl_table').fadeIn();
         }
         else {console.log("ERROR:" + json.mess);}
-
-
-
 
     };
 
