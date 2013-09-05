@@ -46,7 +46,7 @@ $(function () {
         var trans = {};
 
         $("#dl_ui_translate p").each(function() {
-            trans[ $(this).attr('translate') ] = $(this).text();
+            trans[ $(this).data('translate') ] = $(this).text();
         });
 
         $("#t_downloads").html(trans['Downloads Page']);
