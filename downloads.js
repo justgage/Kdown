@@ -4,17 +4,31 @@ $(document).ready(function() {
     /***
      * download ui object
      */
-    //load category and markets on page load
+    //load ategory and markets on page load
     $.post("api.php", {}, function (json) {
 
         var item = $("#vertical_nav li"); $(item).remove();
 
-
         for (var i = 0, l = json.cats.length; i < l; i ++) {
             var temp = item.clone();
             $(temp).find("a").text(json.cats[i])
+            $(temp).find("a").attr("href", "#" + json.cats[i] )
             var menu_item = $("#vertical_nav ul").append(temp);
         }
+
+        var find = false;
+        var urlhash = window.location.hash;
+
+        // this will use the # in the URL to find the category
+        $("#vertical_nav li a[href='" + urlhash + "'").each(function() {
+            $(this).parent().attr("class", "current_page_item");
+            find = true;
+        });
+
+        if (!find) {
+            $("#vertical_nav li").first().attr("class", "current_page_item");
+        }
+
 
         var option = $("<option value=''></option>");
 
@@ -31,7 +45,6 @@ $(document).ready(function() {
 
         }
 
-        $("#vertical_nav li").first().attr("class", dl_ui.SEL_CAT_CURRENT.slice(1));
         dl_ui.bind();
         dl_ui.ajax_load();
 
@@ -110,9 +123,7 @@ $(document).ready(function() {
 
     dl_ui.loadJSON = function (json) {
 
-        console.log(json);
-
-
+        console.log(json.mess);
 
         $('.table_row').remove();
 
@@ -151,7 +162,7 @@ $(document).ready(function() {
                 //Put the files information into the new row in the table
                 $(newRow).find(".table_star").text( "*" );
                 $(newRow).find(".table_name a").text( file.filename ).attr("href", "single.php?id=" + encodeURIComponent( file.id ));
-                $(newRow).find(".table_lang").text("---");
+                $(newRow).find(".table_lang").text(file.native);
                 $(newRow).find(".table_dl_link a").attr("href", file.href);
 
                 if (i % 2 === 0) {

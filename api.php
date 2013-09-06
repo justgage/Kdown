@@ -68,7 +68,7 @@ if( isset($_POST['market'])== true && isset($_POST['cat']) == false )
 
         if ( isset( $markets[ $_POST['market'] ] ) ) 
         {
-            $categories = array("cats" => $markets[$_POST['market']]);
+            $categories = array("market" => $markets[$_POST['market']]);
             $response = array_merge(array("error" => false , "mess" => "Returning Market's categories"), $categories );
         }
         else { $response = array("error" => true); }

@@ -38,7 +38,9 @@ foreach ($markets as $market => $inside) {
     <div id="lang_names" style="display:none;">
     </div>
     <div id="main_content">
-        <a class="grey_callout" href="index.html">&larr; Back to downloads </a>
+        <h4>
+            <a class="grey_callout" href="index.html">&larr; Back </a>
+        </h4>
         <h1><?php echo $found['filename'] ?></h1>
         <table>
             <tbody>
