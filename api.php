@@ -35,14 +35,32 @@ if( isset($_POST['market'])== true && isset($_POST['cat']) == false )
     // this will return a flat list of the files 
     if ($_POST['market'] == 'all-list') {
 
-        $list = array();
-        foreach ($markets as $market) {
-            foreach ($market['cats']['files'] as $file) {
-                $list[] = $file;
+        $market_list = array();
+
+        foreach ($markets as $market => $inside) {
+            if ($market != "cat-list" ) {
+                $list = array();
+                foreach ($inside['cats'] as $cat) {
+                    foreach ($cat['files'] as $file) {
+                        if (isset($_POST['search'])) {
+                            $place = strpos(strtoupper($file["filename"]),strtoupper($_POST['search']));
+                            if ($place !== false) {
+                                $list[] = $file;
+                            }
+                        }
+                        else
+                        {
+                            $list[] = $file;
+                        }
+                        
+                    }
+                }
+
+                $market_list[$market] = $list;
             }
         }
 
-        $response = array_merge(array("error" => false, "mess" => "Returning flat list of files"),  $list);
+        $response = array("error" => false, "mess" => "Returning flat list of files", "list" => $market_list);
 
     } 
     else 
@@ -74,7 +92,7 @@ elseif( isset($_POST['market']) == true && isset($_POST['cat']) == true )
     }
 
     if ($found != false)
-    { $response = array( "error" => false, "mess" => "Returning single category", "langs" => $langs, "cat" => $found); }
+    { $response = array( "error" => false, "mess" => "Returning single category of market " . $_POST['market'], "langs" => $langs, "cat" => $found); }
     else
     { $response = array("error" => true, "mess" => "The category was not found"); }
 
