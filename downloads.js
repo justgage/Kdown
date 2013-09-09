@@ -117,26 +117,26 @@ $(document).ready(function() {
     catList.bind = function () {
         //click the category to change to it
         $(CAT_LINKS).click(function () {
-            $(CAT_CURRENT).removeClass(CAT_CURRENT.slice(1));
-            $(this).parent().addClass(CAT_CURRENT.slice(1));
-            db.load();
         });
     }
 
     // this will load the hash from the URL 
     // reload ~ if to reload the downloads list or not. 
     catList.hashswitch = function(reload) {
+
+        $(CAT_CURRENT).removeClass(CAT_CURRENT.slice(1));
+
         var find = false;
         var urlhash = window.location.hash;
 
         // this will use the # in the URL to find the //category
         $("#vertical_nav li a[href='" + urlhash + "'").each(function() {
-            $(this).parent().addClass("class", "current_page_item");
+            $(this).parent().addClass("current_page_item");
             find = true;
         });
 
         if (!find) {
-            $("#vertical_nav li").first().attr("class", "current_page_item");
+            $("#vertical_nav li").first().addClass("current_page_item");
         }
 
         if (reload) {
@@ -220,7 +220,6 @@ $(document).ready(function() {
 
         // if the category exists in the data
         if (json.cat) {
-
             table.load(json);
         }
         else {console.log("ERROR:" + json.mess);}
@@ -244,7 +243,6 @@ $(document).ready(function() {
     }, "json"); // JSON! very important to include this
 
     
-    //
     // This will change the category when you push back in the browser
     $(window).on('hashchange', function() {
         catList.hashswitch(true);
