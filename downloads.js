@@ -2,131 +2,41 @@
 $(document).ready(function() {
 
     /***
-     * download ui object
+     * Handles the saving and loading of requests to the database
      */
-    //load ategory and markets on page load
-    $.post("api.php", {}, function (json) {
+    var db = db || {};
 
-        var item = $("#vertical_nav li"); $(item).remove();
-
-        for (var i = 0, l = json.cats.length; i < l; i ++) {
-            var temp = item.clone();
-            $(temp).find("a").text(json.cats[i])
-            $(temp).find("a").attr("href", "#" + json.cats[i] )
-            var menu_item = $("#vertical_nav ul").append(temp);
-        }
-
-        var find = false;
-        var urlhash = window.location.hash;
-
-        // this will use the # in the URL to find the category
-        $("#vertical_nav li a[href='" + urlhash + "'").each(function() {
-            $(this).parent().attr("class", "current_page_item");
-            find = true;
-        });
-
-        if (!find) {
-            $("#vertical_nav li").first().attr("class", "current_page_item");
-        }
-
-
-        var option = $("<option value=''></option>");
-
-        //change the markets dropdown
-        for (var i = 0, l = json.markets.length; i < l; i ++) {
-            var v = json.markets[i];
-
-            var clone = option.clone();
-
-            $(clone).text( v );
-            $(clone).attr("value", v );
-
-            $("#market_select").append(clone);
-
-        }
-
-        dl_ui.bind();
-        dl_ui.ajax_load();
-
-    }, "json"); // JSON! very important to include this
-
-    var dl_ui = dl_ui || {};
-
-    //these are the selectors for different elements on the page
-    dl_ui.SEL_MARKET       = "#market_select";
-    dl_ui.SEL_CAT_CURRENT  = ".current_page_item";
-    dl_ui.SEL_CAT_LINK     = "#vertical_nav ul li a";
-
-    dl_ui.save = {}; // variable used to save ajax querys
-
-
-    // abstracts the loading and the saving of pages
-    dl_ui.load = function() {
-
-        var market = $(dl_ui.SEL_MARKET).val();
-        var cat    = $(dl_ui.SEL_CAT_CURRENT).text();
-
-        if ( dl_ui.save[ market ]  &&  dl_ui.save[ market ][ cat ] ) {
-            dl_ui.loadJSON( dl_ui.save[ market ][ cat ] );
-        }
-        else {
-            dl_ui.ajax_load();
-        }
-    }
-
-    dl_ui.bind = function () {
-
-        //click the category to change to it
-        $(dl_ui.SEL_CAT_LINK).click(function () {
-            $(dl_ui.SEL_CAT_CURRENT).removeAttr("class");
-            $(this).parent().attr("class", dl_ui.SEL_CAT_CURRENT.slice(1));
-
-            dl_ui.load();
-
-        });
-
-        /***
-         * Bind market select to reloading the list of files
-         */
-        $(dl_ui.SEL_MARKET).change(function () {
-            dl_ui.load();
-        });
-    }
-
+    db.save = {}; // variable used to save ajax querys
 
     /***
-     * This is a function that will
+     * Handles the cat list
      */
-    dl_ui.ajax_load =  function () {
+    var catList = {};
+    
+    /***
+     * Handles the table
+     */
+    var table = {};
+        table.load = undefined;
 
-        var market = $(dl_ui.SEL_MARKET).val();
-        var cat = $(dl_ui.SEL_CAT_CURRENT   ).text();
-        //empty the list of items
+    /***
+     * handles the market drop down
+     */
+    var marketDD = {};
 
-        $("#dl_loading").show();
-        $("#dl_table table").hide();
+    //these are the selectors for different elements on the page
+    MARKET       = "#market_select";
+    CAT_CURRENT  = ".current_page_item";
+    CAT_LINKS    = ".cat_link a";
+    CAT          = ".cat_link";
 
-        //load using post method
-        $.post("api.php", { "market":market, "cat":cat },  function (json) {
-            console.log("Ajax worked!");
 
-            dl_ui.save[ market ] = dl_ui.save[ market ] || {};
-
-            dl_ui.save[ market ][ cat ] = json;
-            dl_ui.loadJSON(json); // it worked!
-        }, "json")
-        .fail(function () {
-            console.log("Ajax failed!");
-        });
-
-    };
-
-    dl_ui.loadJSON = function (json) {
-
-        console.log(json.mess);
-
-        $('.table_row').remove();
-
+    //***********************************************************
+    // table FUNCTIONS
+    //***********************************************************
+    table.load = function(json) {
+        
+        // UPDATE TRANSLATIONS DROP DOWN ***************
         $("#lang_select").html("");
 
         var option = $("<option value=''></option>");
@@ -143,16 +53,17 @@ $(document).ready(function() {
             $("#lang_select").append(clone);
 
         }
+        
+        // UPDATE TABLE ***************
+        $('.table_row').remove();
 
-        //make a copy and get rid of it
+        //make a copy of the row
         var row = $("#table_copy").clone();
 
         $(row).removeAttr('id');
         $(row).attr('class', 'table_row' );
         $(row).show();
 
-        // if the category exists in the data
-        if (json.cat) {
             for (var i = 0, l = json.cat.length; i < l; i ++) {
 
                 var file = json.cat[i];
@@ -172,9 +83,181 @@ $(document).ready(function() {
             }
             $("#dl_loading").hide();
             $('#dl_table table').fadeIn();
+
+    }
+
+    //***********************************************************
+    // catList FUNCTIONS
+    //***********************************************************
+
+    /***
+     * Load the cat list from json
+     */
+    catList.load = function(json) {
+        var item = $("#vertical_nav li");
+
+        //$(item).remove();
+
+        for (var i = 0, l = json.cats.length; i < l; i ++) {
+            var temp = item.clone();
+            $(temp).addClass("cat_link");
+            $(temp).find("a").text(json.cats[i])
+            $(temp).find("a").attr("href", "#" + json.cats[i])
+            var menu_item = $("#vertical_nav ul").append(temp);
+        }
+
+        $(item).attr('id', 'all_items');
+
+    };
+
+    /***
+     * this function will bind the category links 
+     * (if categorys are changed you need to recall this)
+     */
+    catList.bind = function () {
+        //click the category to change to it
+        $(CAT_LINKS).click(function () {
+            $(CAT_CURRENT).removeClass(CAT_CURRENT.slice(1));
+            $(this).parent().addClass(CAT_CURRENT.slice(1));
+            db.load();
+        });
+    }
+
+    // this will load the hash from the URL 
+    // reload ~ if to reload the downloads list or not. 
+    catList.hashswitch = function(reload) {
+        var find = false;
+        var urlhash = window.location.hash;
+
+        // this will use the # in the URL to find the //category
+        $("#vertical_nav li a[href='" + urlhash + "'").each(function() {
+            $(this).parent().addClass("class", "current_page_item");
+            find = true;
+        });
+
+        if (!find) {
+            $("#vertical_nav li").first().attr("class", "current_page_item");
+        }
+
+        if (reload) {
+            db.load();
+        }
+    };
+
+    //***********************************************************
+    // marketDD FUNCTIONS
+    //***********************************************************
+
+    marketDD.load = function(json) {
+        var option = $("<option value=''></option>");
+        //change the markets dropdown
+        for (var i = 0, l = json.markets.length; i < l; i ++) {
+            var v = json.markets[i];
+
+            var clone = option.clone();
+
+            $(clone).text( v );
+            $(clone).attr("value", v );
+
+            $("#market_select").append(clone);
+
+        }
+
+    };
+
+
+    //***********************************************************
+    // db FUNCTIONS
+    //***********************************************************
+
+    // abstracts the loading and the saving of pages
+    // GOOD!
+    db.load = function() {
+
+        var market = $(MARKET).val();
+        var cat    = $(CAT_CURRENT).text();
+
+        if ( db.save[ market ]  &&  db.save[ market ][ cat ] ) {
+            db.loadJSON( db.save[ market ][ cat ] );
+        }
+        else {
+            db.ajax_load();
+        }
+    }
+
+
+
+
+    /***
+     * This is a function that will
+     * GOOD!
+     */
+    db.ajax_load =  function () {
+
+        var market = $(MARKET).val();
+        var cat = $(CAT_CURRENT).text();
+        //empty the list of items
+
+        $("#dl_loading").show();
+        $("#dl_table table").hide();
+
+        //load using post method
+        $.post("api.php", { "market":market, "cat":cat },  function (json) {
+            console.log("Ajax worked!");
+
+            db.save[ market ] = db.save[ market ] || {};
+
+            db.save[ market ][ cat ] = json;
+            db.loadJSON(json);
+        }, "json")
+        .fail(function () {
+            console.log("ERROR: Ajax failed!");
+        });
+
+    };
+
+    db.loadJSON = function (json) {
+
+        // if the category exists in the data
+        if (json.cat) {
+
+            table.load(json);
         }
         else {console.log("ERROR:" + json.mess);}
 
     };
+
+    //************************************************************
+    // things to do on page load
+    //************************************************************
+    
+    //load category and markets on page load
+    $.post("api.php", {}, function (json) {
+        catList.load(json);
+        catList.hashswitch(false);
+        catList.bind();
+
+        marketDD.load(json);
+
+        db.ajax_load(); //populates the table
+
+    }, "json"); // JSON! very important to include this
+
+    
+    //
+    // This will change the category when you push back in the browser
+    $(window).on('hashchange', function() {
+        catList.hashswitch(true);
+    });
+
+
+
+    /***
+     * Bind market select to reloading the list of files
+     */
+    $(MARKET).change(function () {
+        db.load();
+    });
+
 
 });
