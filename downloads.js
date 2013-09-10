@@ -95,8 +95,8 @@ var kdown = {
             var i, l;
 
             //Search for the hash in the market
-            for (i = 0, l = app.list.markets.length; i < l; i ++) {
-                if (app.list.markets[i] === market)
+            for (i = 0, l = app.valid_list.markets.length; i < l; i ++) {
+                if (app.valid_list.markets[i] === market)
                     {
                         console.log("   FOUND THE MARKET!");
                         app.market = market;
@@ -110,9 +110,9 @@ var kdown = {
             }
 
             //Search for the hash in the categorys
-            for (i = 0, l = app.list.cats.length; i < l; i ++) {
+            for (i = 0, l = app.valid_list.cats.length; i < l; i ++) {
                 // TRANSLATION PROBLEMS!
-                if (app.list.cats[i] === cat)
+                if (app.valid_list.cats[i] === cat)
                     {
                         console.log("   FOUND THE CAT!");
                         app.cat = cat;
@@ -185,7 +185,7 @@ var kdown = {
 
                 //Put the files information into the new row in the table
                 $(newRow).find(".table_star").text( "*" );
-                $(newRow).find(".table_name a").text( file.filename ).attr("href", "single.php?id=" + encodeURIComponent( file.id ));
+                $(newRow).find(".table_name a").text( file.filename ).attr("href", "single.php?id=" + encodeURIComponent( file.id ) + "#");
                 $(newRow).find(".table_lang").text(file.native);
                 $(newRow).find(".table_dl_link a").attr("href", file.href);
 
@@ -301,7 +301,7 @@ $(document).ready(function () {
     $.post("api.php", {}, function (json) {
         console.log("----------$POST LOAD");
 
-        kdown.db.list = json;
+        kdown.db.valid_list = json;
 
         // populate market and cat list
         kdown.marketDD.load(json);
@@ -333,7 +333,8 @@ $(document).ready(function () {
     /***
      * Bind market select to reloading the list of files
      */
-    $(kdown.MARKET).change(function () {
+    $(kdown.db.MARKETDD).change(function () {
+        console.log("market changed");
         kdown.db.market = $(this).val();
         kdown.db.hashUpdate();
         kdown.catList.hashUpdate();
