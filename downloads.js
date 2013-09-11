@@ -140,31 +140,50 @@ var kdown = {
                 }
 
 
-                if (i % 2 === 0) {
-                    $(newRow).addClass("table_row_even");
-                }
 
             }
             $("#dl_loading").hide();
             $('#dl_table table').fadeIn();
 
+            kdown.table.highlight();
+
         },
         filter : function () {
             console.log("table.filter()");
+            $("#dl_table").hide();
+            $("#none_found").hide();
             var filter_lang = $(kdown.db.LANGDD).val();
+
+            var found = 0;
 
             if (filter_lang === "all") {
                 $(".table_row").show();
+                found = 1;
             } else {
                 $(".table_row").hide();
-                $(".lang_" + filter_lang ).show();
+                $(".lang_" + filter_lang ).each(function () {
+                    $(this).show();
+                    found++;
+                });
             }
 
+            $("#dl_table").fadeIn();
 
+            if (found === 0) {
+                $("#none_found").show();
+            }
 
-        }
+            kdown.table.highlight();
+            
 
-
+        },
+        //
+        //fixes the colors in the rows 
+        //
+        highlight : function () {
+            $("#dl_table tr").removeClass("table_row_odd");
+            $("#dl_table tr:visible").filter(":odd").addClass("table_row_odd");
+        } 
 
     },
     marketDD : {
