@@ -3,6 +3,7 @@ var kdown = {
 
     db:{
         MARKETDD : "#market_select",
+        LANGDD : "#lang_select",
         CAT_CURRENT : ".current_page_item",
         CAT_LINKS : ".cat_link a",
         market : "",
@@ -103,22 +104,10 @@ var kdown = {
             //
             // UPDATE TRANSLATIONS DROP DOWN ***************
             //
-            $("#lang_select").html("");
 
-            var option = $("<option value=''></option>");
+            kdown.langDD.load(json);
 
-            //change the translations dropdown
-            for (i = 0, l = json.langs.length; i < l; i ++) {
-                var v = json.langs[i];
 
-                var clone = option.clone();
-
-                $(clone).text( v );
-                $(clone).attr("value", v );
-
-                $("#lang_select").append(clone);
-
-            }
 
             //
             // UPDATE TABLE ***************
@@ -141,8 +130,15 @@ var kdown = {
                 //Put the files information into the new row in the table
                 $(newRow).find(".table_star").text( "*" );
                 $(newRow).find(".table_name a").text( file.filename ).attr("href", "single.php?id=" + encodeURIComponent( file.id ));
-                $(newRow).find(".table_lang").text(file.native);
+                $(newRow).find(".table_lang").text(file.native_lang);
                 $(newRow).find(".table_dl_link a").attr("href", file.href);
+
+                if (typeof file.langs === "object") {
+                    for (var locale in file.langs) {
+                        $(newRow).addClass("lang_" + locale);
+                    }
+                }
+
 
                 if (i % 2 === 0) {
                     $(newRow).addClass("table_row_even");
@@ -152,7 +148,23 @@ var kdown = {
             $("#dl_loading").hide();
             $('#dl_table table').fadeIn();
 
+        },
+        filter : function () {
+            console.log("table.filter()");
+            var filter_lang = $(kdown.db.LANGDD).val();
+
+            if (filter_lang === "all") {
+                $(".table_row").show();
+            } else {
+                $(".table_row").hide();
+                $(".lang_" + filter_lang ).show();
+            }
+
+
+
         }
+
+
 
     },
     marketDD : {
@@ -185,6 +197,33 @@ var kdown = {
             $(app.MARKETDD).val(app.market);
         }
     
+    },
+    "langDD" : {
+        load : function (json) {
+            $("#lang_select").html("");
+
+            var option = $("<option value=''></option>");
+
+            for (var code in json.langs) {
+                var clone = option.clone();
+                $(clone).text( json.langs[code] ); 
+                $(clone).attr("value", code );
+                $("#lang_select").append(clone);
+
+            }
+
+            var allclone = option.clone();
+            $(allclone).text( "All" ); 
+            $(allclone).attr("value", "all" );
+            $("#lang_select").prepend(allclone);
+        },
+        bind : function () {
+            $(kdown.db.LANGDD).change(function () {
+                console.log("translation changed");
+                kdown.table.filter();
+            });
+        }
+
     },
     catList : {
         /***
@@ -226,7 +265,6 @@ var kdown = {
             });
         }
     }
-
 };
 
 
@@ -248,6 +286,7 @@ $(document).ready(function () {
         // populate market and cat list
         kdown.marketDD.load(json);
         kdown.catList.load(json);
+        kdown.langDD.bind();
         
         // poplate table with ajax request
         kdown.db.var_update();
@@ -266,5 +305,7 @@ $(document).ready(function () {
         kdown.db.var_update();
         kdown.db.load();
     });
+
+
 
 });
