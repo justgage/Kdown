@@ -1,10 +1,10 @@
 {
-   "cat-list":[
-      "Applications & Forms",
-      "Business Library",
-      "Premotion & News",
-      "Training"
-   ],
+   "cat-list":{ 
+       "applications" : "Applications & Forms",
+       "business":"Business Library",
+       "premotion":"Premotion & News",
+       "training":"Training"
+ },
    "Europe" : {
       "langs":{
          "da":"Dansk",
@@ -27,7 +27,7 @@
       },
       "cats":[
          {
-            "name":"Applications & Forms",
+            "name":"applications",
             "files":[
                {
                   "filename":"Kyani Order Form",
@@ -99,7 +99,7 @@
             ]
          },
          {
-            "name":"Business Library",
+            "name":"business",
             "files":[
                {
                   "filename":"Kyäni Policies and Procedures",
@@ -515,7 +515,7 @@
             ]
          },
          {
-            "name":"Premotion & News",
+            "name":"premotion",
             "files":[
                {
                   "filename":"2013 Exec Trip",
@@ -787,7 +787,7 @@
             ]
          },
          {
-            "name":"Training",
+            "name":"training",
             "files":[
                {
                   "filename":"Kyäni Policies and Procedures",
@@ -1004,7 +1004,7 @@
       },
       "cats":[
          {
-            "name":"Applications & Forms",
+             "name":"applications",
             "files":[
                {
                   "filename":"Kyani Order Form",
@@ -1105,7 +1105,7 @@
             ]
          },
          {
-            "name":"Business Library",
+            "name":"business",
             "files":[
                {
                   "filename":"Kyäni Policies and Procedures",
@@ -1520,7 +1520,7 @@
             ]
          },
          {
-            "name":"Premotion & News",
+             "name":"premotion",
             "files":[
                {
                   "filename":"2013 Exec Trip",
@@ -1790,7 +1790,7 @@
             ]
          },
          {
-            "name":"Training",
+            "name":"training",
             "files":[
                {
                   "filename":"Kyäni Policies and Procedures",

@@ -75,10 +75,23 @@ var kdown = {
             var app = kdown.db;
            
             app.market = $(app.MARKETDD).val();
-            app.cat = $(app.CAT_CURRENT).text();
+            app.cat = $(app.CAT_CURRENT + " a" ).attr('href').slice(1);
+            console.log("setting cat to :" + app.cat);
 
         },
 
+        ui_update : function () {
+            var app = kdown.db;
+           
+             $(app.MARKETDD).val(app.market);
+
+             $("#none_found").hide();
+             $(".current_page_item").attr("class", "cat_link");
+             $("#cat_" + cat).addClass("current_page_item");
+
+             kdown.db.load();
+
+        },
         //
         // This function will load the file list from the API 
         //
@@ -301,11 +314,12 @@ var kdown = {
 
             //$(item).remove();
 
-            for (i = 0, l = json.cats.length; i < l; i ++) {
+            for (var cat in json.cats) {
                 var temp = item.clone();
                 $(temp).addClass("cat_link");
-                $(temp).find("a").text(json.cats[i]);
-                $(temp).find("a").attr("href", "#" + encodeURIComponent( json.cats[i] ));
+                $(temp).attr("id", "cat_" + cat);
+                $(temp).find("a").text(json.cats[cat]);
+                $(temp).find("a").attr("href", "#" + encodeURIComponent(cat) );
                 $("#vertical_nav ul").append(temp);
             }
 
@@ -353,6 +367,8 @@ $(document).ready(function () {
     // things to do on page load
     //************************************************************
 
+
+
     //populate the categories and markets on page load
     $.post("api.php", {}, function (json) {
         console.log("----------$POST LOAD");
@@ -393,8 +409,8 @@ $(document).ready(function () {
             console.log(hash);
             oldHash = hash;
 
-            kdown.db.cat = hash.slice(1);
-            kdown.db.load();
+            //kdown.db.cat = hash.slice(1);
+            //kdown.db.load();
         }
     };
 
