@@ -3,7 +3,7 @@
     float:right;
 }
 
-#dl_table table td {
+.dl_table table td {
     border-bottom:solid lightgrey 1px;
     padding:2px 5px;
 }
@@ -13,17 +13,16 @@
     text-align:center;
 }
 
-#dl_table table {
+.dl_table table {
     width:690px;
     /* border:solid lightgrey 1px; */
     border-collapse:collapse;
     margin-bottom:1em;
 }
 
-#dl_table th {
+.dl_table th {
     background-color:#E0E0E0;
-
-height:35px;
+    height:35px;
 }
 
 #dl_wrapper {
@@ -35,6 +34,10 @@ height:35px;
     font-size:1.5em;
 }
 
+#dl_controls select {
+    width: 112px;
+}
+
 #dl_controls span {
     margin-left:20px;
 }
@@ -43,4 +46,8 @@ height:35px;
     background:#F5F5F5;
 }
 
+
+.searching {
+    display:none;
+}
 

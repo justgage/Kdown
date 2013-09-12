@@ -5,7 +5,7 @@
       "Premotion & News",
       "Training"
    ],
-   "Europe":{
+   "Europe" : {
       "langs":{
          "da":"Dansk",
          "de":"Deutsch",
@@ -37,7 +37,7 @@
                   "native_lang":"en",
                   "native_lang":"en",
                   "langs":{
-                     "en":{
+                     "ro":{
                         "url":"https://na.kyani.net/downloads/Applications/EN-order-form.pdf"
                      }
                   }

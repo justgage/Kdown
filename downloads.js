@@ -21,13 +21,22 @@ var kdown = {
             
             console.log("---db.load---");
 
-            if ( app.json[ app.market ]  &&  app.json[ app.market ][ app.cat ] ) {
-                console.log("   app.load--->app.loadJSON()");
-                app.loadJSON( app.json[ app.market ][ app.cat ] );
-            }
-            else {
-                console.log("   app.load--->app.ajax_load()");
-                app.ajax_load();
+            if (app.market !== "all-list") {
+                if ( app.json[ app.market ]  &&  app.json[ app.market ][ app.cat ] ) {
+                    console.log("   app.load--->app.loadJSON()");
+                    app.loadJSON( app.json[ app.market ][ app.cat ] );
+                }
+                else {
+                    console.log("   app.load--->app.ajax_load()");
+                    app.ajax_load();
+                }
+            } else {
+
+                $.post("api.php", { "market": "all-list" } ,  function (json) {
+
+                    app.loadJSON(json.list[app.market]);
+                });
+
             }
         },
 
@@ -54,7 +63,7 @@ var kdown = {
             //empty the list of items
 
             $("#dl_loading").show();
-            $("#dl_table table").hide();
+            $("#dl_table_first table").hide();
 
             //load using post method
             $.post("api.php", { "market":app.market, "cat":app.cat },  function (json) {
@@ -95,19 +104,14 @@ var kdown = {
 
 
     },
-
     table : {
         load : function (json) {
             "use strict";
 
             var i, l;
-            //
-            // UPDATE TRANSLATIONS DROP DOWN ***************
-            //
-
-            kdown.langDD.load(json);
 
 
+            kdown.langDD.lang_list = {};
 
             //
             // UPDATE TABLE ***************
@@ -125,7 +129,7 @@ var kdown = {
 
                 var file = json.cat[i];
                 var newRow = row.clone();
-                $("#dl_table table").append(newRow);
+                $("#dl_table_first table").append(newRow);
 
                 //Put the files information into the new row in the table
                 $(newRow).find(".table_star").text( "*" );
@@ -135,22 +139,27 @@ var kdown = {
 
                 if (typeof file.langs === "object") {
                     for (var locale in file.langs) {
+                        kdown.langDD.lang_list[locale] = true;
                         $(newRow).addClass("lang_" + locale);
                     }
                 }
 
+                //
+                // UPDATE TRANSLATIONS DROP DOWN ***************
+                //
 
+                kdown.langDD.load(json);
 
             }
             $("#dl_loading").hide();
-            $('#dl_table table').fadeIn();
+            $('#dl_table_first table').fadeIn();
 
             kdown.table.highlight();
 
         },
         filter : function () {
             console.log("table.filter()");
-            $("#dl_table").hide();
+            $("#dl_table_first").hide();
             $("#none_found").hide();
             var filter_lang = $(kdown.db.LANGDD).val();
 
@@ -167,7 +176,7 @@ var kdown = {
                 });
             }
 
-            $("#dl_table").fadeIn();
+            $("#dl_table_first").fadeIn();
 
             if (found === 0) {
                 $("#none_found").show();
@@ -181,8 +190,8 @@ var kdown = {
         //fixes the colors in the rows 
         //
         highlight : function () {
-            $("#dl_table tr").removeClass("table_row_odd");
-            $("#dl_table tr:visible").filter(":odd").addClass("table_row_odd");
+            $("#dl_table_first tr").removeClass("table_row_odd");
+            $("#dl_table_first tr:visible").filter(":odd").addClass("table_row_odd");
         } 
 
     },
@@ -217,17 +226,27 @@ var kdown = {
         }
     
     },
-    "langDD" : {
+    langDD : {
+        lang_list : {},
         load : function (json) {
+            var app = kdown.langDD;
+
+
             $("#lang_select").html("");
 
             var option = $("<option value=''></option>");
 
             for (var code in json.langs) {
-                var clone = option.clone();
-                $(clone).text( json.langs[code] ); 
-                $(clone).attr("value", code );
-                $("#lang_select").append(clone);
+
+                // make it false if it isn't set by the table.load()
+                app.lang_list[code] = app.lang_list[code] ? app.lang_list[code] : false;
+
+                if (app.lang_list[code] === true) {
+                    var clone = option.clone();
+                    $(clone).text( json.langs[code] ); 
+                    $(clone).attr("value", code );
+                    $("#lang_select").append(clone);
+                }
 
             }
 
@@ -275,7 +294,7 @@ var kdown = {
         //
         bind: function () {
             $(".cat_link a").click(function () { 
-                console.log("CLICK!");
+                $("#none_found").hide();
                 $(".current_page_item").attr("class", "cat_link");
                 $(this).parent().addClass("current_page_item");
 
@@ -283,7 +302,19 @@ var kdown = {
                 kdown.db.load();
             });
         }
+    },
+    search : {
+        bind : function () {
+            "use strict";
+            var app = kdown.db;
+            app.search = true;
+            $("#search_go").click(function () { 
+                $("#none_found").hide();
+                app.load();
+            });
+        }
     }
+
 };
 
 
@@ -324,7 +355,5 @@ $(document).ready(function () {
         kdown.db.var_update();
         kdown.db.load();
     });
-
-
 
 });
