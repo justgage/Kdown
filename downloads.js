@@ -5,7 +5,7 @@
  * Objects:
  *      db
  *      handles interaction between the server and the interface.
- *      including the saving of that data for later use. 
+ *      including the saving of that data for later use.
  *
  *      table
  *      handles the interaction with the table of downloads
@@ -38,14 +38,14 @@ var kdown = {
         json: {},
 
         //
-        // This will load the category list either 
+        // This will load the category list either
         // from the saved JSON or the ajax loaded JSON
-        //
+        // dictated by db.market/db.cat
         load : function () {
             "use strict";
 
             var app = kdown.db;
-            
+
             console.log("---db.load---");
 
             if (app.market !== "all-list") {
@@ -73,27 +73,29 @@ var kdown = {
          */
         var_update : function () {
             var app = kdown.db;
-           
             app.market = $(app.MARKETDD).val();
             app.cat = $(app.CAT_CURRENT + " a" ).attr('href').slice(1);
             console.log("setting cat to :" + app.cat);
-
+            kdown.catList.links_update();
         },
 
+        // 
         ui_update : function () {
-            var app = kdown.db;
-           
-             $(app.MARKETDD).val(app.market);
+            var app = kdown;
 
-             $("#none_found").hide();
-             $(".current_page_item").attr("class", "cat_link");
-             $("#cat_" + cat).addClass("current_page_item");
+            $(app.db.MARKETDD).val(app.db.market);
 
-             kdown.db.load();
+            $("#none_found").hide();
+            $(".current_page_item").attr("class", "cat_link");
+            $("#cat_" + app.db.cat).addClass("current_page_item");
+
+            app.catList.links_update();
+
+            app.db.load();
 
         },
         //
-        // This function will load the file list from the API 
+        // This function will load the file list from the API
         //
         ajax_load :  function () {
             "use strict";
@@ -111,7 +113,7 @@ var kdown = {
 
                 //creates an entry for the market if there isn't one
                 app.json[ app.market ] = app.json[ app.market ] || {};
-                
+
                 //creates the place to store the json for reuse (in the loadJSON function)
                 app.json[ app.market ][ app.cat ] = json;
 
@@ -143,6 +145,38 @@ var kdown = {
         },
 
 
+    },
+    hash : {
+        oldHash : "",
+        loopID : "", 
+        load : function() {
+            "use strict";
+
+            var app = kdown.hash;
+            var hash =  decodeURIComponent( window.location.hash );
+
+            if (hash !== app.oldHash && hash !== "") {
+                app.oldHash = hash;
+
+                // this will split the hash at the @
+                // left is category
+                // right is market
+                var hash_array = hash.slice(1).split("@");
+                kdown.db.cat = hash_array[0];
+                kdown.db.market = hash_array[1];
+
+                kdown.db.ui_update();
+                kdown.db.load();
+            }
+        },
+        update : function () {
+            "use strict";
+            var app = kdown.db;
+            window.location.hash =  "#" + app.cat + "@" + app.market;
+        },
+        start_loop : function () {
+            kdown.hash.loopID = window.setInterval(kdown.hash.load, 400);
+        },
     },
     table : {
         load : function (json) {
@@ -223,28 +257,29 @@ var kdown = {
             }
 
             kdown.table.highlight();
-            
+
 
         },
         //
-        //fixes the colors in the rows 
+        //fixes the colors in the rows
         //
         highlight : function () {
             $("#dl_table_first tr").removeClass("table_row_odd");
             $("#dl_table_first tr:visible").filter(":odd").addClass("table_row_odd");
-        } 
+        }
 
     },
     marketDD : {
-        //populates the market drop down
+        //populates the market drop down from the db.valid_list
         load : function (json) {
             "use strict";
             var app = kdown.db;
+            var markets = app.valid_list.markets;
             var i, l;
             var option = $("<option value=''></option>");
             //change the markets dropdown
-            for (i = 0, l = json.markets.length; i < l; i ++) {
-                var v = json.markets[i];
+            for (i = 0, l = markets.length; i < l; i ++) {
+                var v = markets[i];
 
                 var clone = option.clone();
 
@@ -252,19 +287,8 @@ var kdown = {
                 $(clone).attr("value", v );
 
                 $("#market_select").append(clone);
-
             }
-
-
         },
-
-        // makes the market equal the stored value.
-        update : function () {
-            "use strict";
-            var app = kdown.db;
-            $(app.MARKETDD).val(app.market);
-        }
-    
     },
     langDD : {
         lang_list : {},
@@ -283,7 +307,7 @@ var kdown = {
 
                 if (app.lang_list[code] === true) {
                     var clone = option.clone();
-                    $(clone).text( json.langs[code] ); 
+                    $(clone).text( json.langs[code] );
                     $(clone).attr("value", code );
                     $("#lang_select").append(clone);
                 }
@@ -291,7 +315,7 @@ var kdown = {
             }
 
             var allclone = option.clone();
-            $(allclone).text( "All" ); 
+            $(allclone).text( "All" );
             $(allclone).attr("value", "all" );
             $("#lang_select").prepend(allclone);
         },
@@ -305,26 +329,32 @@ var kdown = {
     },
     catList : {
         /***
-         * Load the cat list from json
+         * Load the cat list from the db.valid_list 
+         * NOTE: db.market must be set before this is ran
          */
-        load : function (json) {
+        load : function () {
             "use strict";
+            var app = kdown.db;
+            var cats = app.valid_list.cats;
+
             var item = $("#vertical_nav li");
             var i, l;
 
-            //$(item).remove();
-
-            for (var cat in json.cats) {
+            // Add a category to the page's sidebar
+            for (var cat in cats) {
                 var temp = item.clone();
                 $(temp).addClass("cat_link");
                 $(temp).attr("id", "cat_" + cat);
-                $(temp).find("a").text(json.cats[cat]);
-                $(temp).find("a").attr("href", "#" + encodeURIComponent(cat) );
+                $(temp).find("a").text(cats[cat]);
+                $(temp).find("a").attr("href", "#" + encodeURIComponent(cat) + app.market );
+                $(temp).data("cat", cat);
                 $("#vertical_nav ul").append(temp);
             }
 
+            // set first one to it's own category
             $(item).attr('id', 'all_items');
 
+            // set the first one on the list to the current page item. 
             $(".cat_link").first().addClass("current_page_item");
 
             kdown.catList.bind();
@@ -334,13 +364,17 @@ var kdown = {
         // this will bind the clicks to the categorys links
         //
         bind: function () {
-            $(".cat_link a").click(function () { 
-                $("#none_found").hide();
-                $(".current_page_item").attr("class", "cat_link");
-                $(this).parent().addClass("current_page_item");
+            $(".cat_link a").click(function () {
+                kdown.db.cat = $(this).parent().data("cat");
+                kdown.ui_update();
+            });
+        },
 
-                kdown.db.var_update();
-                kdown.db.load();
+        links_update : function () {
+            var app = kdown.db;
+            $(".cat_link a").each(function() {
+                $(this).attr("href",
+                             "#" + $(this).parent().data("cat") + "@" + app.market);
             });
         }
     },
@@ -349,7 +383,7 @@ var kdown = {
             "use strict";
             var app = kdown.db;
             app.search = true;
-            $("#search_go").click(function () { 
+            $("#search_go").click(function () {
                 $("#none_found").hide();
                 app.load();
             });
@@ -359,64 +393,44 @@ var kdown = {
 };
 
 
+//************************************************************
+// things to do on page load
+//************************************************************
 $(document).ready(function () {
-
     "use strict";
 
-    //************************************************************
-    // things to do on page load
-    //************************************************************
-
-
-
-    //populate the categories and markets on page load
+    // this gets the list of valid categories and markets
     $.post("api.php", {}, function (json) {
         console.log("----------$POST LOAD");
 
         kdown.db.valid_list = json;
 
         // populate market and cat list
-        kdown.marketDD.load(json);
-        kdown.catList.load(json);
+        kdown.marketDD.load();
+        kdown.catList.load();
         kdown.langDD.bind();
-        
+
         // poplate table with ajax request
         kdown.db.var_update();
+
+        kdown.hash.load();
+        kdown.hash.start_loop();
+
         kdown.db.load();
 
 
 
     }, "json"); // JSON! very important to include this
 
-
-
     /***
      * Bind market select to reloading the list of files
      */
     $(kdown.db.MARKETDD).change(function () {
         console.log("market changed");
-        kdown.db.var_update();
-        kdown.db.load();
+        kdown.db.market = $(this).val();
+        kdown.hash.update();
+        kdown.db.ui_update();
     });
-
-    var oldHash = "";
-
-    var hashGet = function() {
-        var hashObj = {};
-        var hash =  decodeURIComponent( window.location.hash );
-
-        if (hash !== oldHash && hash !== "") {
-            console.log(hash);
-            oldHash = hash;
-
-            //kdown.db.cat = hash.slice(1);
-            //kdown.db.load();
-        }
-    };
-
-
-    var hascheckID = window.setInterval(hashGet, 200);
-
 
 
 });
