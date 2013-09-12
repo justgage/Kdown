@@ -180,6 +180,7 @@ var kdown = {
     table : {
         load : function (json) {
             "use strict";
+            var i, l;
 
             kdown.langDD.lang_list = {};
 

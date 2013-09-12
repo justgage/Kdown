@@ -215,7 +215,7 @@ $(function () {
         $('.none-found').show();
 
         //load using post method
-        $.post("dl_api.php", { "market":market },  function(json){ 
+        $.post("api.php", { "market":market },  function(json){ 
             dl_ui.loadJSON(json); // it worked!
         }, "json")
             .fail(function() { //if request failed!

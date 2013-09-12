@@ -1,7 +1,3 @@
-<?php
-    include 'dl_functions.php';
-    $json = file_get_contents("info.json");
-?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="en-US">
@@ -20,7 +16,7 @@
 <div id="content_wrap" class="gradient">
 
 
-<div id="dl_ui_translate">
+<div style="display:none;" id="dl_ui_translate">
     <p data-translate="Downloads Page">Download Page</p>
     <p data-translate="Market">Market</p>
     <p data-translate="Categorys">Categorys</p>
@@ -43,12 +39,12 @@
         <div id="main_content">
             <h1 dl_ui="downloads_page"><span id="t_downloads">Downloads page</span></h1>
 
-            <h2><span id="t_market">Market</span> <?php market_dropdown($json); ?></h2>
+            <h2><span id="t_market">Market</span> </h2>
 
             <h3><span id="t_cat">Categorys</span></h3>
             <div id="dl-filter">
                 <p>
-                <span id="t_quick_find">Quick Find</span> <input type="text" name="search" id="file-search" value="" />
+                <span id="t_quick_find">Find</span> <input type="text" name="search" id="file-search" value="" />
                 <a href="#"  class="clear-button" ><span id="t_clear">clear</span></a>
                 <a href="#"  id="hide-all-button" ><span id="t_show_all">hide/show all</span></a>
                 </p>
@@ -57,9 +53,8 @@
             <div class="dl-footer"> </div>
         </div>
     </div>
-    <script type="text/javascript" src="jquery.min.js" ></script>
-    <script type="text/javascript" charset="utf-8">
-<?php include 'dl_ui.js' ?>
+    <script type="text/javascript" src="files/jquery.min.js" ></script>
+    <script type="text/javascript" src="dl_ui.js" ></script>
     </script>
 </div>
 </body>
