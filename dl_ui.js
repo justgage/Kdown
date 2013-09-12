@@ -313,7 +313,7 @@ $(function () {
 
            // get users search term and splits it up by spaces
            var searchtext = $(this).val().toUpperCase();
-           var searchtext = searchtext.split(" ");
+           searchtext = searchtext.split(" ");
 
            //if the search term is not empty
            if (searchtext.length > 0) {
