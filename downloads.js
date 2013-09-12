@@ -137,6 +137,7 @@ var kdown = {
             // if the category exists in the data
             if (json.cat) {
                 root_app.table.load(json);
+
             }
             else {
                 console.log("ERROR:" + json.mess);
@@ -151,10 +152,8 @@ var kdown = {
         loopID : "", 
         load : function() {
             "use strict";
-
             var app = kdown.hash;
             var hash =  decodeURIComponent( window.location.hash );
-
             if (hash !== app.oldHash && hash !== "") {
                 app.oldHash = hash;
 
@@ -175,15 +174,12 @@ var kdown = {
             window.location.hash =  "#" + app.cat + "@" + app.market;
         },
         start_loop : function () {
-            kdown.hash.loopID = window.setInterval(kdown.hash.load, 400);
+            kdown.hash.loopID = window.setInterval(kdown.hash.load, 200);
         },
     },
     table : {
         load : function (json) {
             "use strict";
-
-            var i, l;
-
 
             kdown.langDD.lang_list = {};
 
@@ -342,7 +338,7 @@ var kdown = {
 
             // Add a category to the page's sidebar
             for (var cat in cats) {
-                var temp = item.clone();
+                var temp = item.clone().show();
                 $(temp).addClass("cat_link");
                 $(temp).attr("id", "cat_" + cat);
                 $(temp).find("a").text(cats[cat]);
@@ -352,7 +348,9 @@ var kdown = {
             }
 
             // set first one to it's own category
-            $(item).attr('id', 'all_items');
+            //$(item).attr('id', 'all_items');
+            $(item).remove();
+
 
             // set the first one on the list to the current page item. 
             $(".cat_link").first().addClass("current_page_item");
@@ -389,7 +387,6 @@ var kdown = {
             });
         }
     }
-
 };
 
 

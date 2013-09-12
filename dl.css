@@ -3,6 +3,10 @@
     float:right;
 }
 
+#dl_search_big #dl_search_box  {
+    width:300px;
+}
+
 .dl_table table td {
     border-bottom:solid lightgrey 1px;
     padding:2px 5px;
@@ -47,7 +51,4 @@
 }
 
 
-.searching {
-    display:none;
-}
 

@@ -23,15 +23,18 @@
 *       all files in all markets (for search methods)
 *
  ***********************************************************/
+$json = file_get_contents("files/info.json");
+$markets = json_decode($json, true);
 
 $response = array();
 
-// this will grab the whole market. 
-if( isset($_POST['market'])== true && isset($_POST['cat']) == false ) 
+if ( isset($_POST['search']) )
 {
-    $json = file_get_contents("files/info.json");
-    $markets = json_decode($json, true);
 
+    $response = array("error" => false, "mess" => "All files for search", "list" => $markets);
+} 
+elseif( isset($_POST['market']) == true && isset($_POST['cat']) == false ) 
+{
     // this will return a flat list of the files 
     if ($_POST['market'] == 'all-list') {
 
@@ -77,8 +80,6 @@ if( isset($_POST['market'])== true && isset($_POST['cat']) == false )
 } //this will grab one category.
 elseif( isset($_POST['market']) == true && isset($_POST['cat']) == true ) 
 {
-    $json = file_get_contents("files/info.json");
-    $markets = json_decode($json, true);
 
     $found = false;
     $langs = $markets[$_POST['market']]['langs'];
@@ -99,8 +100,6 @@ elseif( isset($_POST['market']) == true && isset($_POST['cat']) == true )
 }
 else // if no input return list of categorys and list of markets
 {
-    $json = file_get_contents("files/info.json");
-    $markets = json_decode($json, true);
     $list = array();
     $cats = $markets["cat-list"];
     foreach ($markets as $market => $in) {

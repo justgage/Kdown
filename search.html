@@ -12,25 +12,20 @@
     <div id="lang_names" style="display:none;">
     </div>
 
-    <div id="vertical_nav">
-        <ul>
-            <li style="display:none;"><a href="#All-files">All Files</a></li>
-        </ul>
-    </div>
     <div id="main_content">
-        <div id="dl_search">
+        <div id="dl_wrapper">
+            <h1>Downloads</h1>
+
+            <div id="dl_controls">
+        <div id="dl_search_big">
             <form action="search.html" method="get" accept-charset="utf-8">
 
                 <span>Search</span>
                 <input type="text" name="dl_search" id="dl_search_box" value="" />
                 <!-- Translate the "go" below -->
-                <input id="search_go" type="submit" value="Go" />
+                <input id="search_go" type="button" value="Go" />
             </form>
         </div>
-        <div id="dl_wrapper">
-            <h1>Downloads</h1>
-
-            <div id="dl_controls">
 
                 <span>Market</span>
                 <select name="market" id="market_select"> </select>
@@ -39,6 +34,9 @@
                 <select name="market" id="lang_select"> </select>
 
             </div>
+
+
+            <h3 class="searching">Searching market: <span>...</span> </h3>
 
             <div id="dl_table_first" class="dl_table" >
                 <div id="dl_loading" style="display:none;" >
@@ -64,6 +62,32 @@
                     </tbody>
                 </table>
             </div>
+                <div id="dl_table_second" class="searching dl_table" >
+                    <h3>Other Markets</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>star</th>
+                                <th>File name</th>
+                                <th>Language</th>
+                                <th>Market</th>
+                                <th>Download</th>
+                            </tr>
+                        </thead>
+                        <!-- this is a template for the table, it will be changed on execution -->
+                        <tbody>
+                        <tr style="display:none;" id="table_copy_other">
+                            <td class="table_star">...</td>
+                            <td class="table_name"><a href="#">...</a></td>
+                            <td class="table_lang">...</td>
+                            <td class="table_market">...</td>
+                            <td class="table_dl_link"><a href="#">Download</a></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <!-- <p><a href="#top">Back to top</a></p> -->
+
+                </div>
                 <!-- <p><a href="#top">Back to top</a></p> -->
 
             <h3 style="display:none;" id="none_found">Sorry, no files where found.</h3>
@@ -72,6 +96,6 @@
     <br style="clear:both;" />
 </div>
 <script type="text/javascript" src="files/jquery.min.js" ></script>
-<script type="text/javascript" src="downloads.js" ></script>
+<script type="text/javascript" src="search.js" ></script>
 </body>
 </html>
