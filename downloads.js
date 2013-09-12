@@ -1,18 +1,45 @@
 
+/***
+ * K-DOWN ~ Kyani download interface
+ *
+ * Objects:
+ *      db
+ *      handles interaction between the server and the interface.
+ *      including the saving of that data for later use. 
+ *
+ *      table
+ *      handles the interaction with the table of downloads
+ *
+ *      marketDD
+ *      handles the interaction with the markets dropdown
+ *
+ *      catList
+ *      handles interactions with the category list
+ *
+ *      search
+ *      handles interaction with the search bar.
+ */
 var kdown = {
-
     db:{
+        // constant selectors (not used exclusively in the code yet)
         MARKETDD : "#market_select",
         LANGDD : "#lang_select",
         CAT_CURRENT : ".current_page_item",
         CAT_LINKS : ".cat_link a",
+
+        //these contain the selected market and category
         market : "",
         cat : "",
+        //this holds the list of valid categories and markets
         valid_list : "",
+
+        // this holds the saved file list in the format
+        // json[market][category]
         json: {},
 
         //
-        // This will load the category list either from the saved JSON or the ajax loaded JSON
+        // This will load the category list either 
+        // from the saved JSON or the ajax loaded JSON
         //
         load : function () {
             "use strict";
@@ -79,7 +106,7 @@ var kdown = {
 
             }, "json")
             .fail(function () {
-                console.log("ERROR: Ajax failed!");
+                console.error("ERROR: Ajax failed!");
             });
 
         },
@@ -278,7 +305,7 @@ var kdown = {
                 var temp = item.clone();
                 $(temp).addClass("cat_link");
                 $(temp).find("a").text(json.cats[i]);
-                $(temp).find("a").attr("href", "#");
+                $(temp).find("a").attr("href", "#" + encodeURIComponent( json.cats[i] ));
                 $("#vertical_nav ul").append(temp);
             }
 
@@ -322,7 +349,6 @@ $(document).ready(function () {
 
     "use strict";
 
-
     //************************************************************
     // things to do on page load
     //************************************************************
@@ -343,6 +369,7 @@ $(document).ready(function () {
         kdown.db.load();
 
 
+
     }, "json"); // JSON! very important to include this
 
 
@@ -355,5 +382,25 @@ $(document).ready(function () {
         kdown.db.var_update();
         kdown.db.load();
     });
+
+    var oldHash = "";
+
+    var hashGet = function() {
+        var hashObj = {};
+        var hash =  decodeURIComponent( window.location.hash );
+
+        if (hash !== oldHash && hash !== "") {
+            console.log(hash);
+            oldHash = hash;
+
+            kdown.db.cat = hash.slice(1);
+            kdown.db.load();
+        }
+    };
+
+
+    var hascheckID = window.setInterval(hashGet, 200);
+
+
 
 });
