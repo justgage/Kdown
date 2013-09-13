@@ -24,7 +24,7 @@
                         <input type="text" name="dl_search" id="dl_search_box" value="" />
                         <!-- Translate the "go" below -->
                         <input id="search_go" type="button" value="Go" />
-                        <a id="search_clear" href="#">clear</a>
+                        <a class="search_clear" href="#">clear</a>
                     </form>
                 </div>
 
@@ -62,7 +62,10 @@
                     </tr>
                     </tbody>
                 </table>
-                <p style="display:none;" class="none_found"><strong>Sorry, no files where found in this market.</strong> Files in other Markets are listed below</p>
+                <p style="display:none;" class="none_found">
+                    <strong>Sorry, no files where found in this market.</strong> Files in other Markets are listed below 
+                    <a class="search_clear" href="#">clear</a>
+                </p>
             </div>
             <div id="dl_table_second" class="searching dl_table" >
                 <h3>Other Markets</h3>
@@ -89,10 +92,8 @@
                 </table>
                 <p style="display:none;" class="none_found"><em>Sorry, no files where found.</em></p>
 
-                <!-- <p><a href="#top">Back to top</a></p> -->
-
+                <div id="to_top"><a>Back to top</a></div>
             </div>
-            <!-- <p><a href="#top">Back to top</a></p> -->
 
         </div>
     </div>

@@ -35,7 +35,7 @@ var kdown  = {
         load : function () {
             var search_term = kdown.search._GET('search');
             if (search_term !== 'null') {
-                $("#dl_search_box").val(search_term);
+                $("#dl_search_box").val(unescape(search_term));
             } else {
                 $("#dl_search_box").val("");
             }
@@ -45,10 +45,15 @@ var kdown  = {
                 kdown.search.go();
             });
 
-            $("#search_clear").click(function () {
+            $(".search_clear").click(function () {
                 $("#dl_search_box").val("");
                 kdown.search.go();
                 $("#dl_search_box").focus();
+            });
+
+            $("#to_top").click(function() {
+                $("html, body").animate({ scrollTop: 0 }, "fast");
+                return false;
             });
         },
         go : function () {
@@ -106,6 +111,8 @@ var kdown  = {
                         $(this).find(".none_found").hide();
                         $(this).find("table").show();
                     }
+
+                    kdown.table.highlight();
 
 
                 });
@@ -170,10 +177,12 @@ var kdown  = {
             var db = kdown.db.list;
             var i, l;
 
+            //goes through each market
             for ( var market in db ) {
 
                 var table_sel = "";
 
+                //if market equal to the selected one in the drop down. 
                 if (market === app.market) {
                     table_sel = $("#dl_table_first table");
                 } else {
@@ -207,6 +216,10 @@ var kdown  = {
                 }
 
             }
+        },
+        highlight : function () {
+            $("#dl_table_first tr, #dl_table_second tr").removeClass("table_row_odd");
+            $("#dl_table_first tr:visible, #dl_table_second tr:visible").filter(":odd").addClass("table_row_odd");
         }
     }
 };

@@ -152,6 +152,7 @@ var kdown = {
         loopID : "", 
         load : function() {
             "use strict";
+            console.log("hashchange check");
             var app = kdown.hash;
             var hash =  decodeURIComponent( window.location.hash );
             if (hash !== app.oldHash && hash !== "") {
@@ -165,16 +166,23 @@ var kdown = {
                 kdown.db.market = hash_array[1];
 
                 kdown.db.ui_update();
-                kdown.db.load();
             }
         },
-        update : function () {
+       update : function () {
             "use strict";
             var app = kdown.db;
             window.location.hash =  "#" + app.cat + "@" + app.market;
         },
         start_loop : function () {
-            kdown.hash.loopID = window.setInterval(kdown.hash.load, 200);
+            ie_version = kdown.ie_check();
+            if (ie_version < 8) {
+                kdown.hash.loopID = window.setInterval(kdown.hash.load, 200);
+            } else {
+                $(window).bind('hashchange', function() {
+                    console.log("Hashchange canceled.");
+                    kdown.hash.load();
+                });
+            }
         },
     },
     table : {
@@ -183,6 +191,8 @@ var kdown = {
             var i, l;
 
             kdown.langDD.lang_list = {};
+
+            $('#dl_table_first table').hide();
 
             //
             // UPDATE TABLE ***************
@@ -223,7 +233,7 @@ var kdown = {
 
             }
             $("#dl_loading").hide();
-            $('#dl_table_first table').fadeIn();
+            $('#dl_table_first table').fadeIn("fast");
 
             kdown.table.highlight();
 
@@ -363,10 +373,11 @@ var kdown = {
         // this will bind the clicks to the categorys links
         //
         bind: function () {
-            $(".cat_link a").click(function () {
-                kdown.db.cat = $(this).parent().data("cat");
-                kdown.ui_update();
-            });
+            // this is not needed due to the hash change event
+            // $(".cat_link a").click(function () {
+            //     kdown.db.cat = $(this).parent().data("cat");
+            //     kdown.db.ui_update();
+            // });
         },
 
         links_update : function () {
@@ -387,6 +398,17 @@ var kdown = {
                 app.load();
             });
         }
+    },
+    ie_check: function () {
+        var rv = -1; // Return value assumes failure.
+        if (navigator.appName == 'Microsoft Internet Explorer')
+            {
+                var ua = navigator.userAgent;
+                var re  = new RegExp("MSIE ([0-9]{1,}[\.0-9]{0,})");
+                if (re.exec(ua) != null)
+                    rv = parseFloat( RegExp.$1 );
+            }
+            return rv;
     }
 };
 
@@ -415,6 +437,11 @@ $(document).ready(function () {
         kdown.hash.start_loop();
 
         kdown.db.load();
+
+        $("#to_top").click(function() {
+            $("html, body").animate({ scrollTop: 0 }, "fast");
+            return false;
+        });
 
 
 
