@@ -210,7 +210,6 @@ var kdown = {
 
                 var file = json.cat[i];
                 var newRow = row.clone();
-                $("#dl_table_first table").append(newRow);
 
                 //Put the files information into the new row in the table
                 $(newRow).find(".table_star").text( "*" );
@@ -224,6 +223,7 @@ var kdown = {
                         $(newRow).addClass("lang_" + locale);
                     }
                 }
+                $("#dl_table_first table").append(newRow);
 
                 //
                 // UPDATE TRANSLATIONS DROP DOWN ***************

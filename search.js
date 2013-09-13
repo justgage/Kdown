@@ -130,7 +130,7 @@ var kdown  = {
             var app = kdown.db;
             var option = $("<option value=''></option>");
 
-            for (var market in app.list) {
+            $.each(app.list, function(market, inside) {
 
                 var clone = option.clone();
 
@@ -142,7 +142,7 @@ var kdown  = {
                 app.market = $("#market_select").val();
 
                 $("#market_label").text(app.market);
-            }
+            });
         }
     },
     langDD : {
@@ -154,14 +154,13 @@ var kdown  = {
 
             var option = $("<option value=''></option>");
 
-            for ( var code in app.list[app.market].langs ) {
-
+            // make an entry for each language in the drop down. 
+            $.each(app.list[app.market].langs, function(lang_code, lang_name) {
                 var clone = option.clone();
-                $(clone).text( app.list[app.market].langs[code] );
-                $(clone).attr("value", code );
+                $(clone).text(lang_name);
+                $(clone).attr("value", lang_code );
                 $("#lang_select").append(clone);
-
-            }
+            });
 
             var allclone = option.clone();
             $(allclone).text( "All" );
@@ -178,7 +177,7 @@ var kdown  = {
             var i, l;
 
             //goes through each market
-            for ( var market in db ) {
+            $.each( db, function (market, inside) {
 
                 var table_sel = "";
 
@@ -189,9 +188,9 @@ var kdown  = {
                     table_sel = $("#dl_table_second table");
                 }
                 // go through each category
-                for (i = 0, l = db[market].cats.length; i < l; i ++) {
+                for (i = 0, l = inside.cats.length; i < l; i ++) {
 
-                    var cat = db[market].cats[i];
+                    var cat = inside.cats[i];
                     // each file
                     for (var j = 0, ll = cat.files.length; j < ll; j ++) {
                         var file = cat.files[j];
@@ -215,7 +214,7 @@ var kdown  = {
                     }
                 }
 
-            }
+            });
         },
         highlight : function () {
             $("#dl_table_first tr, #dl_table_second tr").removeClass("table_row_odd");
