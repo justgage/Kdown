@@ -8,6 +8,15 @@
     overflow: hidden;
 }
 
+.table_name a {
+    text-decoration:none;
+    display:block;
+    padding: 10px;
+    vertical-align:center;
+}
+
+
+
 #dl_search_big #dl_search_box  {
     width:300px;
 }
@@ -54,6 +63,11 @@
 .table_row_odd {
     background:#F5F5F5;
 }
+
+.table_row:hover {
+    background-color:#EEE;
+}
+
 
 
 

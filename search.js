@@ -34,8 +34,11 @@ var kdown  = {
         // use get in the URL 
         load : function () {
             var search_term = kdown.search._GET('search');
-            $("#dl_search_box").val(search_term);
-
+            if (search_term !== 'null') {
+                $("#dl_search_box").val(search_term);
+            } else {
+                $("#dl_search_box").val("");
+            }
         },
         bind : function () {
             $("#dl_search_box").keyup(function () {
@@ -44,14 +47,10 @@ var kdown  = {
         },
         go : function () {
 
-            console.log("keyup");
-
-
             // get users search term and splits it up by spaces
             var searchtext = $("#dl_search_box").val().toUpperCase();
             searchtext = searchtext.split(" ");
 
-            console.log(searchtext);
             if (searchtext.length > 0) {
 
                 $(".table_row").hide();
@@ -70,7 +69,6 @@ var kdown  = {
                 $(".dl_table").each(function () {
                     var numFound = 0; 
 
-                    console.log("table");
                     //goes through each table row
                     $(this).find(".table_row").each(function () {
                         // this will get an uppercase string to search in.
@@ -161,33 +159,44 @@ var kdown  = {
             var app = kdown.db;
             var db = kdown.db.list;
             var i, l;
-            var row = $("#table_copy").clone();
 
-            $(row).removeAttr('id');
-            $(row).attr('class', 'table_row' );
-            $(row).show();
+            for ( var market in db ) {
 
-            // go through each category
-            for (i = 0, l = db[app.market].cats.length; i < l; i ++) {
+                var table_sel = "";
 
-                var cat = db[app.market].cats[i];
-                // each file
-                for (var j = 0, ll = cat.files.length; j < ll; j ++) {
-                    var file = cat.files[j];
-
-                    var newRow = row.clone();
-                    $("#dl_table_first table").append(newRow);
-
-                    //Put the files information into the new row in the table
-                    $(newRow).find(".table_star").text( "*" );
-                    $(newRow).find(".table_name a").text( file.filename ).attr("href",
-                                                                               "single.php?id=" + encodeURIComponent( file.id ));
-                                                                               $(newRow).find(".table_lang").text(file.native_lang);
-                                                                               $(newRow).find(".table_dl_link a").attr("href", file.href);
-
+                if (market === app.market) {
+                    table_sel = $("#dl_table_first table");
+                } else {
+                    table_sel = $("#dl_table_second table");
                 }
-            }
+                // go through each category
+                for (i = 0, l = db[market].cats.length; i < l; i ++) {
 
+                    var cat = db[market].cats[i];
+                    // each file
+                    for (var j = 0, ll = cat.files.length; j < ll; j ++) {
+                        var file = cat.files[j];
+
+                        var row = $(table_sel).find(".table_copy").clone();
+
+                        $(row).attr('class', 'table_row' );
+                        $(row).show();
+
+                        var newRow = row.clone();
+                        $(table_sel).append(newRow);
+
+                        //Put the files information into the new row in the table
+                        $(newRow).find(".table_star").text( "*" );
+                        $(newRow).find(".table_name a").text( file.filename ).attr("href",
+                                "single.php?id=" + encodeURIComponent( file.id ));
+                        $(newRow).find(".table_lang").text(file.native_lang);
+                        $(newRow).find(".table_market").text(market);
+                        $(newRow).find(".table_dl_link a").attr("href", file.href);
+
+                    }
+                }
+
+            }
         }
     }
 };
