@@ -44,6 +44,12 @@ var kdown  = {
             $("#dl_search_box").keyup(function () {
                 kdown.search.go();
             });
+
+            $("#search_clear").click(function () {
+                $("#dl_search_box").val("");
+                kdown.search.go();
+                $("#dl_search_box").focus();
+            });
         },
         go : function () {
 
