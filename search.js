@@ -95,8 +95,10 @@ var kdown  = {
                     // if none found in the table show the message
                     if (numFound === 0) {
                         $(this).find(".none_found").show();
+                        $(this).find("table").hide();
                     } else {
                         $(this).find(".none_found").hide();
+                        $(this).find("table").show();
                     }
 
 
@@ -125,6 +127,8 @@ var kdown  = {
                 $("#market_select").append(clone);
 
                 app.market = $("#market_select").val();
+
+                $("#market_label").text(app.market);
             }
         }
     },
