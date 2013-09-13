@@ -6,6 +6,9 @@ $markets = json_decode($json, true);
 
 $found = false;
 
+$myMarket ="";
+$myCat =""; // the the kind that meows
+
 foreach ($markets as $market => $inside) {
     if ($market != "cat-list" ) {
         foreach ($inside['cats'] as $cat) {
@@ -13,16 +16,13 @@ foreach ($markets as $market => $inside) {
                 if ($file["id"] == $_GET['id']) {
                     echo $file['filename'] . ":" . $file['id'];
                     $found = $file;
+                    $myMarket = $market;
+                    $myCat = $cat['name'];
                 }
             }
         }
     }
 }
-
-
-
-
-
 
 
 ?>
@@ -39,7 +39,7 @@ foreach ($markets as $market => $inside) {
     </div>
     <div id="main_content">
         <h4>
-            <a class="grey_callout" href="index.html">&larr; Back </a>
+           <a class="grey_callout" href="index.html<?php echo "#" . $myCat . "@" . $myMarket; ?>">&larr; Back </a>
         </h4>
         <h1><?php echo $found['filename'] ?></h1>
         <table>
