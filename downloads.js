@@ -175,14 +175,14 @@ var kdown = {
         },
         start_loop : function () {
             ie_version = kdown.ie_check();
-            if (ie_version < 8) {
-                kdown.hash.loopID = window.setInterval(kdown.hash.load, 200);
+            if ( ie_version > 7 || ie_version === -1 ) {
+                    $(window).bind('hashchange', function() {
+                        console.log("Hashchange canceled.");
+                        kdown.hash.load();
+                    });
             } else {
-                $(window).bind('hashchange', function() {
-                    console.log("Hashchange canceled.");
-                    kdown.hash.load();
-                });
-            }
+                kdown.hash.loopID = window.setInterval(kdown.hash.load, 200);
+            } 
         },
     },
     table : {
@@ -233,7 +233,7 @@ var kdown = {
 
             }
             $("#dl_loading").hide();
-            $('#dl_table_first table').fadeIn("fast");
+            $('#dl_table_first table').show();
 
             kdown.table.highlight();
 
@@ -257,12 +257,13 @@ var kdown = {
                 });
             }
 
-            $("#dl_table_first").fadeIn();
 
             if (found === 0) {
                 $("#none_found").show();
             }
 
+
+            $("#dl_table_first").show();
             kdown.table.highlight();
 
 
