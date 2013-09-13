@@ -3,6 +3,11 @@
     float:right;
 }
 
+.table_name {
+    width: 450px;
+    overflow: hidden;
+}
+
 #dl_search_big #dl_search_box  {
     width:300px;
 }
