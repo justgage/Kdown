@@ -206,9 +206,9 @@ var kdown = {
             $(row).attr('class', 'table_row' );
             $(row).show();
 
-            for (i = 0, l = json.cat.length; i < l; i ++) {
+            //go through each file in the array
+            $.each(json.cat, function(i, file) {
 
-                var file = json.cat[i];
                 var newRow = row.clone();
 
                 //Put the files information into the new row in the table
@@ -218,10 +218,10 @@ var kdown = {
                 $(newRow).find(".table_dl_link a").attr("href", file.href);
 
                 if (typeof file.langs === "object") {
-                    for (var locale in file.langs) {
+                        $.each( file.langs, function (locale, info) {
                         kdown.langDD.lang_list[locale] = true;
                         $(newRow).addClass("lang_" + locale);
-                    }
+                    });
                 }
                 $("#dl_table_first table").append(newRow);
 
@@ -231,7 +231,8 @@ var kdown = {
 
                 kdown.langDD.load(json);
 
-            }
+            });
+
             $("#dl_loading").hide();
             $('#dl_table_first table').show();
 
@@ -285,17 +286,17 @@ var kdown = {
             var markets = app.valid_list.markets;
             var i, l;
             var option = $("<option value=''></option>");
-            //change the markets dropdown
-            for (i = 0, l = markets.length; i < l; i ++) {
-                var v = markets[i];
+            
+            //populate the market drop down
+            $.each(market, function(i, market) {
 
                 var clone = option.clone();
 
-                $(clone).text( v );
-                $(clone).attr("value", v );
+                $(clone).text( market );
+                $(clone).attr("value", market );
 
                 $("#market_select").append(clone);
-            }
+            });
         },
     },
     langDD : {
@@ -308,7 +309,7 @@ var kdown = {
 
             var option = $("<option value=''></option>");
 
-            for (var code in json.langs) {
+            $.each(json.langs, function (code, lang) {
 
                 // make it false if it isn't set by the table.load()
                 app.lang_list[code] = app.lang_list[code] ? app.lang_list[code] : false;
@@ -320,7 +321,7 @@ var kdown = {
                     $("#lang_select").append(clone);
                 }
 
-            }
+            });
 
             var allclone = option.clone();
             $(allclone).text( "All" );
@@ -349,15 +350,15 @@ var kdown = {
             var i, l;
 
             // Add a category to the page's sidebar
-            for (var cat in cats) {
+            $.each(cats, function(code, cat) {
                 var temp = item.clone().show();
                 $(temp).addClass("cat_link");
-                $(temp).attr("id", "cat_" + cat);
-                $(temp).find("a").text(cats[cat]);
+                $(temp).attr("id", "cat_" + code);
+                $(temp).find("a").text(cat);
                 $(temp).find("a").attr("href", "#" + encodeURIComponent(cat) + app.market );
-                $(temp).data("cat", cat);
+                $(temp).data("cat", code);
                 $("#vertical_nav ul").append(temp);
-            }
+            });
 
             // set first one to it's own category
             //$(item).attr('id', 'all_items');
