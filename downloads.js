@@ -19,6 +19,14 @@
  *      search
  *      handles interaction with the search bar.
  */
+
+function log(mess) {
+    if (window.console !== undefined) {
+        console.log(mess);
+    }
+}
+
+
 var kdown = {
     db:{
         // constant selectors (not used exclusively in the code yet)
@@ -46,24 +54,21 @@ var kdown = {
 
             var app = kdown.db;
 
-            console.log("---db.load---");
+            log("---db.load---");
 
             if (app.market !== "all-list") {
                 if ( app.json[ app.market ]  &&  app.json[ app.market ][ app.cat ] ) {
-                    console.log("   app.load--->app.loadJSON()");
+                    log("   app.load--->app.loadJSON()");
                     app.loadJSON( app.json[ app.market ][ app.cat ] );
                 }
                 else {
-                    console.log("   app.load--->app.ajax_load()");
+                    log("   app.load--->app.ajax_load()");
                     app.ajax_load();
                 }
             } else {
-
                 $.post("api.php", { "market": "all-list" } ,  function (json) {
-
                     app.loadJSON(json.list[app.market]);
                 });
-
             }
         },
 
@@ -75,7 +80,7 @@ var kdown = {
             var app = kdown.db;
             app.market = $(app.MARKETDD).val();
             app.cat = $(app.CAT_CURRENT + " a" ).attr('href').slice(1);
-            console.log("setting cat to :" + app.cat);
+            log("setting cat to :" + app.cat);
             kdown.catList.links_update();
         },
 
@@ -104,12 +109,13 @@ var kdown = {
 
             //empty the list of items
 
+            $("#ajax_error").hide();
             $("#dl_loading").show();
             $("#dl_table_first table").hide();
 
             //load using post method
             $.post("api.php", { "market":app.market, "cat":app.cat },  function (json) {
-                console.log("Ajax worked!");
+                log("Ajax worked!");
 
                 //creates an entry for the market if there isn't one
                 app.json[ app.market ] = app.json[ app.market ] || {};
@@ -121,7 +127,8 @@ var kdown = {
 
             }, "json")
             .fail(function () {
-                console.error("ERROR: Ajax failed!");
+                $("#ajax_error").show();
+                $("#dl_loading").hide();
             });
 
         },
@@ -137,22 +144,16 @@ var kdown = {
             // if the category exists in the data
             if (json.cat) {
                 root_app.table.load(json);
-
+            } else {
+                //log("ERROR:" + json.mess);
             }
-            else {
-                console.log("ERROR:" + json.mess);
-            }
-
-        },
-
-
+        }
     },
     hash : {
         oldHash : "",
         loopID : "", 
         load : function() {
             "use strict";
-            console.log("hashchange check");
             var app = kdown.hash;
             var hash =  decodeURIComponent( window.location.hash );
             if (hash !== app.oldHash && hash !== "") {
@@ -162,7 +163,10 @@ var kdown = {
                 // left is category
                 // right is market
                 var hash_array = hash.slice(1).split("@");
-                kdown.db.cat = hash_array[0];
+                if (hash_array[0]) {
+                    kdown.db.cat = hash_array[0];
+                }
+                    
                 kdown.db.market = hash_array[1];
 
                 kdown.db.ui_update();
@@ -173,17 +177,28 @@ var kdown = {
             var app = kdown.db;
             window.location.hash =  "#" + app.cat + "@" + app.market;
         },
-        start_loop : function () {
-            ie_version = kdown.ie_check();
-            if ( ie_version > 7 || ie_version === -1 ) {
+        bind : function () {
+            ie_version = kdown.hash.ie_check();
+            if ( ie_version > 8 || ie_version === -1 ) {
                     $(window).bind('hashchange', function() {
-                        console.log("Hashchange canceled.");
+                        log("Hashchange canceled.");
                         kdown.hash.load();
                     });
             } else {
-                kdown.hash.loopID = window.setInterval(kdown.hash.load, 200);
+                kdown.hash.loopID = window.setInterval(kdown.hash.load, 100);
             } 
         },
+        ie_check: function () {
+            var rv = -1; // Return value assumes failure.
+            if (navigator.appName == 'Microsoft Internet Explorer')
+                {
+                    var ua = navigator.userAgent;
+                    var re  = new RegExp("MSIE ([0-9]{1,}[\.0-9]{0,})");
+                    if (re.exec(ua) != null)
+                        rv = parseFloat( RegExp.$1 );
+                }
+                return rv;
+        }
     },
     table : {
         load : function (json) {
@@ -233,6 +248,7 @@ var kdown = {
 
             });
 
+            $("#ajax_error").hide();
             $("#dl_loading").hide();
             $('#dl_table_first table').show();
 
@@ -240,7 +256,7 @@ var kdown = {
 
         },
         filter : function () {
-            console.log("table.filter()");
+            log("table.filter()");
             $("#dl_table_first").hide();
             $("#none_found").hide();
             var filter_lang = $(kdown.db.LANGDD).val();
@@ -288,7 +304,7 @@ var kdown = {
             var option = $("<option value=''></option>");
             
             //populate the market drop down
-            $.each(market, function(i, market) {
+            $.each(markets, function(i, market) {
 
                 var clone = option.clone();
 
@@ -297,7 +313,7 @@ var kdown = {
 
                 $("#market_select").append(clone);
             });
-        },
+        }
     },
     langDD : {
         lang_list : {},
@@ -330,7 +346,7 @@ var kdown = {
         },
         bind : function () {
             $(kdown.db.LANGDD).change(function () {
-                console.log("translation changed");
+                log("translation changed");
                 kdown.table.filter();
             });
         }
@@ -400,17 +416,6 @@ var kdown = {
                 app.load();
             });
         }
-    },
-    ie_check: function () {
-        var rv = -1; // Return value assumes failure.
-        if (navigator.appName == 'Microsoft Internet Explorer')
-            {
-                var ua = navigator.userAgent;
-                var re  = new RegExp("MSIE ([0-9]{1,}[\.0-9]{0,})");
-                if (re.exec(ua) != null)
-                    rv = parseFloat( RegExp.$1 );
-            }
-            return rv;
     }
 };
 
@@ -423,7 +428,7 @@ $(document).ready(function () {
 
     // this gets the list of valid categories and markets
     $.post("api.php", {}, function (json) {
-        console.log("----------$POST LOAD");
+        log("----------$POST LOAD");
 
         kdown.db.valid_list = json;
 
@@ -432,13 +437,16 @@ $(document).ready(function () {
         kdown.catList.load();
         kdown.langDD.bind();
 
+
         // poplate table with ajax request
+        kdown.db.load();
+
+        //update variables 
         kdown.db.var_update();
 
         kdown.hash.load();
-        kdown.hash.start_loop();
+        kdown.hash.bind();
 
-        kdown.db.load();
 
         $("#to_top").click(function() {
             $("html, body").animate({ scrollTop: 0 }, "fast");
@@ -453,7 +461,7 @@ $(document).ready(function () {
      * Bind market select to reloading the list of files
      */
     $(kdown.db.MARKETDD).change(function () {
-        console.log("market changed");
+        log("market changed");
         kdown.db.market = $(this).val();
         kdown.hash.update();
         kdown.db.ui_update();

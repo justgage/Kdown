@@ -22,14 +22,18 @@ var kdown  = {
 
             }, "json" );
 
-        },
+        }
     },
     search : {
         // this will get the GET parameter from the URL based on name
         _GET : function (name) {
-            return decodeURI(
+            var result = decodeURI(
                 (RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]
             );
+
+            //fixes all the + and makes them spaces
+            return result.replace(/\+/g, " ");
+
         },
         // use get in the URL 
         load : function () {
@@ -67,13 +71,12 @@ var kdown  = {
                 $(".table_row").hide();
                 //checks for any blank items in the array and deletes them
                 (function() {
-                    for (var l = searchtext.length, i = l; i > -1; i-- ) {
-
+                    $.each(searchtext, function (i, searchterm) {
                         //if the item is blank
                         if ( searchtext[i] === "" ) {
                             searchtext.splice(i,1);
                         }
-                    }
+                    });
                 })();
 
 
@@ -88,12 +91,11 @@ var kdown  = {
                         // console.log(haystack);
 
                         // this checks each search term 
-                        for (var i = 0, l = searchtext.length; i < l; i ++) {
-                            var term = searchtext[i];
+                        $.each(searchtext, function (i, term) {
                             if (haystack.indexOf(term) !== -1 ) {
                                 isFound++;
                             }
-                        }
+                        });
 
                         //found each search term in the text
                         if (isFound === (searchtext.length - 1) ) {
@@ -188,12 +190,10 @@ var kdown  = {
                     table_sel = $("#dl_table_second table");
                 }
                 // go through each category
-                for (i = 0, l = inside.cats.length; i < l; i ++) {
+                $.each(inside.cats, function(i, cat) {
 
-                    var cat = inside.cats[i];
                     // each file
-                    for (var j = 0, ll = cat.files.length; j < ll; j ++) {
-                        var file = cat.files[j];
+                    $.each(cat.files, function(i, file) {
 
                         var row = $(table_sel).find(".table_copy").clone();
 
@@ -211,8 +211,8 @@ var kdown  = {
                         $(newRow).find(".table_market").text(market);
                         $(newRow).find(".table_dl_link a").attr("href", file.href);
 
-                    }
-                }
+                    });
+                });
 
             });
         },
