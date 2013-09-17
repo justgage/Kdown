@@ -111,7 +111,7 @@ var kdown = {
 
             $("#ajax_error").hide();
             $("#dl_loading").show();
-            $("#dl_table_first table").hide();
+            $("#dl_table_first").hide();
 
             //load using post method
             $.post("api.php", { "market":app.market, "cat":app.cat },  function (json) {
@@ -207,7 +207,7 @@ var kdown = {
 
             kdown.langDD.lang_list = {};
 
-            $('#dl_table_first table').hide();
+            $('#dl_table_first').hide();
 
             //
             // UPDATE TABLE ***************
@@ -233,10 +233,9 @@ var kdown = {
 
                 var list = [];
                 $.each( file.langs, function (locale, info) {
-                    kdown.langDD.lang_list[locale] = true;
+                    kdown.langDD.lang_list[locale] += 1 ;
                     $(newRow).addClass("lang_" + locale);
                     list.push(locale);
-                    //list.push(json.langs[locale]);
                     log(locale);
                 });
 
@@ -249,7 +248,7 @@ var kdown = {
 
                 log(list);
                 log(json.langs);
-                $(newRow).find(".table_lang div").html( "<a>" + list.join("</a>, <a>") + "</a>" );
+                $(newRow).find(".table_lang div").html( list.join(", ") );
 
                 $("#dl_table_first table").append(newRow);
 
@@ -263,7 +262,7 @@ var kdown = {
 
             $("#ajax_error").hide();
             $("#dl_loading").hide();
-            $('#dl_table_first table').show();
+            $('#dl_table_first').show();
 
             kdown.table.highlight();
 
@@ -342,14 +341,23 @@ var kdown = {
             $.each(json.langs, function (code, lang) {
 
                 // make it false if it isn't set by the table.load()
-                app.lang_list[code] = app.lang_list[code] ? app.lang_list[code] : false;
+                app.lang_list[code] = app.lang_list[code] ? app.lang_list[code] : 0;
 
-                if (app.lang_list[code] === true) {
-                    var clone = option.clone();
-                    $(clone).text( lang );
-                    $(clone).attr("value", code );
-                    $("#lang_select").append(clone);
+                var clone = option.clone();
+
+                // this next block of code will add spaces to the right of the number
+                // so that all the translations are nicely lined up. 
+                // change the 4 to how many figures the max number will be
+                var num = app.lang_list[code] + "" ;
+                var spaces = [];
+                for (var i = 0, l = 4 - num.length; i < l; i++) {
+                    spaces.push("\u00A0"); //this is the char for a non-breaking space
                 }
+                num = num + spaces.join(" ");
+
+                $(clone).text(num + lang);
+                $(clone).attr("value", code );
+                $("#lang_select").append(clone);
 
             });
 

@@ -124,7 +124,7 @@ var kdown  = {
                 $(".table_row").show();
                 $(".none_found").hide();
             }
-        },
+        }
     },
     marketDD : {
         // this will populate the market drop down
@@ -176,7 +176,6 @@ var kdown  = {
 
             var app = kdown.db;
             var db = kdown.db.list;
-            var i, l;
 
             //goes through each market
             $.each( db, function (market, inside) {

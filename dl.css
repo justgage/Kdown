@@ -25,7 +25,7 @@
 }
 
 .table_name a {
-    text-decoration:none;
+    /* text-decoration:none; */
     display:block;
     padding: 10px;
     vertical-align:center;
@@ -101,3 +101,7 @@
 }
 
 
+#dl_loading {
+    padding:5em;
+    text-align:center;
+}
