@@ -1,7 +1,22 @@
 
 #dl_search {
     float:right;
-    font-size:13px;
+    font-size:16px;
+    padding:10px 20px;
+    border-radius:25px;
+    background-color:lightgrey;
+    background-image: -webkit-linear-gradient(top, #EDEDED 0%, #BDBDBD 100%);
+}
+
+#dl_search form {
+    padding:0;
+}
+#dl_search input[type="text"] {
+    font-size:12px;
+}
+
+#dl_search_big #dl_search_box  {
+    width:300px;
 }
 
 .table_name {
@@ -16,24 +31,33 @@
     vertical-align:center;
 }
 
-
-
-#dl_search_big #dl_search_box  {
-    width:300px;
-}
-
 .dl_table table td {
     border-bottom:solid lightgrey 1px;
     padding:2px 5px;
 }
 
-
 .table_star, .table_lang, .table_dl_link {
     text-align:center;
 }
 
-.dl_table table {
+.table_lang {
+    font-size:13px;
+}
+
+.lang_hide {
+    height:35px;
+    overflow:hidden;
+}
+
+#main_content .dl_table table {
     width:690px;
+    /* border:solid lightgrey 1px; */
+    border-collapse:collapse;
+    margin-bottom:1em;
+}
+
+#full_width .dl_table table {
+    width:960px;
     /* border:solid lightgrey 1px; */
     border-collapse:collapse;
     margin-bottom:1em;

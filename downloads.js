@@ -229,15 +229,28 @@ var kdown = {
                 //Put the files information into the new row in the table
                 $(newRow).find(".table_star").text( "*" );
                 $(newRow).find(".table_name a").text( file.filename ).attr("href", "single.php?id=" + encodeURIComponent( file.id ));
-                $(newRow).find(".table_lang").text(file.native_lang);
                 $(newRow).find(".table_dl_link a").attr("href", file.href);
 
-                if (typeof file.langs === "object") {
-                        $.each( file.langs, function (locale, info) {
-                        kdown.langDD.lang_list[locale] = true;
-                        $(newRow).addClass("lang_" + locale);
+                var list = [];
+                $.each( file.langs, function (locale, info) {
+                    kdown.langDD.lang_list[locale] = true;
+                    $(newRow).addClass("lang_" + locale);
+                    list.push(locale);
+                    //list.push(json.langs[locale]);
+                    log(locale);
+                });
+
+                if (list.length < 3) {
+                    $.each(list, function (i, locale) {
+                        list[i] = json.langs[locale];
                     });
                 }
+
+
+                log(list);
+                log(json.langs);
+                $(newRow).find(".table_lang div").html( "<a>" + list.join("</a>, <a>") + "</a>" );
+
                 $("#dl_table_first table").append(newRow);
 
                 //
@@ -253,6 +266,7 @@ var kdown = {
             $('#dl_table_first table').show();
 
             kdown.table.highlight();
+
 
         },
         filter : function () {
@@ -332,7 +346,7 @@ var kdown = {
 
                 if (app.lang_list[code] === true) {
                     var clone = option.clone();
-                    $(clone).text( json.langs[code] );
+                    $(clone).text( lang );
                     $(clone).attr("value", code );
                     $("#lang_select").append(clone);
                 }
@@ -466,6 +480,7 @@ $(document).ready(function () {
         kdown.hash.update();
         kdown.db.ui_update();
     });
+
 
 
 });

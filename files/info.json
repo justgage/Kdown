@@ -1,11 +1,11 @@
 {
-   "cat-list":{ 
-       "applications" : "Applications & Forms",
-       "business":"Business Library",
-       "premotion":"Premotion & News",
-       "training":"Training"
- },
-   "Europe" : {
+   "cat-list":{
+      "applications":"Applications & Forms",
+      "business":"Business Library",
+      "premotion":"Premotion & News",
+      "training":"Training"
+   },
+   "Europe":{
       "langs":{
          "da":"Dansk",
          "de":"Deutsch",
@@ -48,13 +48,55 @@
                   "id":53465,
                   "native_lang":"en",
                   "langs":{
-                     "en":{
+                     "da":{
                         "url":"https://na.kyani.net/downloads/Applications/EN-order-form.pdf"
                      },
-                     "es":{
+                     "de":{
                         "url":"https://na.kyani.net/downloads/Applications/EN-order-form.pdf"
                      },
                      "et":{
+                        "url":"https://na.kyani.net/downloads/Applications/EN-order-form.pdf"
+                     },
+                     "en":{
+                        "url":"https://na.kyani.net/downloads/Applications/EN-order-form.pdf"
+                     },
+                     "hr":{
+                        "url":"https://na.kyani.net/downloads/Applications/EN-order-form.pdf"
+                     },
+                     "hu":{
+                        "url":"https://na.kyani.net/downloads/Applications/EN-order-form.pdf"
+                     },
+                     "no":{
+                        "url":"https://na.kyani.net/downloads/Applications/EN-order-form.pdf"
+                     },
+                     "pl":{
+                        "url":"https://na.kyani.net/downloads/Applications/EN-order-form.pdf"
+                     },
+                     "ru":{
+                        "url":"https://na.kyani.net/downloads/Applications/EN-order-form.pdf"
+                     },
+                     "ro":{
+                        "url":"https://na.kyani.net/downloads/Applications/EN-order-form.pdf"
+                     },
+                     "sk":{
+                        "url":"https://na.kyani.net/downloads/Applications/EN-order-form.pdf"
+                     },
+                     "sn":{
+                        "url":"https://na.kyani.net/downloads/Applications/EN-order-form.pdf"
+                     },
+                     "sr":{
+                        "url":"https://na.kyani.net/downloads/Applications/EN-order-form.pdf"
+                     },
+                     "fi":{
+                        "url":"https://na.kyani.net/downloads/Applications/EN-order-form.pdf"
+                     },
+                     "sv":{
+                        "url":"https://na.kyani.net/downloads/Applications/EN-order-form.pdf"
+                     },
+                     "tr":{
+                        "url":"https://na.kyani.net/downloads/Applications/EN-order-form.pdf"
+                     },
+                     "ua":{
                         "url":"https://na.kyani.net/downloads/Applications/EN-order-form.pdf"
                      }
                   }
@@ -69,7 +111,7 @@
                      "en":{
                         "url":"https://na.kyani.net/downloads/Applications/EN-order-form.pdf"
                      },
-                     "es":{
+                     "ro":{
                         "url":"https://na.kyani.net/downloads/Applications/EN-order-form.pdf"
                      },
                      "et":{
@@ -84,7 +126,7 @@
                   "id":53462,
                   "native_lang":"en",
                   "langs":{
-                     "es":{
+                     "ro":{
                         "url":"https://na.kyani.net/downloads/Applications/EN-order-form.pdf"
                      },
                      "et":{
@@ -103,13 +145,11 @@
                   "native_lang":"en",
                   "href":"files/",
                   "filetype":"txt",
-
                   "langs":{
                      "en":{
                         "url":"https://na.kyani.net/downloads/Applications/EN-order-form.pdf"
                      }
                   }
-
                },
                {
                   "filename":"Spánish Fileo",
@@ -118,7 +158,7 @@
                   "href":"/downloads/Business Documents/Autoship Terms &amp; Conditions-1.00-ENGLISH-USA.pdf",
                   "filetype":" ",
                   "langs":{
-                     "es":{
+                     "ro":{
                         "url":"https://na.kyani.net/downloads/Applications/EN-order-form.pdf"
                      }
                   }
@@ -130,7 +170,7 @@
                   "href":"/downloads/Business Documents/Autoship Terms &amp; Conditions-1.00-ENGLISH-USA.pdf",
                   "filetype":" ",
                   "langs":{
-                     "es":{
+                     "ro":{
                         "url":"https://na.kyani.net/downloads/Applications/EN-order-form.pdf"
                      }
                   }
@@ -146,7 +186,6 @@
                         "url":"https://na.kyani.net/downloads/Applications/EN-order-form.pdf"
                      }
                   }
-
                },
                {
                   "filename":"Blue_Kyani_Independent Distributor_logo",
@@ -1011,7 +1050,7 @@
       },
       "cats":[
          {
-             "name":"applications",
+            "name":"applications",
             "files":[
                {
                   "filename":"Kyani Order Form",
@@ -1495,7 +1534,7 @@
                   "href":"files/",
                   "filetype":"pdf",
                   "langs":{
-                     "es":{
+                     "ro":{
                         "url":"https://na.kyani.net/downloads/Applications/EN-order-form.pdf"
                      }
                   }
@@ -1527,7 +1566,7 @@
             ]
          },
          {
-             "name":"premotion",
+            "name":"premotion",
             "files":[
                {
                   "filename":"2013 Exec Trip",

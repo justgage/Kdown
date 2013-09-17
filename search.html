@@ -6,98 +6,96 @@
 </head>
 <body>
 <div class="center">
-    <!-- <a name="top"></a> -->
-    <!-- for the link to go back to the top -->
+        <!-- <a name="top"></a> -->
+        <!-- for the link to go back to the top -->
 
-    <div id="lang_names" style="display:none;">
-    </div>
+        <div id="full_width">
+            <div id="dl_wrapper" class="gradient" >
+                <h1><a href="index.html">Downloads</a></h1>
 
-    <div id="main_content">
-        <div id="dl_wrapper">
-            <h1><a href="index.html">Downloads</a></h1>
+                <div id="dl_controls">
+                    <div id="dl_search_big">
+                        <form action="search.html" method="get" accept-charset="utf-8">
 
-            <div id="dl_controls">
-                <div id="dl_search_big">
-                    <form action="search.html" method="get" accept-charset="utf-8">
+                            <span>Search</span>
+                            <input type="text" name="dl_search" id="dl_search_box" value="" />
+                            <!-- Translate the "go" below -->
+                            <input id="search_go" type="button" value="Go" />
+                            <a class="search_clear" href="#">clear</a>
+                        </form>
+                    </div>
 
-                        <span>Search</span>
-                        <input type="text" name="dl_search" id="dl_search_box" value="" />
-                        <!-- Translate the "go" below -->
-                        <input id="search_go" type="button" value="Go" />
-                        <a class="search_clear" href="#">clear</a>
-                    </form>
+                    <span>Market</span>
+                    <select name="market" id="market_select"> </select>
+
+                    <span>Translations</span>
+                    <select name="market" id="lang_select"> </select>
+
                 </div>
 
-                <span>Market</span>
-                <select name="market" id="market_select"> </select>
 
-                <span>Translations</span>
-                <select name="market" id="lang_select"> </select>
+                <h3 class="searching">Searching market: <span id="market_label">...</span> </h3>
 
-            </div>
-
-
-            <h3 class="searching">Searching market: <span id="market_label">...</span> </h3>
-
-            <div id="dl_table_first" class="dl_table" >
-                <div id="dl_loading" style="display:none;" >
-                    Loading the downloads...
-                </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th class="table_star">star</th>
-                            <th class="table_name">File name</th>
-                            <th class="table_lang">Language</th>
-                            <th class="table_dl_link">Download</th>
+                <div id="dl_table_first" class="dl_table" >
+                    <div id="dl_loading" style="display:none;" >
+                        Loading the downloads...
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="table_star">star</th>
+                                <th class="table_name">File name</th>
+                                <th class="table_lang">Language</th>
+                                <th class="table_dl_link">Download</th>
+                            </tr>
+                        </thead>
+                        <!-- this is a template for the table, it will be changed on execution -->
+                        <tbody>
+                        <tr style="display:none;" class="table_copy">
+                            <td class="table_star">...</td>
+                            <td class="table_name"><a href="#">...</a></td>
+                            <td class="table_lang">...</td>
+                            <td class="table_dl_link"><a href="#">Download</a></td>
                         </tr>
-                    </thead>
-                    <!-- this is a template for the table, it will be changed on execution -->
-                    <tbody>
-                    <tr style="display:none;" class="table_copy">
-                        <td class="table_star">...</td>
-                        <td class="table_name"><a href="#">...</a></td>
-                        <td class="table_lang">...</td>
-                        <td class="table_dl_link"><a href="#">Download</a></td>
-                    </tr>
-                    </tbody>
-                </table>
-                <p style="display:none;" class="none_found">
+                        </tbody>
+                    </table>
+                    <p style="display:none;" class="none_found">
                     <strong>Sorry, no files where found in this market.</strong> Files in other Markets are listed below 
                     <a class="search_clear" href="#">clear</a>
-                </p>
-            </div>
-            <div id="dl_table_second" class="searching dl_table" >
-                <h3>Other Markets</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>star</th>
-                            <th>File name</th>
-                            <th>Language</th>
-                            <th>Market</th>
-                            <th>Download</th>
+                    </p>
+                </div>
+                <div id="dl_table_second" class="searching dl_table" >
+                    <h3>Other Markets</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>star</th>
+                                <th>File name</th>
+                                <th>Language</th>
+                                <th>Market</th>
+                                <th>Download</th>
+                            </tr>
+                        </thead>
+                        <!-- this is a template for the table, it will be changed on execution -->
+                        <tbody>
+                        <tr style="display:none;" class="table_copy">
+                            <td class="table_star">...</td>
+                            <td class="table_name"><a href="#">...</a></td>
+                            <td class="table_lang">...</td>
+                            <td class="table_market">...</td>
+                            <td class="table_dl_link"><a href="#">Download</a></td>
                         </tr>
-                    </thead>
-                    <!-- this is a template for the table, it will be changed on execution -->
-                    <tbody>
-                    <tr style="display:none;" class="table_copy">
-                        <td class="table_star">...</td>
-                        <td class="table_name"><a href="#">...</a></td>
-                        <td class="table_lang">...</td>
-                        <td class="table_market">...</td>
-                        <td class="table_dl_link"><a href="#">Download</a></td>
-                    </tr>
-                    </tbody>
-                </table>
-                <p style="display:none;" class="none_found"><em>Sorry, no files where found.</em></p>
+                        </tbody>
+                    </table>
+                    <p style="display:none;" class="none_found"><em>Sorry, no files where found.</em></p>
 
-                <div id="to_top"><a>Back to top</a></div>
+                    <div id="to_top"><a>Back to top</a></div>
+                </div>
+
             </div>
-
         </div>
-    </div>
-    <br style="clear:both;" />
+        <br style="clear:both;" />
+</div>
 </div>
 <script type="text/javascript" src="files/jquery.min.js" ></script>
 <script type="text/javascript" src="search.js" ></script>
