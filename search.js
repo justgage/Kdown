@@ -20,8 +20,6 @@ var kdown = {
                 var cat_list = json.list["cat-list"];
                 delete json.list["cat-list"];
 
-                klog("API json  ->");
-
                 var temp = json.list;
 
                 var list = {};
@@ -45,8 +43,6 @@ var kdown = {
                 });
 
 
-                klog("New list ->");
-                klog(list);
                 kdown.db.marketsJSON = list;
 
                 kdown.marketDD.load();
@@ -118,20 +114,11 @@ var kdown = {
     },
     table : {
         html_row : $(".table_copy").html(),
-        // populate the table with given json
         load: function (json) {
             "use strict";
-            klog("table.load()-------");
-            console.log(typeof json);
             if (typeof json === "undefined") {
                 json = kdown.db.marketsJSON;
             }
-
-            klog("JSON => ");
-            klog(json);
-
-
-            //yes going back to this way. 
 
             var db = kdown.db;
             var table_yours = $("#dl_table_first table");
@@ -139,14 +126,8 @@ var kdown = {
             var html_tbody_yours = "";
             var html_tbody_other = "";
 
-            var html_row = "<tr>" + kdown.table.html_row + "</tr>";
+            var html_row = "<tr class='table_row'>" + kdown.table.html_row + "</tr>";
 
-
-            klog("db looks like :");
-            klog(table_yours);
-
-
-            //goes through each market
             $.each(json, function (market, files) {
                 $.each(files, function (i, file) {
                     var table_sel = "";
@@ -170,7 +151,6 @@ var kdown = {
             table_yours.find("tbody").html(html_tbody_yours);
             table_other.find("tbody").html(html_tbody_other);
             kdown.table.highlight();
-            klog("-------");
         },
         // stripes the table
         highlight: function () {
@@ -262,11 +242,8 @@ var kdown = {
             });
         },
         go: function () {
-            klog("-----go-----");
             var searchtext = $("#dl_search_box").val();
             var json = kdown.db.filter(searchtext);
-            klog(json);
-            klog("----->table.load");
             kdown.table.load(json);
         }
     }

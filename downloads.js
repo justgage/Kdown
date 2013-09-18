@@ -54,15 +54,12 @@ var kdown = {
 
             var app = kdown.db;
 
-            klog("---db.load---");
 
             if (app.market !== "all-list") {
                 if ( app.json[ app.market ]  &&  app.json[ app.market ][ app.cat ] ) {
-                    klog("   app.load--->app.loadJSON()");
                     app.loadJSON( app.json[ app.market ][ app.cat ] );
                 }
                 else {
-                    klog("   app.load--->app.ajax_load()");
                     app.ajax_load();
                 }
             } else {
@@ -80,7 +77,6 @@ var kdown = {
             var app = kdown.db;
             app.market = $(app.MARKETDD).val();
             app.cat = $(app.CAT_CURRENT + " a" ).attr('href').slice(1);
-            klog("setting cat to :" + app.cat);
             kdown.catList.links_update();
         },
 
@@ -115,7 +111,6 @@ var kdown = {
 
             //load using post method
             $.post("api.php", { "market":app.market, "cat":app.cat },  function (json) {
-                klog("Ajax worked!");
 
                 //creates an entry for the market if there isn't one
                 app.json[ app.market ] = app.json[ app.market ] || {};
@@ -181,7 +176,6 @@ var kdown = {
             ie_version = kdown.hash.ie_check();
             if ( ie_version > 8 || ie_version === -1 ) {
                     $(window).bind('hashchange', function() {
-                        klog("Hashchange canceled.");
                         kdown.hash.load();
                     });
             } else {
@@ -201,9 +195,14 @@ var kdown = {
         }
     },
     table : {
+        html_row : $("#table_copy").html(),
         load : function (json) {
             "use strict";
-            var i, l;
+            var i, l, table_sel, row;
+            var db = kdown.db;
+            var table = $("#dl_table_first table");
+            var html_tbody = "";
+            var html_row = "<tr class='table_row (LANG_CLASS)' >" + kdown.table.html_row + "</tr>";
 
             kdown.langDD.lang_list = {};
 
@@ -212,32 +211,28 @@ var kdown = {
             //
             // UPDATE TABLE ***************
             //
-            $('.table_row').remove();
-
-            //make a copy of the row
-            var row = $("#table_copy").clone();
-
-            $(row).removeAttr('id');
-            $(row).attr('class', 'table_row' );
-            $(row).show();
 
             //go through each file in the array
             $.each(json.cat, function(i, file) {
+                table_sel = "";
+                row = html_row;
 
-                var newRow = row.clone();
-
-                //Put the files information into the new row in the table
-                $(newRow).find(".table_star").text( "*" );
-                $(newRow).find(".table_name a").text( file.filename ).attr("href", "single.php?id=" + encodeURIComponent( file.id ));
-                $(newRow).find(".table_dl_link a").attr("href", file.href);
+                row = row.replace("(NAME)", file.filename);
+                row = row.replace("(FILE_LINK)", "single.php?id=" + encodeURIComponent(file.id));
+                row = row.replace("(DL_LINK)", file.href);
 
                 var list = [];
                 $.each( file.langs, function (locale, info) {
                     kdown.langDD.lang_list[locale] += 1 ;
-                    $(newRow).addClass("lang_" + locale);
                     list.push(locale);
-                    klog(locale);
                 });
+
+                var class_list = [];
+                $.each(list, function (i, list) {
+                    class_list.push("lang_" + list);
+                });
+
+                row = row.replace("(LANG_CLASS)", class_list.join(" ") );
 
                 if (list.length < 3) {
                     $.each(list, function (i, locale) {
@@ -246,30 +241,24 @@ var kdown = {
                 }
 
 
-                klog(list);
-                klog(json.langs);
-                $(newRow).find(".table_lang div").html( list.join(", ") );
+                row = row.replace("(LANG)", list.join(", "));
 
-                $("#dl_table_first table").append(newRow);
+                html_tbody += row;
 
-                //
                 // UPDATE TRANSLATIONS DROP DOWN ***************
-                //
-
                 kdown.langDD.load(json);
 
             });
+
+            table.find("tbody").html(html_tbody);
 
             $("#ajax_error").hide();
             $("#dl_loading").hide();
             $('#dl_table_first').show();
 
             kdown.table.highlight();
-
-
         },
         filter : function () {
-            klog("table.filter()");
             $("#dl_table_first").hide();
             $("#none_found").hide();
             var filter_lang = $(kdown.db.LANGDD).val();
@@ -287,23 +276,18 @@ var kdown = {
                 });
             }
 
-
             if (found === 0) {
                 $("#none_found").show();
             }
 
-
             $("#dl_table_first").show();
             kdown.table.highlight();
-
-
         },
         //
         //fixes the colors in the rows
         //
         highlight : function () {
-            $("#dl_table_first tr").removeClass("table_row_odd");
-            $("#dl_table_first tr:visible").filter(":odd").addClass("table_row_odd");
+            $(".dl_table tr").removeClass( "table_row_odd").filter(":odd").addClass("table_row_odd");
         }
 
     },
@@ -334,7 +318,7 @@ var kdown = {
             var app = kdown.langDD;
 
 
-            $("#lang_select").html("");
+            $("select:#lang_select").html("");
 
             var option = $("<option value=''></option>");
 
@@ -368,7 +352,6 @@ var kdown = {
         },
         bind : function () {
             $(kdown.db.LANGDD).change(function () {
-                klog("translation changed");
                 kdown.table.filter();
             });
         }
@@ -450,7 +433,6 @@ $(document).ready(function () {
 
     // this gets the list of valid categories and markets
     $.post("api.php", {}, function (json) {
-        klog("----------$POST LOAD");
 
         kdown.db.valid_list = json;
 
@@ -483,7 +465,6 @@ $(document).ready(function () {
      * Bind market select to reloading the list of files
      */
     $(kdown.db.MARKETDD).change(function () {
-        klog("market changed");
         kdown.db.market = $(this).val();
         kdown.hash.update();
         kdown.db.ui_update();
