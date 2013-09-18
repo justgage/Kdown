@@ -20,9 +20,9 @@ var kdown = {
                 var cat_list = json.list["cat-list"];
                 delete json.list["cat-list"];
 
-                console.log("API json  ->");
-                console.log(json);
-                console.log(cat_list);
+                klog("API json  ->");
+                klog(json);
+                klog(cat_list);
 
                 var temp = json.list;
 
@@ -34,7 +34,7 @@ var kdown = {
                     list[market_name] = [];
 
                     kdown.db.langsJSON[market_name] = inside.langs;
-                    console.log(kdown.db.langsJSON);
+                    klog(kdown.db.langsJSON);
 
                     $.each(inside.cats, function (cat_code, cat) {
                         $.each(cat.files, function (i, file) {
@@ -48,8 +48,8 @@ var kdown = {
                 });
 
 
-                console.log("New list ->");
-                console.log(list);
+                klog("New list ->");
+                klog(list);
                 kdown.db.marketsJSON = list;
 
                 kdown.marketDD.load();
@@ -69,7 +69,7 @@ var kdown = {
             // get users search term and splits it up by spaces
             searchtext = searchtext.split(" ");
 
-            if (searchtext.length > 0) {
+            if (searchtext.length > 2) {
 
                 //checks for any blank items in the array and deletes them
                 (function () {
@@ -125,8 +125,11 @@ var kdown = {
             "use strict";
 
             var db = kdown.db;
-            console.log("db looks like :");
-            console.log(db.marketsJSON);
+            klog("db looks like :");
+            klog(db.marketsJSON);
+
+            var table_yours = $("#dl_table_first table");
+            var table_other = $("#dl_table_second table");
 
             //goes through each market
             $.each(db.marketsJSON, function (market, files) {
@@ -135,9 +138,9 @@ var kdown = {
 
                     //if market equal to the selected one in the drop down. 
                     if (market === db.market) {
-                        table_sel = $("#dl_table_first table");
+                        table_sel = table_yours;
                     } else {
-                        table_sel = $("#dl_table_second table");
+                        table_sel = table_other;
                     }
 
                     var row = $(table_sel).find(".table_copy").clone();
@@ -294,9 +297,9 @@ var kdown = {
         },
         go: function () {
             var searchtext = $("#dl_search_box").val();
-            console.log(searchtext);
+            klog(searchtext);
             var json = kdown.db.filter(searchtext);
-            console.log(json);
+            klog(json);
             kdown.table.reload(json);
         }
     }
