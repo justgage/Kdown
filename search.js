@@ -66,7 +66,7 @@ var kdown = {
             // get users search term and splits it up by spaces
             searchtext = searchtext.split(" ");
 
-            if (searchtext.length > 2) {
+            if (searchtext.length > 0) {
 
                 //checks for any blank items in the array and deletes them
                 (function () {
@@ -117,13 +117,15 @@ var kdown = {
         }
     },
     table : {
-
         html_row : $(".table_copy").html(),
         // populate the table with given json
         load: function (json) {
             "use strict";
-
-            json = typeof json !== undefined ? kdown.db.marketsJSON : json;
+            klog("table.load()-------");
+            console.log(typeof json);
+            if (typeof json === "undefined") {
+                json = kdown.db.marketsJSON;
+            }
 
             klog("JSON => ");
             klog(json);
@@ -168,6 +170,7 @@ var kdown = {
             table_yours.find("tbody").html(html_tbody_yours);
             table_other.find("tbody").html(html_tbody_other);
             kdown.table.highlight();
+            klog("-------");
         },
         // stripes the table
         highlight: function () {
@@ -263,9 +266,10 @@ var kdown = {
         },
         go: function () {
             klog("-----go-----");
-            var searchtext = "searching for = " + $("#dl_search_box").val();
+            var searchtext = $("#dl_search_box").val();
             var json = kdown.db.filter(searchtext);
             klog(json);
+            klog("----->table.load");
             kdown.table.load(json);
         }
     }
