@@ -21,8 +21,6 @@ var kdown = {
                 delete json.list["cat-list"];
 
                 klog("API json  ->");
-                klog(json);
-                klog(cat_list);
 
                 var temp = json.list;
 
@@ -34,7 +32,6 @@ var kdown = {
                     list[market_name] = [];
 
                     kdown.db.langsJSON[market_name] = inside.langs;
-                    klog(kdown.db.langsJSON);
 
                     $.each(inside.cats, function (cat_code, cat) {
                         $.each(cat.files, function (i, file) {
@@ -131,10 +128,17 @@ var kdown = {
             var table_yours = $("#dl_table_first table");
             var table_other = $("#dl_table_second table");
 
+            klog(table_yours);
+
+            table_yours.detach(); 
+            table_other.detach(); 
+
             //goes through each market
             $.each(db.marketsJSON, function (market, files) {
+                klog("market => " + market);
                 $.each(files, function (i, file) {
                     var table_sel = "";
+                    klog("file => " + i);
 
                     //if market equal to the selected one in the drop down. 
                     if (market === db.market) {
@@ -149,7 +153,9 @@ var kdown = {
                     $(row).show();
 
                     var newRow = row.clone();
+                    klog(" starting append...");
                     $(table_sel).append(newRow);
+                    klog(" done!");
 
                     //Put the files information into the new row in the table
                     $(newRow).find(".table_star").text("*");
@@ -162,6 +168,9 @@ var kdown = {
                         file.href);
                 });
             });
+
+            table_yours.appendTo("#dl_table_first");
+            table_other.appendTo("#dl_table_second");
         },
         // used to create the table based on filtered JSON
         reload: function (json) {
