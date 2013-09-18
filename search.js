@@ -174,10 +174,7 @@ var kdown = {
         },
         // stripes the table
         highlight: function () {
-            $("#dl_table_first tr, #dl_table_second tr").removeClass(
-                "table_row_odd");
-            $("#dl_table_first tr:visible, #dl_table_second tr:visible").filter(
-                ":odd").addClass("table_row_odd");
+            $(".dl_table tr").removeClass( "table_row_odd").filter(":odd").addClass("table_row_odd");
         }
     },
     marketDD: {
