@@ -117,100 +117,57 @@ var kdown = {
         }
     },
     table : {
-        // populate the table 
-        load: function () {
+
+        html_row : $(".table_copy").html(),
+        // populate the table with given json
+        load: function (json) {
             "use strict";
 
-            var db = kdown.db;
-            klog("db looks like :");
-            klog(db.marketsJSON);
+            json = typeof json !== undefined ? kdown.db.marketsJSON : json;
 
+            klog("JSON => ");
+            klog(json);
+
+
+            //yes going back to this way. 
+
+            var db = kdown.db;
             var table_yours = $("#dl_table_first table");
             var table_other = $("#dl_table_second table");
+            var html_tbody_yours = "";
+            var html_tbody_other = "";
 
+            var html_row = "<tr>" + kdown.table.html_row + "</tr>";
+
+
+            klog("db looks like :");
             klog(table_yours);
 
-            table_yours.detach(); 
-            table_other.detach(); 
 
-            //goes through each market
-            $.each(db.marketsJSON, function (market, files) {
-                klog("market => " + market);
-                $.each(files, function (i, file) {
-                    var table_sel = "";
-                    klog("file => " + i);
-
-                    //if market equal to the selected one in the drop down. 
-                    if (market === db.market) {
-                        table_sel = table_yours;
-                    } else {
-                        table_sel = table_other;
-                    }
-
-                    var row = $(table_sel).find(".table_copy").clone();
-
-                    $(row).attr('class', 'table_row');
-                    $(row).show();
-
-                    var newRow = row.clone();
-                    klog(" starting append...");
-                    $(table_sel).append(newRow);
-                    klog(" done!");
-
-                    //Put the files information into the new row in the table
-                    $(newRow).find(".table_star").text("*");
-                    $(newRow).find(".table_name a").text(file.filename)
-                        .attr("href", "single.php?id=" +
-                            encodeURIComponent(file.id));
-                    $(newRow).find(".table_lang").text(file.native_lang);
-                    $(newRow).find(".table_market").text(market);
-                    $(newRow).find(".table_dl_link a").attr("href",
-                        file.href);
-                });
-            });
-
-            table_yours.appendTo("#dl_table_first");
-            table_other.appendTo("#dl_table_second");
-        },
-        // used to create the table based on filtered JSON
-        reload: function (json) {
-            "use strict";
-            var db = kdown.db;
-
-            $(".table_row").remove();
-            
             //goes through each market
             $.each(json, function (market, files) {
                 $.each(files, function (i, file) {
                     var table_sel = "";
-
                     //if market equal to the selected one in the drop down. 
+                    var row = html_row;
+
+                    row = row.replace("(NAME)", file.filename);
+                    row = row.replace("(FILE_LINK)", "single.php?id=" + encodeURIComponent(file.id));
+                    row = row.replace("(LANG)", file.native_lang);
+                    row = row.replace("(MARKET)", market);
+                    row = row.replace("(DL_LINK)", file.href);
+
                     if (market === db.market) {
-                        table_sel = $("#dl_table_first table");
+                        html_tbody_yours += row;
                     } else {
-                        table_sel = $("#dl_table_second table");
+                        html_tbody_other += row;
                     }
-
-                    var row = $(table_sel).find(".table_copy").clone();
-
-                    $(row).attr('class', 'table_row');
-                    $(row).show();
-
-                    var newRow = row.clone();
-                    $(table_sel).append(newRow);
-
-                    //Put the files information into the new row in the table
-                    $(newRow).find(".table_star").text("*");
-                    $(newRow).find(".table_name a").text(file.filename)
-                        .attr("href", "single.php?id=" +
-                            encodeURIComponent(file.id));
-                    $(newRow).find(".table_lang").text(file.native_lang);
-                    $(newRow).find(".table_market").text(market);
-                    $(newRow).find(".table_dl_link a").attr("href",
-                        file.href);
                 });
             });
 
+            table_yours.find("tbody").html(html_tbody_yours);
+            table_other.find("tbody").html(html_tbody_other);
+            kdown.table.highlight();
         },
         // stripes the table
         highlight: function () {
@@ -305,11 +262,11 @@ var kdown = {
             });
         },
         go: function () {
-            var searchtext = $("#dl_search_box").val();
-            klog(searchtext);
+            klog("-----go-----");
+            var searchtext = "searching for = " + $("#dl_search_box").val();
             var json = kdown.db.filter(searchtext);
             klog(json);
-            kdown.table.reload(json);
+            kdown.table.load(json);
         }
     }
 };
