@@ -20,7 +20,7 @@
  *      handles interaction with the search bar.
  */
 
-function log(mess) {
+function klog(mess) {
     if (window.console !== undefined) {
         console.log(mess);
     }
@@ -54,15 +54,15 @@ var kdown = {
 
             var app = kdown.db;
 
-            log("---db.load---");
+            klog("---db.load---");
 
             if (app.market !== "all-list") {
                 if ( app.json[ app.market ]  &&  app.json[ app.market ][ app.cat ] ) {
-                    log("   app.load--->app.loadJSON()");
+                    klog("   app.load--->app.loadJSON()");
                     app.loadJSON( app.json[ app.market ][ app.cat ] );
                 }
                 else {
-                    log("   app.load--->app.ajax_load()");
+                    klog("   app.load--->app.ajax_load()");
                     app.ajax_load();
                 }
             } else {
@@ -80,7 +80,7 @@ var kdown = {
             var app = kdown.db;
             app.market = $(app.MARKETDD).val();
             app.cat = $(app.CAT_CURRENT + " a" ).attr('href').slice(1);
-            log("setting cat to :" + app.cat);
+            klog("setting cat to :" + app.cat);
             kdown.catList.links_update();
         },
 
@@ -115,7 +115,7 @@ var kdown = {
 
             //load using post method
             $.post("api.php", { "market":app.market, "cat":app.cat },  function (json) {
-                log("Ajax worked!");
+                klog("Ajax worked!");
 
                 //creates an entry for the market if there isn't one
                 app.json[ app.market ] = app.json[ app.market ] || {};
@@ -181,7 +181,7 @@ var kdown = {
             ie_version = kdown.hash.ie_check();
             if ( ie_version > 8 || ie_version === -1 ) {
                     $(window).bind('hashchange', function() {
-                        log("Hashchange canceled.");
+                        klog("Hashchange canceled.");
                         kdown.hash.load();
                     });
             } else {
@@ -236,7 +236,7 @@ var kdown = {
                     kdown.langDD.lang_list[locale] += 1 ;
                     $(newRow).addClass("lang_" + locale);
                     list.push(locale);
-                    log(locale);
+                    klog(locale);
                 });
 
                 if (list.length < 3) {
@@ -246,8 +246,8 @@ var kdown = {
                 }
 
 
-                log(list);
-                log(json.langs);
+                klog(list);
+                klog(json.langs);
                 $(newRow).find(".table_lang div").html( list.join(", ") );
 
                 $("#dl_table_first table").append(newRow);
@@ -269,7 +269,7 @@ var kdown = {
 
         },
         filter : function () {
-            log("table.filter()");
+            klog("table.filter()");
             $("#dl_table_first").hide();
             $("#none_found").hide();
             var filter_lang = $(kdown.db.LANGDD).val();
@@ -368,7 +368,7 @@ var kdown = {
         },
         bind : function () {
             $(kdown.db.LANGDD).change(function () {
-                log("translation changed");
+                klog("translation changed");
                 kdown.table.filter();
             });
         }
@@ -450,7 +450,7 @@ $(document).ready(function () {
 
     // this gets the list of valid categories and markets
     $.post("api.php", {}, function (json) {
-        log("----------$POST LOAD");
+        klog("----------$POST LOAD");
 
         kdown.db.valid_list = json;
 
@@ -483,7 +483,7 @@ $(document).ready(function () {
      * Bind market select to reloading the list of files
      */
     $(kdown.db.MARKETDD).change(function () {
-        log("market changed");
+        klog("market changed");
         kdown.db.market = $(this).val();
         kdown.hash.update();
         kdown.db.ui_update();
