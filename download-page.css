@@ -1,3 +1,7 @@
+#dl_loading {
+    text-align:center;
+}
+
 #downloads-header {
     margin:20px;
     padding:0px;
@@ -162,7 +166,9 @@
 }
 
 #hide-all-button {
-    float:right
+    float:right;
 }
+
+
 
 

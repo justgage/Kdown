@@ -46,7 +46,7 @@ $(function () {
         var trans = {};
 
         $("#dl_ui_translate p").each(function() {
-            trans[ $(this).attr('translate') ] = $(this).text();
+            trans[ $(this).data('translate') ] = $(this).text();
         });
 
         $("#t_downloads").html(trans['Downloads Page']);
@@ -215,7 +215,7 @@ $(function () {
         $('.none-found').show();
 
         //load using post method
-        $.post("dl_api.php", { "market":market },  function(json){ 
+        $.post("api.php", { "market":market },  function(json){ 
             dl_ui.loadJSON(json); // it worked!
         }, "json")
             .fail(function() { //if request failed!
@@ -313,7 +313,7 @@ $(function () {
 
            // get users search term and splits it up by spaces
            var searchtext = $(this).val().toUpperCase();
-           var searchtext = searchtext.split(" ");
+           searchtext = searchtext.split(" ");
 
            //if the search term is not empty
            if (searchtext.length > 0) {
