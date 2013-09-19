@@ -12,7 +12,7 @@
 
         <div id="full_width">
             <div id="dl_wrapper" class="gradient" >
-                <h1><a href="index.html">Downloads</a></h1>
+                <h1><a href="index.html">Downloads</a> > Search</h1>
 
                 <div id="dl_controls">
                     <div id="dl_search_big">
@@ -37,10 +37,12 @@
 
                 <h3>Searching market: <span id="market_label">...</span> </h3>
 
+                <div id="dl_loading">
+                    <img alt="" src="files/AjaxLoader.gif" />
+                    <!-- this can contain text for clarity -->
+                </div>
+
                 <div id="dl_table_first" class="dl_table" >
-                    <div id="dl_loading" style="display:none;" >
-                        Loading the downloads...
-                    </div>
                     <table>
                         <thead>
                             <tr>
@@ -99,8 +101,8 @@
         </div>
         <br style="clear:both;" />
 </div>
-</div>
 <script type="text/javascript" src="files/jquery.min.js" ></script>
+<script type="text/javascript" src="files/time.js" ></script>
 <script type="text/javascript" src="search.js" ></script>
 </body>
 </html>

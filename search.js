@@ -113,26 +113,29 @@ var kdown = {
         }
     },
     table : {
-        html_row : $(".table_copy").html(),
+        html_row : "<tr class='table_row'>" + $(".table_copy").html() + "</tr>",
         load: function (json) {
             "use strict";
             if (typeof json === "undefined") {
                 json = kdown.db.marketsJSON;
             }
 
+            $("#dl_loading").show();
+
             var db = kdown.db;
             var table_yours = $("#dl_table_first table");
             var table_other = $("#dl_table_second table");
             var html_tbody_yours = "";
             var html_tbody_other = "";
+            var html_row = kdown.table.html_row;
+            var row = "";
 
-            var html_row = "<tr class='table_row'>" + kdown.table.html_row + "</tr>";
 
+            time.start("file_list");
             $.each(json, function (market, files) {
                 $.each(files, function (i, file) {
-                    var table_sel = "";
+                    row = html_row;
                     //if market equal to the selected one in the drop down. 
-                    var row = html_row;
 
                     row = row.replace("(NAME)", file.filename);
                     row = row.replace("(FILE_LINK)", "single.php?id=" + encodeURIComponent(file.id));
@@ -147,10 +150,21 @@ var kdown = {
                     }
                 });
             });
+            time.stop("file_list");
 
+            time.start("first_populate");
             table_yours.find("tbody").html(html_tbody_yours);
+            time.stop("first_populate");
+
+            time.start("2nd_populate");
             table_other.find("tbody").html(html_tbody_other);
+            time.stop("2nd_populate");
+
+            time.start("highlight");
             kdown.table.highlight();
+            time.stop("highlight");
+
+            $("#dl_loading").hide();
         },
         // stripes the table
         highlight: function () {
@@ -159,8 +173,13 @@ var kdown = {
     },
     marketDD: {
         // this will populate the market drop down
+
+        sel : $("#market_select"),
+        label : $("#market_label"),
         load: function () {
             var db = kdown.db;
+            var market_sel = kdown.marketDD.sel;
+            var market_label = kdown.marketDD.label;
             var option = $("<option value=''></option>");
 
             $.each(db.marketsJSON, function (market, inside) {
@@ -170,12 +189,12 @@ var kdown = {
                 $(clone).text(market);
                 $(clone).attr("value", market);
 
-                $("#market_select").append(clone);
+                market_sel.append(clone);
 
-                db.market = $("#market_select").val();
-
-                $("#market_label").text(db.market);
             });
+            db.market = market_sel.val();
+
+            market_label.text(market_sel.val());
         }
     },
     langDD: {
@@ -225,7 +244,8 @@ var kdown = {
         },
         bind: function () {
             $("#dl_search_box").keyup(function () {
-                kdown.search.go();
+                //helps it not hang (as much) in IE. 
+                window.setTimeout(function () {kdown.search.go(); }, 100);
             });
 
             $(".search_clear").click(function () {
@@ -249,5 +269,10 @@ var kdown = {
     }
 };
 
+$(kdown.marketDD.sel).change(function () {
+    kdown.db.market = $(this).val();
+    kdown.marketDD.label.text($(this).val());
+    kdown.table.load();
+});
 
 kdown.db.load();

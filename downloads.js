@@ -21,11 +21,18 @@
  */
 
 function klog(mess) {
+    "use strict";
     if (window.console !== undefined) {
         console.log(mess);
     }
 }
 
+function kreport(mess) {
+    "use strict";
+    if (window.console !== undefined) {
+        console.log(mess + "");
+    }
+}
 
 var kdown = {
     db:{
@@ -51,21 +58,13 @@ var kdown = {
         // dictated by db.market/db.cat
         load : function () {
             "use strict";
-
             var app = kdown.db;
 
-
-            if (app.market !== "all-list") {
-                if ( app.json[ app.market ]  &&  app.json[ app.market ][ app.cat ] ) {
-                    app.loadJSON( app.json[ app.market ][ app.cat ] );
-                }
-                else {
-                    app.ajax_load();
-                }
-            } else {
-                $.post("api.php", { "market": "all-list" } ,  function (json) {
-                    app.loadJSON(json.list[app.market]);
-                });
+            if ( app.json[ app.market ]  &&  app.json[ app.market ][ app.cat ] ) {
+                app.loadJSON( app.json[ app.market ][ app.cat ] );
+            }
+            else {
+                app.ajax_load();
             }
         },
 
@@ -74,6 +73,7 @@ var kdown = {
          * to match the interface
          */
         var_update : function () {
+            "use strict";
             var app = kdown.db;
             app.market = $(app.MARKETDD).val();
             app.cat = $(app.CAT_CURRENT + " a" ).attr('href').slice(1);
@@ -110,7 +110,9 @@ var kdown = {
             $("#dl_table_first").hide();
 
             //load using post method
+            time.start("ajax_wait");
             $.post("api.php", { "market":app.market, "cat":app.cat },  function (json) {
+            time.start("ajax_wait");
 
                 //creates an entry for the market if there isn't one
                 app.json[ app.market ] = app.json[ app.market ] || {};
@@ -132,15 +134,13 @@ var kdown = {
         // This will load the json IF the category exists
         //
         loadJSON : function (json) {
-            "use strict";
-
             var root_app = kdown;
 
             // if the category exists in the data
             if (json.cat) {
                 root_app.table.load(json);
             } else {
-                //log("ERROR:" + json.mess);
+                $("#ajax_error").show();
             }
         }
     },
@@ -179,6 +179,7 @@ var kdown = {
                         kdown.hash.load();
                     });
             } else {
+                klog("using pooling loop! this should be for IE only.");
                 kdown.hash.loopID = window.setInterval(kdown.hash.load, 100);
             } 
         },
@@ -195,25 +196,32 @@ var kdown = {
         }
     },
     table : {
-        html_row : $("#table_copy").html(),
+        sel : $("#dl_table_first").find("table"),
+        tbody_sel : $("#dl_table_first").find("tbody"),
+        html_row : $("#table_copy")[0].innerHTML,
         load : function (json) {
             "use strict";
+            klog("table.load-------------------");
             var i, l, table_sel, row;
             var db = kdown.db;
-            var table = $("#dl_table_first table");
             var html_tbody = "";
             var html_row = "<tr class='table_row (LANG_CLASS)' >" + kdown.table.html_row + "</tr>";
+            var list = [];
+            var class_list = [];
+            var table = kdown.table;
+            var langDD = kdown.langDD;
 
-            kdown.langDD.lang_list = {};
-
-            $('#dl_table_first').hide();
+            langDD.lang_list = {};
 
             //
             // UPDATE TABLE ***************
             //
 
             //go through each file in the array
+            time.start("html_making");
             $.each(json.cat, function(i, file) {
+
+                time.start("     one_file" + file.filename );
                 table_sel = "";
                 row = html_row;
 
@@ -221,13 +229,19 @@ var kdown = {
                 row = row.replace("(FILE_LINK)", "single.php?id=" + encodeURIComponent(file.id));
                 row = row.replace("(DL_LINK)", file.href);
 
-                var list = [];
+                list = [];
+
                 $.each( file.langs, function (locale, info) {
-                    kdown.langDD.lang_list[locale] += 1 ;
+                    if ( langDD.lang_list[locale] === undefined ) {
+                        langDD.lang_list[locale] = 1;
+                    }
+                    else {
+                        langDD.lang_list[locale] += 1 ;
+                    }
                     list.push(locale);
                 });
 
-                var class_list = [];
+                class_list = [];
                 $.each(list, function (i, list) {
                     class_list.push("lang_" + list);
                 });
@@ -240,23 +254,32 @@ var kdown = {
                     });
                 }
 
-
                 row = row.replace("(LANG)", list.join(", "));
 
                 html_tbody += row;
 
-                // UPDATE TRANSLATIONS DROP DOWN ***************
-                kdown.langDD.load(json);
-
+                time.stop("     one_file" + file.filename );
             });
+            time.stop("html_making");
 
-            table.find("tbody").html(html_tbody);
+            time.start('inject_html');
+            kdown.table.tbody_sel.html(html_tbody);
+            time.stop('inject_html');
 
+            time.start('showing_stuff');
             $("#ajax_error").hide();
             $("#dl_loading").hide();
             $('#dl_table_first').show();
+            time.stop('showing_stuff');
 
+            window.setTimeout(function () { langDD.load(json); },10);
+
+            time.start("highlight");
             kdown.table.highlight();
+            time.stop("highlight");
+
+
+            //time.report();
         },
         filter : function () {
             $("#dl_table_first").hide();
@@ -313,42 +336,48 @@ var kdown = {
         }
     },
     langDD : {
+        sel : $("#lang_select"),
         lang_list : {},
+        template : "<option value='(CODE)'>(NAME)</option>",
         load : function (json) {
-            var app = kdown.langDD;
+            time.start("langDD.load");
+            var langDD = kdown.langDD;
+            var html = "";
+            var clone;
 
+            langDD.sel.html("");
 
-            $("select:#lang_select").html("");
-
-            var option = $("<option value=''></option>");
-
+            //goes through each language and adds it. 
             $.each(json.langs, function (code, lang) {
+                clone = langDD.template;
 
                 // make it false if it isn't set by the table.load()
-                app.lang_list[code] = app.lang_list[code] ? app.lang_list[code] : 0;
+                langDD.lang_list[code] = langDD.lang_list[code] ? langDD.lang_list[code] : 0;
 
-                var clone = option.clone();
 
                 // this next block of code will add spaces to the right of the number
                 // so that all the translations are nicely lined up. 
-                // change the 4 to how many figures the max number will be
-                var num = app.lang_list[code] + "" ;
+                var num = langDD.lang_list[code] + "" ;
                 var spaces = [];
                 for (var i = 0, l = 4 - num.length; i < l; i++) {
                     spaces.push("\u00A0"); //this is the char for a non-breaking space
                 }
+
                 num = num + spaces.join(" ");
 
-                $(clone).text(num + lang);
-                $(clone).attr("value", code );
-                $("#lang_select").append(clone);
+                clone = clone.replace("(NAME)", num + lang);
+                clone = clone.replace("(CODE)", code);
 
+                html += clone;
             });
 
-            var allclone = option.clone();
-            $(allclone).text( "All" );
-            $(allclone).attr("value", "all" );
-            $("#lang_select").prepend(allclone);
+            clone = langDD.template;
+            clone = clone.replace("(NAME)", "All");
+            clone = clone.replace("(CODE)", "all");
+
+            html = clone + html;
+            langDD.sel.html(html);
+            time.stop("langDD.load");
         },
         bind : function () {
             $(kdown.db.LANGDD).change(function () {
@@ -397,10 +426,11 @@ var kdown = {
         //
         bind: function () {
             // this is not needed due to the hash change event
-            // $(".cat_link a").click(function () {
+            $(".cat_link").click(function () {
+                time.start("hash");
             //     kdown.db.cat = $(this).parent().data("cat");
             //     kdown.db.ui_update();
-            // });
+            });
         },
 
         links_update : function () {
@@ -430,6 +460,8 @@ var kdown = {
 //************************************************************
 $(document).ready(function () {
     "use strict";
+
+    time.setLineReportMethod(kreport);
 
     // this gets the list of valid categories and markets
     $.post("api.php", {}, function (json) {
