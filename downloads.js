@@ -223,9 +223,9 @@ var kdown = {
                 
                 //highlight the table
                 if ( (i % 2) === 0) {
-                    row = row.replace("(ROW_CLASS)", "");
-                } else {
                     row = row.replace("(ROW_CLASS)", "table_row_odd");
+                } else {
+                    row = row.replace("(ROW_CLASS)", "");
                 }
 
                 row = row.replace("(NAME)", file.filename);
