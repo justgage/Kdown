@@ -200,9 +200,8 @@ var kdown = {
             "use strict";
             klog("table.load-------------------");
             var i, l, table_sel, row;
-            var db = kdown.db;
             var html_tbody = "";
-            var html_row = "<tr class='table_row (LANG_CLASS)' >" + kdown.table.html_row + "</tr>";
+            var html_row = "<tr class='table_row (ROW_CLASS) (LANG_CLASS)' >" + kdown.table.html_row + "</tr>";
             var list = [];
             var class_list = [];
             var table = kdown.table;
@@ -221,6 +220,13 @@ var kdown = {
                 time.start("     one_file" + file.filename );
                 table_sel = "";
                 row = html_row;
+                
+                //highlight the table
+                if ( (i % 2) === 0) {
+                    row = row.replace("(ROW_CLASS)", "");
+                } else {
+                    row = row.replace("(ROW_CLASS)", "table_row_odd");
+                }
 
                 row = row.replace("(NAME)", file.filename);
                 row = row.replace("(FILE_LINK)", "single.php?id=" + encodeURIComponent(file.id));
@@ -270,11 +276,6 @@ var kdown = {
             time.stop('showing_stuff');
 
             window.setTimeout(function () { langDD.load(json); },10);
-
-            time.start("highlight");
-            kdown.table.highlight();
-            time.stop("highlight");
-
 
             //time.report();
         },
