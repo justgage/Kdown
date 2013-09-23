@@ -1,4 +1,3 @@
-
 /***
  * K-DOWN ~ Kyani download interface
  *
@@ -147,21 +146,53 @@ var kdown = {
         load : function() {
             "use strict";
             var hash = kdown.hash;
+            var db = kdown.db;
+            var vl = kdown.db.valid_list;
             var hash_str =  decodeURIComponent( window.location.hash );
+            klog(hash_str);
+            var if_market = false;
+            var first_cat = $(kdown.db.CAT_CURRENT).attr('id').slice(4);
+
             if (hash_str !== hash.oldHash && hash_str !== "") {
                 hash.oldHash = hash_str;
+
+                klog("HASH LOAD:");
 
                 // this will split the hash at the @
                 // left is category
                 // right is market
                 var hash_array = hash_str.slice(1).split("@");
-                if (hash_array[0]) {
-                    kdown.db.cat = hash_array[0];
-                }
-                    
-                kdown.db.market = hash_array[1];
 
+
+                klog(vl);
+
+                //checks if there's a valid cat in the hash
+                if (vl.cats[hash_array[0]]) {
+                    db.cat = hash_array[0];
+                } else {
+                    db.cat = first_cat;
+                }
+
+                for (var i = 0, l = vl.markets.length; i < l; i ++) {
+                    if (vl.markets[i] === hash_array[1]) {
+                        if_market = true;
+                        continue;
+                    }
+                }
+
+                //checks if there's a valid market in the hash
+                if (if_market === true) {
+                    db.market = hash_array[1];
+                } else {
+                    db.market = vl.markets[0];
+                }
+
+                window.location.hash = "#" + db.cat + "@" + db.market;
                 kdown.db.ui_update();
+            } else {
+                db.market = vl.markets[0];
+                db.cat = first_cat;
+                window.location.hash = "#" + db.cat + "@" + db.market;
             }
         },
        update : function () {
@@ -235,7 +266,7 @@ var kdown = {
                 list = [];
 
                 $.each( file.langs, function (locale, info) {
-                    if ( langDD.lang_list[locale] === undefined ) {
+                    if (typeof langDD.lang_list[locale] === "undefined" ) {
                         langDD.lang_list[locale] = 1;
                     }
                     else {
