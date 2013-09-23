@@ -187,12 +187,12 @@ var kdown = {
                     db.market = vl.markets[0];
                 }
 
-                window.location.hash = "#" + db.cat + "@" + db.market;
+                //window.location.hash = "#" + db.cat + "@" + db.market;
                 kdown.db.ui_update();
             } else {
                 db.market = vl.markets[0];
                 db.cat = first_cat;
-                window.location.hash = "#" + db.cat + "@" + db.market;
+                //window.location.hash = "#" + db.cat + "@" + db.market;
             }
         },
        update : function () {
