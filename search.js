@@ -9,7 +9,7 @@ var kdown = {
         marketsJSON: {}, // saved JSON from ajax query
         langsJSON: {}, // this will save the languages based on market
         market: "", // current market
-        lang: "", // language we are searching for
+        lang: "all", // language we are searching for
 
         //  this will load the whole file list into db.marketsJSON
         load: function () {
@@ -138,33 +138,61 @@ var kdown = {
             var html_tbody_other = "";
             var html_row = kdown.table.html_row;
             var row = "";
+            var list = [];
 
 
             time.start("file_list");
             $.each(json, function (market, files) {
                 $.each(files, function (i, file) {
+                    list = [];
                     row = html_row;
 
-                    if (db.lang === "all" || file.langs[db.lang] !== undefined) {
-                    $.each( file.langs, function (locale, info) {
-                        if ( langDD.lang_list[locale] === undefined ) {
-                            langDD.lang_list[locale] = 1;
-                        }
-                        else {
-                            langDD.lang_list[locale] += 1 ;
-                        }
-                        list.push(locale);
-                    });
+                    
+
+                    if (db.lang === "all") {
+                        klog("All IS selected");
+                        $("#lang_label").hide();
+                        $.each( file.langs, function (locale, info) {
+                            if ( typeof langDD.lang_list[locale] === "undefined" ) {
+                                langDD.lang_list[locale] = 1;
+                            }
+                            else {
+                                langDD.lang_list[locale] += 1 ;
+                            }
+                            list.push(locale);
+                        });
                     } else {
-                        return true; // same as a continue statement
+                        $("#lang_label").show();
+                        $("#lang_label_name").html(db.langsJSON[db.lang]);
+
+                        klog("All is not selected");
+                        if (typeof file.langs[db.lang] === "undefined") {
+                            klog("file doesn't have lang");
+                            return true; // same as a continue statement
+                        } else {
+                            klog("This has the language!");
+                            klog(file.langs);
+                            klog(db.lang);
+                            $.each( file.langs, function (locale, info) {
+                                if ( typeof langDD.lang_list[locale] === "undefined" ) {
+                                    langDD.lang_list[locale] = 1;
+                                }
+                                else {
+                                    langDD.lang_list[locale] += 1 ;
+                                }
+                                list.push(locale);
+                            });
+                        }
                     }
                     
+                    time.start("highlight");
                     //highlight the table
                     if ( (i % 2) === 0) {
                         row = row.replace("(ROW_CLASS)", "");
                     } else {
                         row = row.replace("(ROW_CLASS)", "table_row_odd");
                     }
+                    time.stop("highlight");
 
                     row = row.replace("(NAME)", file.filename);
                     row = row.replace("(FILE_LINK)", "single.php?id=" + encodeURIComponent(file.id));
@@ -221,21 +249,22 @@ var kdown = {
     },
     langDD: {
         sel: $("#lang_select"),
+        lang_list : {},
         load: function () {
-
+ 
             var db = kdown.db;
-
+ 
             $("#lang_select").html("");
-
-            var option = $("<option value=''></option>");
-
+ 
+             var option = $("<option value=''></option>");
+ 
             // make an entry for each language in the drop down. 
-            $.each(db.langsJSON[db.market], function (lang_code, lang_name) {
+             $.each(db.langsJSON, function (lang_code, lang_name) {
                 var clone = option.clone();
                 $(clone).text(lang_name);
                 $(clone).attr("value", lang_code);
                 $("#lang_select").append(clone);
-            });
+             });
 
             var allclone = option.clone();
             $(allclone).text("All");
