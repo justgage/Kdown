@@ -260,6 +260,7 @@ var kdown = {
                 }
 
                 row = row.replace("(NAME)", file.filename);
+                row = row.replace("(HEART_URL)", "#");
                 row = row.replace("(FILE_LINK)", "single.php?id=" + encodeURIComponent(file.id));
                 row = row.replace("(DL_LINK)", file.href);
 
@@ -307,6 +308,8 @@ var kdown = {
             time.stop('showing_stuff');
 
             window.setTimeout(function () { langDD.load(json); },10);
+
+            window.setTimeout(function () { kdown.fav.bind(); },10);
 
             //time.report();
         },
@@ -478,6 +481,14 @@ var kdown = {
             $("#search_go").click(function () {
                 $("#none_found").hide();
                 db.load();
+            });
+        }
+    },
+    fav : {
+        bind : function () {
+            $(".table_fav a").click(function (e) {
+                $(this).toggleClass("favd");
+                e.preventDefault();
             });
         }
     }

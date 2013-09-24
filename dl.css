@@ -19,8 +19,11 @@
     width:300px;
 }
 
+.table_fav {
+    padding:4px;
+}
 .table_name {
-    width: 450px;
+    width: 400px;
     overflow: hidden;
 }
 
@@ -33,10 +36,10 @@
 
 .dl_table table td {
     border-bottom:solid lightgrey 1px;
-    padding:2px 5px;
+    padding:2px 13px;
 }
 
-.table_star, .table_lang, .table_dl_link {
+.table_fav, .table_lang, .table_dl_link {
     text-align:center;
 }
 
@@ -63,8 +66,33 @@
     margin-bottom:1em;
 }
 
+.table_fav a {
+    margin: 0 auto;
+    opacity: 0.50;
+    width: 24px;
+    height: 24px;
+    display: block;
+    background:url(files/heart_sprite.png) 24 1;
+}
+
+.favd {
+    background:url(files/heart_sprite.png) 0 1 !important;
+    opacity: 1 !important;
+}
+
+.table_fav a:hover {
+    opacity: 9.0;
+    margin-bottom:2px;
+}
+
+.table_fav a:active {
+    margin-top:5px;
+}
+
 .dl_table th {
-    background-color:#E0E0E0;
+    /* background-image:url(files/row_bg.png); */
+    /* background-color:#E0E0E0; */
+    border-bottom: 2px solid;
     height:35px;
 }
 
@@ -86,11 +114,13 @@
 }
 
 .table_row_odd {
-    background:#F5F5F5;
+    background-color:#F4F6FA;
 }
 
-.table_row:hover {
-    background-color:#EEE;
+.table_row {
+    /* border-left:1px solid #EEE; */
+    /* border-right:1px solid #EEE; */
+    /* background-image:url(files/row_bg.png); */
 }
 
 

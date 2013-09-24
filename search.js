@@ -219,6 +219,7 @@ var kdown = {
             time.stop("2nd_populate");
 
             $("#dl_loading").hide();
+            kdown.fav.bind();
         }
     },
     marketDD: {
@@ -318,6 +319,14 @@ var kdown = {
             var searchtext = $("#dl_search_box").val();
             var json = kdown.db.filter(searchtext);
             kdown.table.load(json);
+        }
+    },
+    fav : {
+        bind : function () {
+            $(".table_fav a").click(function (e) {
+                $(this).toggleClass("favd");
+                e.preventDefault();
+            });
         }
     }
 };
