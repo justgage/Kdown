@@ -47,7 +47,7 @@
 #search_go {
 	font-size: 12px;
 	color: #0D5200;
-	height: 27px;
+	height: 30px;
 	padding: 0 10px;
 	margin: 0;
 	border: 0;
@@ -62,7 +62,7 @@
 }
 
 #search_go:active {
-	padding-top: 2px;
+	/* padding-top: 2px; */
 }
 
 .table_fav {
@@ -136,7 +136,7 @@ a.favd {
 	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=90)";
 	filter: alpha(opacity=90);
 	opacity: 0.9;
-	margin-bottom: 2px;
+	/* margin-bottom: 2px; */
 }
 
 .table_fav a:active {

@@ -150,7 +150,6 @@ var kdown = {
                 var hash_array = hash_str.slice(1).split("@");
 
 
-                klog(vl);
 
                 //checks if there's a valid cat in the hash
                 if (vl.cats[hash_array[0]]) {
@@ -188,13 +187,13 @@ var kdown = {
         },
         bind : function () {
             ie_version = kdown.hash.ie_check();
-            if ( ie_version > 8 || ie_version === -1 ) {
+            if ( ie_version > 7 || ie_version === -1 ) {
                     $(window).bind('hashchange', function() {
                         kdown.hash.load();
                     });
             } else {
                 klog("using pooling loop! this should be for IE only.");
-                kdown.hash.loopID = window.setInterval(kdown.hash.load, 100);
+                kdown.hash.loopID = window.setInterval(kdown.hash.load, 1000);
             } 
         },
         ie_check: function () {
@@ -295,7 +294,7 @@ var kdown = {
 
             window.setTimeout(function () { langDD.load(json); },10);
 
-            window.setTimeout(function () { kdown.fav.bind(); },10);
+            window.setTimeout(function () { kdown.fav.bind(); },20);
 
             //time.report();
         },
