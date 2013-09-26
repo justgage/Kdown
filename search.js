@@ -139,9 +139,11 @@ var kdown = {
             var html_row = kdown.table.html_row;
             var row = "";
             var list = [];
+            var your_count = 0;
+            var other_count = 0;
+             
 
 
-            time.start("file_list");
             $.each(json, function (market, files) {
                 $.each(files, function (i, file) {
                     list = [];
@@ -185,14 +187,12 @@ var kdown = {
                         }
                     }
                     
-                    time.start("highlight");
                     //highlight the table
                     if ( (i % 2) === 0) {
                         row = row.replace("(ROW_CLASS)", "");
                     } else {
                         row = row.replace("(ROW_CLASS)", "table_row_odd");
                     }
-                    time.stop("highlight");
 
                     row = row.replace("(NAME)", file.filename);
                     row = row.replace("(FILE_LINK)", "single.php?id=" + encodeURIComponent(file.id));
@@ -202,21 +202,34 @@ var kdown = {
 
                     //if market equal to the selected one in the drop down. 
                     if (market === db.market) {
+                        your_count++;
                         html_tbody_yours += row;
                     } else {
+                        other_count++;
                         html_tbody_other += row;
                     }
                 });
             });
-            time.stop("file_list");
 
-            time.start("first_populate");
             table_yours.find("tbody").html(html_tbody_yours);
-            time.stop("first_populate");
-
-            time.start("2nd_populate");
             table_other.find("tbody").html(html_tbody_other);
-            time.stop("2nd_populate");
+            klog(your_count);
+            if (your_count === 0) {
+                table_yours.hide();
+                table_yours.parent().find(".none_found").show();
+            } else {
+                table_yours.show();
+                table_yours.parent().find(".none_found").hide();
+            } 
+
+            klog(other_count);
+            if (other_count === 0) {
+                table_other.hide();
+                table_other.parent().find(".none_found").show();
+            } else {
+                table_other.show();
+                table_other.parent().find(".none_found").hide();
+            } 
 
             $("#dl_loading").hide();
             kdown.fav.bind();
@@ -302,10 +315,10 @@ var kdown = {
                 window.setTimeout(function () {kdown.search.go(); }, 100);
             });
 
-            $(".search_clear").click(function () {
-                $("#dl_search_box").val("");
+            $(".search_clear").click(function (e) {
+                $("#dl_search_box").val("").focus();
                 kdown.search.go();
-                $("#dl_search_box").focus();
+                e.preventDefault();
             });
 
             $("#to_top").click(function () {

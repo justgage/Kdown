@@ -1,8 +1,9 @@
 <html>
 <head>
-<link rel="stylesheet" href="https://na.kyani.net/include/css/cool_blue.2.css" type="text/css" media="screen" />
-<link rel="stylesheet" href="https://na.kyani.net/include/css/backoffice.css" type="text/css" media="screen" />
-<link rel="stylesheet" href="dl.css" type="text/css" media="screen" />
+    <title>Downloads Page</title>
+    <link rel="stylesheet" href="https://na.kyani.net/include/css/cool_blue.2.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="https://na.kyani.net/include/css/backoffice.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="dl.css" type="text/css" media="screen" />
 </head>
 <body>
 <center><img alt="header image" src="files/header.png" /></center>
@@ -17,12 +18,11 @@
                 <div id="dl_controls">
                     <div id="dl_search_big">
                         <form action="search.html" method="get" accept-charset="utf-8">
-
-                            <span>Search</span>
-                            <input type="text" name="dl_search" id="dl_search_box" value="" />
-                            <!-- Translate the "go" below -->
-                            <input id="search_go" type="button" value="Go" />
-                            <a class="search_clear" href="#">clear</a>
+                            <div class="search_round">
+                                <input type="text" name="dl_search" id="dl_search_box" value="" />
+                                <!-- Translate the "go" below -->
+                                <input id="search_go" type="submit" value="SEARCH" />
+                            </div>
                         </form>
                     </div>
 
@@ -31,6 +31,8 @@
 
                     <span>Translations</span>
                     <select name="market" id="lang_select"> </select>
+
+                    <br style="clear:both">
 
                 </div>
 
@@ -63,11 +65,11 @@
                             <td class="table_dl_link"><a href="(DL_LINK)">Download</a></td>
                         </tr>
                         </tbody>
-                    </table>
                     <p style="display:none;" class="none_found">
                     <strong>Sorry, no files where found in this market.</strong> Files in other Markets are listed below 
                     <a class="search_clear" href="#">clear</a>
                     </p>
+                    </table>
                 </div>
                 <div id="dl_table_second" class="dl_table" >
                     <h3>Other Markets</h3>
@@ -92,10 +94,9 @@
                         </tr>
                         </tbody>
                     </table>
-                    <p style="display:none;" class="none_found"><em>Sorry, no files where found.</em></p>
-
-                    <div id="to_top"><a>Back to top</a></div>
+                        <p style="display:none;" class="none_found"><em>Sorry, no files where found.</em></p>
                 </div>
+                <div id="to_top"><a>Back to top</a></div>
 
             </div>
         </div>

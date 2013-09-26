@@ -19,20 +19,6 @@
  *      handles interaction with the search bar.
  */
 
-function klog(mess) {
-    "use strict";
-    if (window.console !== undefined) {
-        console.log(mess);
-    }
-}
-
-function kreport(mess) {
-    "use strict";
-    if (window.console !== undefined) {
-        console.log(mess + "");
-    }
-}
-
 var kdown = {
     db:{
         // constant selectors (not used exclusively in the code yet)
@@ -192,7 +178,7 @@ var kdown = {
             } else {
                 db.market = vl.markets[0];
                 db.cat = first_cat;
-                //window.location.hash = "#" + db.cat + "@" + db.market;
+                db.load();
             }
         },
        update : function () {
@@ -494,6 +480,19 @@ var kdown = {
     }
 };
 
+function klog(mess) {
+    "use strict";
+    if (window.console !== undefined) {
+        console.log(mess);
+    }
+}
+
+function kreport(mess) {
+    "use strict";
+    if (window.console !== undefined) {
+        console.log(mess + "");
+    }
+}
 
 //************************************************************
 // things to do on page load
@@ -520,8 +519,8 @@ $(document).ready(function () {
         //update variables 
         kdown.db.var_update();
 
-        kdown.hash.load();
         kdown.hash.bind();
+        kdown.hash.load();
 
 
         $("#to_top").click(function() {
