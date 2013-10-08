@@ -518,8 +518,8 @@ $(document).ready(function () {
         //update variables 
         kdown.db.var_update();
 
-        //kdown.hash.bind();
-        //kdown.hash.load();
+        kdown.hash.bind();
+        kdown.hash.load();
 
 
         $("#to_top").click(function() {
@@ -543,46 +543,3 @@ $(document).ready(function () {
 
 
 });
-
-
-var route = function() {
-
-   var hash_event = function () {
-      var hash = window.location.hash;
-      for (var i = 0, l = hash_routes.length; i < l; i ++) {
-         var route = hash_routes[i];
-
-         if (hash === route.name) {
-            route
-         }
-      }
-   };
-
-   $(window).bind('hashchange', hash_event);
-
-   return {
-      hash_routes : [],
-      hash_event : route.hash,
-      add : function (route, method) {
-         if (typeof method === "function" && typeof route === "string") {
-            if (route[0] === "#") {
-               M
-            } else {
-
-            }
-         } else {
-            klog('route: bad input on add');
-            klog(route);
-            klog(method);
-            return false;
-         }
-      }
-   };
-
-};
-
-myroute = route();
-myroute.add("awesome", function () {
-   console.log("fire");
-});
-
