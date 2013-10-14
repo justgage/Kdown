@@ -1,3 +1,5 @@
+
+
 /***
  * K-DOWN ~ Kyani download interface
  *
@@ -555,7 +557,7 @@ $(document).ready(function () {
 /***
  * make_router
  *
- * returns an object with
+ * returns an object with these functions
  *
  * add (route,  
  *
@@ -617,16 +619,34 @@ var make_router = function(undefined) {
 
    $(window).bind('hashchange', hash_event);
 
+   // Make return object
    return {
       add : function (route, callback) {
          if (typeof callback === "function" && typeof route === "string") {
-            if (route[0] === "#") {
-               hash_routes.push( { name: route , fire : [callback] } );
-            } else {
-               trigger_routes.push( { name: route , fire : [callback] } );
+
+            //is a hash route
+            if (route[0] === "#") { 
+               if (find(route)) {
+                  hash_routes.push( { name: route , fire : [callback] } );
+               } else {
+                  kerr("ERROR: route already exists, use listen"); 
+                  return  false;
+               }
+            } 
+
+            // not a hash route
+            else { 
+               if (find(route)) {
+                  trigger_routes.push( { name: route , fire : [callback] } );
+               } else {
+                  kerr("ERROR: route already exists, use listen"); 
+                  return  false;
+               }
             }
             return  true;
-         } else {
+            
+         // bad input for route
+         } else { 
             klog('ROUTE: bad input on add');
             klog(route);
             klog(callback);
