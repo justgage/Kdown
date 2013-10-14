@@ -486,6 +486,13 @@ function klog(mess) {
     }
 }
 
+function kerr(mess) {
+    "use strict";
+    if (window.console !== undefined) {
+        console.error(mess);
+    }
+}
+
 function kreport(mess) {
     "use strict";
     if (window.console !== undefined) {
@@ -545,44 +552,146 @@ $(document).ready(function () {
 });
 
 
-var route = function() {
+/***
+ * make_router
+ *
+ * returns an object with
+ *
+ * add (route,  
+ *
+ */
+
+var make_router = function(undefined) {
+   var hash_routes = [];
+   var trigger_routes = [];
 
    var hash_event = function () {
       var hash = window.location.hash;
+      var found = 0;
+      console.log("HASH_EVENT!");
+
       for (var i = 0, l = hash_routes.length; i < l; i ++) {
          var route = hash_routes[i];
 
          if (hash === route.name) {
-            route
+            found++;
+            route.fire();
          }
       }
+
+      if (found === 0) {
+         klog("none found!");
+      }
+
+   };
+
+   var find = function (name, callback) {
+      var route;
+      var found = 0;
+
+      var fire = typeof callback === "function";
+
+      for (i = 0, l = trigger_routes.length; i < l; i ++) {
+         route = trigger_routes[i];
+         if ( name === route.name ) {
+            found++;
+            if (fire) {
+               callback(route, trigger_routes, i);
+            }
+         }
+      }
+
+      for (i = 0, l = hash_routes.length; i < l; i ++) {
+         route = hash_routes[i];
+         if ( name === route.name ) {
+            found++;
+            if (fire) {
+               callback(route, hash_routes, i);
+            }
+         }
+      }
+
+      if (found > 0) { return true; } else { return false; }
+
    };
 
    $(window).bind('hashchange', hash_event);
 
    return {
-      hash_routes : [],
-      hash_event : route.hash,
-      add : function (route, method) {
-         if (typeof method === "function" && typeof route === "string") {
+      add : function (route, callback) {
+         if (typeof callback === "function" && typeof route === "string") {
             if (route[0] === "#") {
-               M
+               hash_routes.push( { name: route , fire : [callback] } );
             } else {
-
+               trigger_routes.push( { name: route , fire : [callback] } );
             }
+            return  true;
          } else {
-            klog('route: bad input on add');
+            klog('ROUTE: bad input on add');
             klog(route);
-            klog(method);
+            klog(callback);
             return false;
+         }
+      },
+
+      //this will fire any event
+      fire : function (route) {
+         var trigger;
+         var i = 0;
+         var j = 0;
+
+         var worked = find(route, function (route) {
+            for (var i = 0, l = route.fire.length; i < l; i ++) {
+               route.fire[i]();
+            }
+         });
+
+         if (worked === false) {
+            kerr('fire failed: event not found!');
+         }
+
+         return worked;
+
+      },
+      listen : function (name , callback) {
+         return find(name, function (route) {
+            route.fire.push(callback);
+         });
+      },
+
+      //this will get rid of a route
+      remove : function (name) {
+         find(name, function (route, list, i) {
+            list.splice(i, 1);
+         });
+      },
+
+      //show all the routes (error checking)
+      show : function () {
+         var i = 0;
+         var v;
+
+         klog('hash_routes');
+         if (hash_routes.length === 0) {
+            klog("   ~~no routes~~");
+         }
+         else {
+            for (i = 0, l = hash_routes.length; i < l; i ++) {
+               klog("   " + hash_routes[i].name);
+            }
+         }
+
+         klog('trigger_routes');
+         if (trigger_routes.length === 0) {
+            klog("   ~~no routes~~");
+         }
+         else {
+            for (i = 0, l = trigger_routes.length; i < l; i ++) {
+               klog("   " + trigger_routes[i].name);
+            }
          }
       }
    };
+ };
 
-};
-
-myroute = route();
-myroute.add("awesome", function () {
-   console.log("fire");
-});
-
+ var r = make_router();
