@@ -676,5 +676,8 @@ $(document).ready(function () {
    kdown.start();
 });
 
-
-
+/***
+ * TODO: make DB variables private members, (market, category)
+ * TODO: make search on the same page
+ *
+ */
