@@ -46,7 +46,7 @@ function run(request, response) {
    console.log("hit");
    request.setEncoding("utf8");
    postdata(request, response, function(err, data) {
-      var reply; //used to send json back
+      var reply = {}; //used to send json back
 
       if (err) {
          console.log(err);
@@ -74,6 +74,25 @@ function run(request, response) {
             }
 
 
+         } else if (typeof data['all-list'] !== 'undefined') {
+            //each market
+            for (var market in markets) {
+               if (market !== 'cat-list') {
+                  //add the market
+                  console.log(reply);
+                  reply[market] = [];
+                  var mcats = markets[market].cats;
+                  //through each cat
+                  for (var one_cat in mcats) {
+                     //reply[market].push(mcats[one_cat].files);
+                     var files = mcats[one_cat].files;
+                     for (var j = 0, ll = files.length; j < ll; j ++) {
+                        reply[market].push(files[j]);
+                     }
+                  }
+               }
+            }
+            
          } else {
             console.log("No POST data, sending list of markets and categorys");
             var lists = {};
