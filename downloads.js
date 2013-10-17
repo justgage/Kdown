@@ -20,7 +20,7 @@
  */
 
 var make_kdown = function () {
-   
+
    //holds values needed to be stored
    var db = {
       //these contain the selected market and category
@@ -41,133 +41,108 @@ var make_kdown = function () {
    var CAT_CURRENT = ".current_page_item";
    var CAT_LINKS = ".cat_link a";
    var router = make_router();
+   var model = {
+      changer : function (cat, market) {
+         return function () {
+            db.market = market;
+            db.cat = cat;
+            model.ui_update();
+         };
+      },
 
-   return {
-      model:{
-         // This will load the category list either
-         // from the saved JSON or the ajax loaded JSON
-         // dictated by db.market/db.cat
-         changer : function (cat, market) {
-            return function () {
-               // kdown.db.market = market;
-               // kdown.db.cat = cat;
-               // kdown.db.ui_update();
-               db.market = market;
-               db.cat = cat;
-               kdown.model.ui_update();
-            };
-         },
-         load : function () {
-            "use strict";
-            var model = kdown.model;
+      /***
+       * this will update the sored values of market and category
+       * to match the interface
+       */
+      var_update : function () {
+         "use strict";
+         db.market = $(MARKETDD).val();
+         db.cat = $(CAT_CURRENT + " a" ).attr('href').slice(1);
+         MAIN.catList.links_update();
+      },
 
-            if ( db.json[ db.market ]  &&  db.json[ db.market ][ db.cat ] ) {
-               model.loadJSON( db.json[ db.market ][ db.cat ] );
-            }
-            else {
-               model.ajax_load();
-            }
-         },
+      // this will update the UI based on information on the inside. 
+      ui_update : function () {
 
-         /***
-          * this will update the sored values of market and category
-          * to match the interface
-          */
-         var_update : function () {
-            "use strict";
-            //var db = kdown.model;
-            db.market = $(MARKETDD).val();
-            db.cat = $(CAT_CURRENT + " a" ).attr('href').slice(1);
-            kdown.catList.links_update();
-         },
+         $(MAIN.MARKETDD).val(model.market);
 
-         // this will update the UI based on information on the inside. 
-         ui_update : function () {
+         $("#none_found").hide();
+         $(".current_page_item").attr("class", "cat_link");
+         $("#cat_" + model.cat).addClass("current_page_item");
 
-            $(kdown.MARKETDD).val(kdown.model.market);
+         MAIN.catList.links_update();
 
-            $("#none_found").hide();
-            $(".current_page_item").attr("class", "cat_link");
-            $("#cat_" + kdown.model.cat).addClass("current_page_item");
+         model.load();
 
-            kdown.catList.links_update();
+      },
+      // This will load the category list either
+      // from the saved JSON or the ajax loaded JSON
+      // dictated by db.market/db.cat
+      load : function () {
+         "use strict";
 
-            kdown.model.load();
-
-         },
-
-         //
-         // This function will load the file list from the API
-         //
-         ajax_load :  function () {
-            "use strict";
-
-            var model = kdown.model;
-            /* replace ALL db */
-
-            //empty the list of items
-
-            $("#ajax_error").hide();
-            $("#dl_loading").show();
-            $("#dl_table_first").hide();
-
-            //load using post method
-            time.start("ajax_wait");
-            $.post("api.php", { "market":db.market, "cat":db.cat },  function (json) {
-               time.start("ajax_wait");
-
-               //creates an entry for the market if there isn't one
-               db.json[ db.market ] = db.json[ db.market ] || {};
-
-               //creates the place to store the json for reuse (in the loadJSON function)
-               db.json[ db.market ][ db.cat ] = json;
-
-               model.loadJSON(json);
-
-            }, "json")
-            .fail(function () {
-               $("#ajax_error").show();
-               $("#dl_loading").hide();
-            });
-
-         },
-
-         //
-         // This will load the json IF the category exists
-         //
-         loadJSON : function (json) {
-            // if the category exists in the data
-            if (json.cat) {
-               kdown.table.load(json);
-            } else {
-               $("#ajax_error").show();
-            }
+         if ( db.json[ db.market ]  &&  db.json[ db.market ][ db.cat ] ) {
+            model.loadJSON( db.json[ db.market ][ db.cat ] );
+         }
+         else {
+            model.ajax_load();
          }
       },
-      hash : {
-         update : function () {
-            "use strict";
-            window.location.hash =  "#" + db.cat + "@" + db.market;
-         },
-         bind : function () {
-            ie_version = kdown.hash.ie_check();
-            if ( ie_version > 7 || ie_version === -1 ) {
-               $(window).bind('hashchange', function() {
-                  kdown.hash.load();
-               });
-            } else {
-               klog("using pooling loop! this should be for IE only.");
-               kdown.hash.loopID = window.setInterval(kdown.hash.load, 1000);
-            } 
-         },
+
+      //
+      // This function will load the file list from the API
+      //
+      ajax_load :  function () {
+         "use strict";
+
+         //empty the list of items
+
+         $("#ajax_error").hide();
+         $("#dl_loading").show();
+         $("#dl_table_first").hide();
+
+         //load using post method
+         time.start("ajax_wait");
+         $.post("api.php", { "market":db.market, "cat":db.cat },  function (json) {
+            time.start("ajax_wait");
+
+            //creates an entry for the market if there isn't one
+            db.json[ db.market ] = db.json[ db.market ] || {};
+
+            //creates the place to store the json for reuse (in the loadJSON function)
+            db.json[ db.market ][ db.cat ] = json;
+
+            model.loadJSON(json);
+
+         }, "json")
+         .fail(function () {
+            $("#ajax_error").show();
+            $("#dl_loading").hide();
+         });
+
       },
+
+      //
+      // This will load the json IF the category exists
+      //
+      loadJSON : function (json) {
+         // if the category exists in the data
+         if (json.cat) {
+            MAIN.table.load(json);
+         } else {
+            $("#ajax_error").show();
+         }
+      }
+   };
+
+   var MAIN = {
       table : {
          sel : $("#dl_table_first").find("table"),
          tbody_sel : $("#dl_table_first").find("tbody"),
          html_row : $("#table_copy")[0].innerHTML,
          load : function (json) {
             "use strict";
-            router.add("table_filter", kdown.table.filter);
+            router.add("table_filter", this.filter);
             router.add('table_highlight', function () {
                $(".dl_table tr").removeClass( "table_row_odd").filter(":odd").addClass("table_row_odd");
             });
@@ -175,11 +150,11 @@ var make_kdown = function () {
             klog("table.load-------------------");
             var i, l, table_sel, row;
             var html_tbody = "";
-            var html_row = "<tr class='table_row (ROW_CLASS) (LANG_CLASS)' >" + kdown.table.html_row + "</tr>";
+            var html_row = "<tr class='table_row (ROW_CLASS) (LANG_CLASS)' >" + this.html_row + "</tr>";
             var list = [];
             var class_list = [];
-            var table = kdown.table;
-            var langDD = kdown.langDD;
+            //var table = MAIN.table;
+            var langDD = MAIN.langDD;
 
             langDD.lang_list = {};
 
@@ -241,7 +216,7 @@ var make_kdown = function () {
             time.stop("html_making");
 
             time.start('inject_html');
-            kdown.table.tbody_sel.html(html_tbody);
+            this.tbody_sel.html(html_tbody);
             time.stop('inject_html');
 
             time.start('showing_stuff');
@@ -252,7 +227,7 @@ var make_kdown = function () {
 
             window.setTimeout(function () { langDD.load(json); },10);
 
-            window.setTimeout(function () { kdown.fav.bind(); },20);
+            window.setTimeout(function () { MAIN.fav.bind(); },20);
 
             //time.report();
          },
@@ -279,7 +254,7 @@ var make_kdown = function () {
             }
 
             $("#dl_table_first").show();
-            kdown.table.highlight();
+            this.highlight();
          },
          //
          //fixes the colors in the rows
@@ -310,8 +285,8 @@ var make_kdown = function () {
          bind : function () {
             router.add("market_change",function () {
                db.market = $(MARKETDD).val();
-               kdown.hash.update();
-               kdown.model.ui_update();
+               MAIN.hash.update();
+               model.ui_update();
             });
 
             $(MARKETDD).change(function () {
@@ -325,7 +300,7 @@ var make_kdown = function () {
          template : "<option value='(CODE)'>(NAME)</option>",
          load : function (json) {
             time.start("langDD.load");
-            var langDD = kdown.langDD;
+            var langDD = MAIN.langDD;
             var html = "";
             var clone;
 
@@ -402,7 +377,7 @@ var make_kdown = function () {
             // set the first one on the list to the current page item. 
             $(".cat_link").first().addClass("current_page_item");
 
-            kdown.catList.bind();
+            MAIN.catList.bind();
 
          },
          //
@@ -411,9 +386,7 @@ var make_kdown = function () {
          bind: function () {
             // this is not needed due to the hash change event
             $(".cat_link").click(function () {
-               time.start("hash");
-               //     kdown.db.cat = $(this).parent().data("cat");
-               //     kdown.db.ui_update();
+               //do somthing???
             });
          },
 
@@ -427,7 +400,7 @@ var make_kdown = function () {
       search : {
          bind : function () {
             "use strict";
-            var model = kdown.model;
+            var model = model;
             model.search = true;
             $("#search_go").click(function () {
                $("#none_found").hide();
@@ -457,7 +430,7 @@ var make_kdown = function () {
                for( var cat in json.cats ) {
                   if (json.cats.hasOwnProperty(cat)) {
                      router.add("#" + cat + "@" + market,
-                                      kdown.model.changer(cat, market));
+                                model.changer(cat, market));
                   }
                }
             }
@@ -465,21 +438,17 @@ var make_kdown = function () {
             router.show();
 
             // populate market and cat list
-            kdown.marketDD.load();
-            kdown.marketDD.bind();
+            MAIN.marketDD.load();
+            MAIN.marketDD.bind();
 
-            kdown.catList.load();
-            kdown.langDD.bind();
+            MAIN.catList.load();
+            MAIN.langDD.bind();
 
             // poplate table with ajax request
-            kdown.model.load();
+            model.load();
 
             //update variables 
-            kdown.model.var_update();
-
-            //kdown.hash.bind();
-            //kdown.hash.load();
-
+            model.var_update();
 
             $("#to_top").click(function() {
                $("html, body").animate({ scrollTop: 0 }, "fast");
@@ -488,9 +457,13 @@ var make_kdown = function () {
          }, "json"); // JSON! Very important to include this
       },
    };
+
+   return MAIN;
+
+
 };
 
-kdown = make_kdown();
+kdown = new make_kdown();
 
 //************************************************************
 // things to do on page load
@@ -502,6 +475,6 @@ $(document).ready(function () {
 
 /***
  * TODO: make DB variables private members, (market, category)
- * TODO: make search on the same page
+ * TODO: nmake search on the same page
  *
  */
