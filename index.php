@@ -87,10 +87,14 @@
    include 'files/jquery.min.js';
    include 'files/time.js';
    include 'router.js';
-   include 'downloads.js';
+   include 'klog.js';
+   //include 'downloads.js';
 ?>
 </script>
 
+<script src="downloads.js" type="text/javascript" charset="utf-8">
+   
+</script>
 
 </body>
 </html>
