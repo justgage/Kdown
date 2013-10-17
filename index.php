@@ -80,8 +80,17 @@
     </div>
     <br style="clear:both;" />
 </div>
-<script type="text/javascript" src="files/jquery.min.js" ></script>
-<script type="text/javascript" src="files/time.js" ></script>
-<script type="text/javascript" src="downloads.js" ></script>
+
+<script type="text/javascript" charset="utf-8">
+<?php 
+//combine all the js files;
+   include 'files/jquery.min.js';
+   include 'files/time.js';
+   include 'router.js';
+   include 'downloads.js';
+?>
+</script>
+
+
 </body>
 </html>
