@@ -41,7 +41,7 @@ var make_kdown = function () {
    var LANGDD = "#lang_select";
    var CAT_CURRENT = ".current_page_item";
    var CAT_LINKS = ".cat_link a";
-   var router = make_router(true);
+   var router = make_router(false);
    var Model = {
       set : function (cat, market) {
          return function () {
@@ -77,6 +77,12 @@ var make_kdown = function () {
          kerr('trying to set market to invalid value -> ' + market);
          return false;
 
+      },
+      getCat : function () {
+         return db.cat;
+      },
+      getMarket : function () {
+         return db.market;
       },
 
       /***
@@ -379,29 +385,33 @@ var make_kdown = function () {
           * Load the cat list from the db.valid_list 
           * NOTE: db.market must be set before this is ran
           */
+
          load : function () {
             "use strict";
             var cats = db.valid_list.cats;
 
-            var item = $("#vertical_nav li");
+            //hack to get outerHTML
+            var copy = $('#copy-cat').clone().wrap('<p>').parent().html();
+            $('#copy-cat').remove();
+            var html = ""; //holds the return html
             var i, l;
 
             // Add a category to the page's sidebar
             $.each(cats, function(code, cat) {
-               var temp = item.clone().show();
+               var temp = copy;
+               klog(code);
                var hash = "#" + code + "@" + db.market;
 
-               $(temp).addClass("cat_link");
-               $(temp).attr("id", "cat_" + code);
-               $(temp).find("a").text(cat);
-               $(temp).find("a").attr("href", hash );
-               $(temp).data("cat", code);
-               $("#vertical_nav ul").append(temp);
+               temp = temp.replace("copy-cat", "cat_" + code);
+               temp = temp.replace("(TITLE)", cat);
+               temp = temp.replace("(HREF)", hash);
+               temp = temp.replace("(CAT)", code);
+               temp = temp.replace(/dis.*;/, ''); //get rid of the display:none
+
+               html += temp;
             });
 
-            // set first one to it's own category
-            //$(item).attr('id', 'all_items');
-            $(item).remove();
+            $('#vertical_nav ul').prepend(html);
 
 
             // set the first one on the list to the current page item. 
@@ -421,6 +431,7 @@ var make_kdown = function () {
          },
 
          links_update : function () {
+            kerr(db.cat);
             $(".cat_link a").each(function() {
                $(this).attr("href",
                             "#" + $(this).parent().data("cat") + "@" + db.market);

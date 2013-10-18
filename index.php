@@ -16,7 +16,8 @@
 
     <div id="vertical_nav">
         <ul>
-            <li style="display:none;"><a href="#All-files">All Files</a></li>
+            <li id="copy-cat" data-cat="(CAT)" class="cat_link" style="display:none;"><a href="(HREF)">(TITLE)</a></li>
+            <li id="" class="" style=""><a href="#search">Search</a></li>
         </ul>
     </div>
     <div id="main_content">
