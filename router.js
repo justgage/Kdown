@@ -9,10 +9,24 @@
  *
  * returns an object with these functions
  *
- * add (route,  
+ * add (route,
  *
  */
-var make_router = function (undefined) {
+
+
+var make_router = function (debug) {
+   var log = function (text) {
+      if (debug) {
+         klog(text);
+      }
+   };
+
+   var err = function (text) {
+      if (debug) {
+         kerr(text);
+      }
+   };
+
    var hash_routes = [];
    var trigger_routes = [];
 
@@ -56,6 +70,7 @@ var make_router = function (undefined) {
          var route = hash_routes[i];
          if (route.name === hash) {
             for (i = 0, l = route.event.length; i < l; i ++) {
+               log(hash + " event Fired! (from hashchange)");
                route.event[i]();
             }
          }
@@ -70,12 +85,14 @@ var make_router = function (undefined) {
             if (route[0] === "#") { 
                if (find(route) === false) {
                   if (typeof callback === 'function') {
+                     log(route + "was added with a function");
                      hash_routes.push( { name: route , event : [callback] } );
                   } else {
+                     log(route + "was added without ANY function");
                      hash_routes.push( { name: route , event : [] } );
                   }
                } else {
-                  kerr("ERROR: route already exists, use listen -> route"); 
+                  err("ERROR: route already exists, use listen -> route"); 
                   return  false;
                }
             } 
@@ -89,7 +106,7 @@ var make_router = function (undefined) {
                      trigger_routes.push( { name: route , event : [] } );
                   }
                } else {
-                  kerr("ERROR: route already exists, use listen -> " + route); 
+                  err("ERROR: route already exists, use listen -> " + route); 
                   return  false;
                }
             }
@@ -97,9 +114,9 @@ var make_router = function (undefined) {
 
             // bad input for route
          } else { 
-            klog('ROUTE: bad input on add');
-            klog(route);
-            klog(callback);
+            log('ROUTE: bad input on add');
+            log(route);
+            log(callback);
             return false;
          }
       },
@@ -109,23 +126,27 @@ var make_router = function (undefined) {
          var i = 0;
          var j = 0;
 
+         log(route + " FIRED!");
+
          var worked = find(route, function (route) {
             for (var i = 0, l = route.event.length; i < l; i ++) {
+               log(i + ": event fired");
                route.event[i]();
             }
 
             if (i === 0) {
-               klog("route " + route.name + ' has no listeners');
+               log("route " + route.name + ' has no listeners');
             }
          });
 
          if (worked === false) {
-            klog('fire failed: event not found!');
+            log('fire failed: event not found!');
          }
 
          return worked;
       },
       listen : function (name , callback) {
+         log(name + " has new listener");
          return find(name, function (route) {
             route.event.push(callback);
          });
@@ -133,6 +154,7 @@ var make_router = function (undefined) {
       //this will get rid of a route
       remove : function (name) {
          find(name, function (route, list, i) {
+            log("route " + route + " was removed");
             list.splice(i, 1);
          });
       },

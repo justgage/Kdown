@@ -20,7 +20,6 @@
  */
 
 var make_kdown = function () {
-
    //holds values needed to be stored
    var db = {
       //these contain the selected market and category
@@ -32,6 +31,8 @@ var make_kdown = function () {
 
       // this holds the saved file list in the format
       // json[market][category]
+      // also note that the cat-list (a list of the categorys)
+      // is also listed as a market
       json : {}
    };
 
@@ -40,13 +41,13 @@ var make_kdown = function () {
    var LANGDD = "#lang_select";
    var CAT_CURRENT = ".current_page_item";
    var CAT_LINKS = ".cat_link a";
-   var router = make_router();
-   var model = {
+   var router = make_router(true);
+   var Model = {
       changer : function (cat, market) {
          return function () {
             db.market = market;
             db.cat = cat;
-            model.ui_update();
+            Model.ui_update();
          };
       },
 
@@ -64,15 +65,15 @@ var make_kdown = function () {
       // this will update the UI based on information on the inside. 
       ui_update : function () {
 
-         $(MAIN.MARKETDD).val(model.market);
+         $(MAIN.MARKETDD).val(Model.market);
 
          $("#none_found").hide();
          $(".current_page_item").attr("class", "cat_link");
-         $("#cat_" + model.cat).addClass("current_page_item");
+         $("#cat_" + Model.cat).addClass("current_page_item");
 
          MAIN.catList.links_update();
 
-         model.load();
+         Model.load();
 
       },
       // This will load the category list either
@@ -82,10 +83,10 @@ var make_kdown = function () {
          "use strict";
 
          if ( db.json[ db.market ]  &&  db.json[ db.market ][ db.cat ] ) {
-            model.loadJSON( db.json[ db.market ][ db.cat ] );
+            Model.loadJSON( db.json[ db.market ][ db.cat ] );
          }
          else {
-            model.ajax_load();
+            Model.ajax_load();
          }
       },
 
@@ -102,9 +103,7 @@ var make_kdown = function () {
          $("#dl_table_first").hide();
 
          //load using post method
-         time.start("ajax_wait");
          $.post("api.php", { "market":db.market, "cat":db.cat },  function (json) {
-            time.start("ajax_wait");
 
             //creates an entry for the market if there isn't one
             db.json[ db.market ] = db.json[ db.market ] || {};
@@ -112,7 +111,7 @@ var make_kdown = function () {
             //creates the place to store the json for reuse (in the loadJSON function)
             db.json[ db.market ][ db.cat ] = json;
 
-            model.loadJSON(json);
+            Model.loadJSON(json);
 
          }, "json")
          .fail(function () {
@@ -135,17 +134,21 @@ var make_kdown = function () {
       }
    };
 
+   // This is what is returned to the object
    var MAIN = {
       table : {
          sel : $("#dl_table_first").find("table"),
          tbody_sel : $("#dl_table_first").find("tbody"),
          html_row : $("#table_copy")[0].innerHTML,
-         load : function (json) {
-            "use strict";
-            router.add("table_filter", this.filter);
+         bind : function () {
             router.add('table_highlight', function () {
                $(".dl_table tr").removeClass( "table_row_odd").filter(":odd").addClass("table_row_odd");
             });
+            router.add("table_filter", this.filter);
+            
+         },
+         load : function (json) {
+            "use strict";
 
             klog("table.load-------------------");
             var i, l, table_sel, row;
@@ -163,10 +166,8 @@ var make_kdown = function () {
             //
 
             //go through each file in the array
-            time.start("html_making");
             $.each(json.cat, function(i, file) {
 
-               time.start("     one_file" + file.filename );
                table_sel = "";
                row = html_row;
 
@@ -211,19 +212,13 @@ var make_kdown = function () {
 
                html_tbody += row;
 
-               time.stop("     one_file" + file.filename );
             });
-            time.stop("html_making");
 
-            time.start('inject_html');
             this.tbody_sel.html(html_tbody);
-            time.stop('inject_html');
 
-            time.start('showing_stuff');
             $("#ajax_error").hide();
             $("#dl_loading").hide();
             $('#dl_table_first').show();
-            time.stop('showing_stuff');
 
             window.setTimeout(function () { langDD.load(json); },10);
 
@@ -254,7 +249,7 @@ var make_kdown = function () {
             }
 
             $("#dl_table_first").show();
-            this.highlight();
+            router.fire("table_highlight");
          },
          //
          //fixes the colors in the rows
@@ -285,8 +280,7 @@ var make_kdown = function () {
          bind : function () {
             router.add("market_change",function () {
                db.market = $(MARKETDD).val();
-               MAIN.hash.update();
-               model.ui_update();
+               Model.ui_update();
             });
 
             $(MARKETDD).change(function () {
@@ -299,7 +293,6 @@ var make_kdown = function () {
          lang_list : {},
          template : "<option value='(CODE)'>(NAME)</option>",
          load : function (json) {
-            time.start("langDD.load");
             var langDD = MAIN.langDD;
             var html = "";
             var clone;
@@ -336,7 +329,6 @@ var make_kdown = function () {
 
             html = clone + html;
             langDD.sel.html(html);
-            time.stop("langDD.load");
          },
          bind : function () {
             $(LANGDD).change(function () {
@@ -400,11 +392,11 @@ var make_kdown = function () {
       search : {
          bind : function () {
             "use strict";
-            var model = model;
-            model.search = true;
+            var Model = Model;
+            Model.search = true;
             $("#search_go").click(function () {
                $("#none_found").hide();
-               model.load();
+               Model.load();
             });
          }
       },
@@ -430,7 +422,7 @@ var make_kdown = function () {
                for( var cat in json.cats ) {
                   if (json.cats.hasOwnProperty(cat)) {
                      router.add("#" + cat + "@" + market,
-                                model.changer(cat, market));
+                                Model.changer(cat, market));
                   }
                }
             }
@@ -444,11 +436,16 @@ var make_kdown = function () {
             MAIN.catList.load();
             MAIN.langDD.bind();
 
+            MAIN.table.bind();
+
             // poplate table with ajax request
-            model.load();
+            Model.load();
 
             //update variables 
-            model.var_update();
+            Model.var_update();
+
+            //load it from the URL
+            router.fire(window.location.hash);
 
             $("#to_top").click(function() {
                $("html, body").animate({ scrollTop: 0 }, "fast");
@@ -459,7 +456,6 @@ var make_kdown = function () {
    };
 
    return MAIN;
-
 
 };
 
@@ -476,5 +472,6 @@ $(document).ready(function () {
 /***
  * TODO: make DB variables private members, (market, category)
  * TODO: nmake search on the same page
+ * TODO: make maretDD change hash. 
  *
  */
