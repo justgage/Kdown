@@ -6,10 +6,7 @@
  * licence -> MIT
  *
  * make_router
- *
- * returns an object with these functions
- *
- * add (route,
+ *    returns an object with these functions
  *
  */
 
@@ -85,10 +82,10 @@ var make_router = function (debug) {
             if (route[0] === "#") { 
                if (find(route) === false) {
                   if (typeof callback === 'function') {
-                     log(route + "was added with a function");
+                     log("ADDED : " + route + "\t\tNO function");
                      hash_routes.push( { name: route , event : [callback] } );
                   } else {
-                     log(route + "was added without ANY function");
+                     log("ADDED : " + route + "\t\tWITH function");
                      hash_routes.push( { name: route , event : [] } );
                   }
                } else {
@@ -126,21 +123,26 @@ var make_router = function (debug) {
          var i = 0;
          var j = 0;
 
-         log(route + " FIRED!");
+         log( 'FIRE: "' + route +  '"');
 
          var worked = find(route, function (route) {
+
             for (var i = 0, l = route.event.length; i < l; i ++) {
-               log(i + ": event fired");
+               log("   " + i + ": event fired");
                route.event[i]();
             }
 
             if (i === 0) {
-               log("route " + route.name + ' has no listeners');
+               log("   route " + route.name + ' has no listeners');
+            } else {
+               if (route[0] === "#") {
+                  window.location.hash = route;
+               }
             }
          });
 
          if (worked === false) {
-            log('fire failed: event not found!');
+            err('   fire failed: event not found!');
          }
 
          return worked;
@@ -158,7 +160,9 @@ var make_router = function (debug) {
             list.splice(i, 1);
          });
       },
-
+      hashUpdate : function(hash){
+         window.location.hash = hash;
+      },
       //show all the routes (error checking)
       show : function () {
          var i = 0;
