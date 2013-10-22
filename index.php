@@ -53,6 +53,7 @@
                 <!-- this can contain text for clarity -->
             </div>
             <div id="dl_table_first" class="dl_table" >
+            <h3 style="display:none;" id="none_found">Sorry, no files where found.</h3>
                 <table>
                     <thead>
                         <tr>
@@ -75,7 +76,6 @@
                 <h3><a id="to_top">Back to top</a></h3>
             </div>
 
-            <h3 style="display:none;" id="none_found">Sorry, no files where found.</h3>
 
         </div>
     </div>
