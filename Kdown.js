@@ -14,13 +14,13 @@ var Kdown = function () {
     var logging = true;
 
     function log(message) {
-        if (loggin === true && typeof console !== 'undefined') {
+        if (logging === true && typeof console !== 'undefined') {
             console.log(message);
         }
     }
 
     function err(message) {
-        if (loggin === true && typeof console !== 'undefined') {
+        if (logging === true && typeof console !== 'undefined') {
             console.error(message);
         }
     }
@@ -30,7 +30,7 @@ var Kdown = function () {
      * This is the local database that holds everything we need
      * to know about the current page
      */
-    db = {
+    var db = {
         page : null,       // current page
 
         market : null,     // current market
@@ -46,7 +46,27 @@ var Kdown = function () {
         pastSearch : null  // a way to filter out the file list faster.
     };
 
-    model = {
+    /***
+     * Converts object to arrays using the words from 
+     * php 'key' and value' this is used to transform json 
+     * from the API to the proper array format that's
+     * faster to go through with a for loop
+     **/
+    function objectToArray(object) {
+        var array = [];
+        for(var prop in object) {
+            if(obj.hasOwnProperty(prop)) {
+                array.push({
+                    "key" : prop,
+                    "value" : object[prop]
+                });
+            }
+        }
+
+        return array;
+    }
+
+    var model = {
         /***
          * this will choose if the console.log is used
          */
@@ -54,26 +74,39 @@ var Kdown = function () {
         /***
          * load the json to the API
          */
-        AjaxToDb : function () {
+        ajaxLists : function () {
+            $.post("api.php", {}, function (json) {
+                db.marketList = json.markets;
+                db.catList = objectToArray(json.cats);
+            }, 'json');
+        },
+        ajaxCatFiles : function () {
 
-            var error = null;
+            var worked = null;
 
-            $.post(API_URL, { "market":db.market, "cat":db.cat }, function (json) {
+            if (db.market !== null && db.cat !== null ) {
 
-                //creates an entry for the market if there isn't one
-                db.json[ db.market ] = db.json[ db.market ] || {};
 
-                //creates the place to store the json for reuse 
-                db.json[ db.market ][ db.cat ] = json;
+                $.post(API_URL, { "market":db.market, "cat":db.cat }, function (json) {
 
-                error = false;
+                    //creates an entry for the market if there isn't one
+                    db.json[ db.market ] = db.json[ db.market ] || {};
 
-            }, "json")
-            .fail(function () {
-                error = true;
-            });
+                    //creates the place to store the json for reuse
+                    db.json[ db.market ][ db.cat ] = json;
 
-            return error;
+                    worked = true;
+
+                }, "json")
+                .fail(function () {
+                    worked = false;
+                });
+            } else { // if  one is not set
+                worked = false;
+                err('ajaxToDb: Market = ' + db.market + ' Cat = ' + db.cat);
+            }
+
+            return worked;
         },
         formatJson : function () {
             /* format the JSON into the list spesified in 
@@ -152,15 +185,19 @@ var Kdown = function () {
         filterTable : function (searchTerm ,tableJson) {
             // filter the tableJson
         }, 
+        show : function () {
+            log(db);
+        },
+        me : function () {
+            return this;
+        }
+
 
     };
 
-
-
-
+    return {
+    "model" : model
+    };
 };
 
-
-
-
-
+k = Kdown();

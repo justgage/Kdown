@@ -12,14 +12,12 @@ IN then one way OUT of the controllers _
         - current category
     - lang
         - current translation selected (can be 'ALL')
-
     - catList
         - list of valid categorys
     - marketList
         - list of valid markets
     - langList
         - list of valid markets
-
     - tableJson
         - hold the current table's JSON
     - page 
@@ -66,6 +64,11 @@ IN then one way OUT of the controllers _
         - execute a list of commands based on a "TAG" from the dom
     - out()
         - update the DOM with the model's values
+    - view {} 
+        var page;                          // what page currently on
+        var error = true / false           // if there's an error message;
+        var errorText = "this is my error" // what error to display.
+        display();
 
 #Dom helpers
 - Table {}
