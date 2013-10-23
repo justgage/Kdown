@@ -9,8 +9,6 @@
  *    returns an object with these functions
  *
  */
-
-
 var make_router = function (debug) {
    var log = function (text) {
       if (debug) {
@@ -79,7 +77,7 @@ var make_router = function (debug) {
       add : function (route, callback) {
          if (typeof route === "string") {
             //is a hash route
-            if (route[0] === "#") { 
+            if (route[0] === "#") {
                if (find(route) === false) {
                   if (typeof callback === 'function') {
                      log("ADDED : " + route + "\t\tNO function");
@@ -89,13 +87,13 @@ var make_router = function (debug) {
                      hash_routes.push( { name: route , event : [] } );
                   }
                } else {
-                  err("ERROR: route already exists, use listen -> route"); 
+                  err("ERROR: route already exists, use listen -> route");
                   return  false;
                }
-            } 
+            }
 
             // not a hash route
-            else { 
+            else {
                if (find(route) === false) {
                   if (typeof callback === 'function') {
                      trigger_routes.push( { name: route , event : [callback] } );
@@ -103,14 +101,14 @@ var make_router = function (debug) {
                      trigger_routes.push( { name: route , event : [] } );
                   }
                } else {
-                  err("ERROR: route already exists, use listen -> " + route); 
+                  err("ERROR: route already exists, use listen -> " + route);
                   return  false;
                }
             }
             return  true;
 
             // bad input for route
-         } else { 
+         } else {
             log('ROUTE: bad input on add');
             log(route);
             log(callback);

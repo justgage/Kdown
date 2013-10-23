@@ -1,6 +1,12 @@
 /***
  * K-DOWN ~ Kyani download interface
  *
+ * Made by Gage Peterson 2013, 
+ * justgage@gmail.com, twitter @justgage. 
+ *
+ * This file will follow the style guide found at:
+ * https://github.com/rwaldron/idiomatic.js/
+ *
  * Objects:
  *       MODEL
  *       handles interaction between the server and the interface.
