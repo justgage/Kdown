@@ -221,6 +221,7 @@ var Kdown = function () {
     };
 
     var view = {
+
         /***
          * Jquery handlers for everything.
          */
@@ -256,29 +257,46 @@ var Kdown = function () {
             tableRow : $("#table_copy").html(),
             cat : $('#copy-cat').html() //NOTE: need to change HTML
         },
+
         /***
-         * Easy way to replace traslations to other things.
+         * bind or rebind all the dom elements
          */
-        templater : {
+        bind : function () {},
+
+        /***
+         * this is the amount of things that have to be updated.
+         * by their 'update' id.
+         *
+         * when the push() command is run it will go through
+         * each of these and execute their function. 
+         *
+         * see prepare object below, and make below that. 
+         */
+        que : [],
+
+        /***
+         * a list of methods to update UI coponents
+         */
+        update : {
+            loading : {
+                 
+            }
             table : function () {
+                var returnHtml
 
             }
         },
         /***
-         * bind or rebind all the dom elements
+         * this will update the dom with everything in the QUE
          */
-        //bind : function () { },
-        /***
-         * This will prepare all the HTML for exporting it to the DOM
-         */
-        make : function () {
-
-        },
-        /***
-         * This will push the prepared HTML to the dom.
-         */
-        display : function () {
-
+        push : function () {
+            if (this.que.length > 0) {
+                this.prepare[this.que[0]]();
+                this.cue = this.cue.slice(1);
+                this.update();
+            } else {
+                return true;
+            }
         },
     };
 
@@ -309,9 +327,9 @@ var test = {
 
         r.add("#cool");
 
-        r.listen('#cool', function (a, b, c) {
-            console.log("fired");
-            console.log(a);
+        r.listen('#cool', function (args) {
+            console.log("Here's the args");
+            console.log(ags);
         });
 
         r.show();
@@ -319,7 +337,6 @@ var test = {
         r.fire("#cool/a/b/c");
 
     }
-
 };
 
 test.router();
