@@ -36,13 +36,13 @@ var Kdown = function () {
         cat : null,        // current category
         lang : null,       // current translation selected (can be 'ALL')
 
-        catList : null,    // list of valid categorys
-        marketList : null, // list of valid markets
-        langList : null,   // list of valid markets
+        cat_list : null,    // list of valid categorys
+        market_list : null, // list of valid markets
+        lang_list : null,   // list of valid markets
 
         json : {},       // saved json from the ajax querys
-        tableJson : null,  // hold the current table's JSON
-        pastSearch : null  // a way to filter out the file list faster.
+        table_json : null,  // hold the current table's JSON
+        past_search : null  // a way to filter out the file list faster.
     };
 
     /***
@@ -51,7 +51,7 @@ var Kdown = function () {
      * from the API to the proper array format that's
      * faster to go through with a for loop
      **/
-    function objectToArray(object) {
+    function object_to_array(object) {
         var array = [];
         for(var prop in object) {
             if(object.hasOwnProperty(prop)) {
@@ -66,11 +66,11 @@ var Kdown = function () {
     }
 
     // search arrays that are outputed by the 
-    // above function, objectToArray
+    // above function, object_to_array
     //
     // returns: if it finds it it returns the index
     //          if not -1
-    function findInAraryObj(needle, arr, prop) {
+    function find_in_arary_obj(needle, arr, prop) {
         for (var i = 0, l = arr.length; i < l; i ++) {
             var item =  arr[i];
             if (item[prop] === needle) {
@@ -88,88 +88,88 @@ var Kdown = function () {
         /***
          * load the json to the API
          */
-        formatJson : function () {
+        format_json : function () {
             /* format the JSON into the list spesified in
              * files/structure.json
              */
         },
 
-        getMarket : function () {
+        get_market : function () {
             return db.market;
         },
-        getCat : function () {
+        get_cat : function () {
             return db.cat;
         },
-        getLang : function () {
+        get_lang : function () {
             return db.lang;
         },
-        setMarket : function (newVal) {
-            var oldMarket = db.market;
+        set_market : function (new_val) {
+            var old_market = db.market;
 
-            if ($.inArray(newVal, db.marketList) !== -1) {
-                log('SET db.market (' + oldMarket + ') -> (' + newVal + ')');
-                db.market = newVal;
+            if ($.inArray(new_val, db.market_list) !== -1) {
+                log('SET db.market (' + old_market + ') -> (' + new_val + ')');
+                db.market = new_val;
                 return true;
             } else {
-                err('Setting to invalid Market ' + newVal);
-                log(db.marketList);
+                err('Setting to invalid Market ' + new_val);
+                log(db.market_list);
                 return false;
             }
         },
-        setCat : function (newVal) {
-            var oldCat = db.cat;
+        set_cat : function (new_val) {
+            var old_cat = db.cat;
 
-            if (findInAraryObj(newVal, db.catList, 'key') !== -1) {
-                log('SET db.cat (' + oldCat + ') -> (' + newVal + ')');
-                db.cat = newVal;
+            if (find_in_arary_obj(new_val, db.cat_list, 'key') !== -1) {
+                log('SET db.cat (' + old_cat + ') -> (' + new_val + ')');
+                db.cat = new_val;
                 return true;
             } else {
-                err('Setting to invalid Cat ' + newVal);
+                err('Setting to invalid Cat ' + new_val);
                 return false;
             }
         },
-        setLang : function (newVal) {
-            var oldLang = db.lang;
+        set_lang : function (new_val) {
+            var old_lang = db.lang;
 
-            if ($.inArray(newVal, db.langList) !== -1) {
-                log('SET db.lang (' + oldLang + ') -> (' + newVal + ')');
-                db.lang = newVal;
+            if ($.inArray(new_val, db.lang_list) !== -1) {
+                log('SET db.lang (' + old_lang + ') -> (' + new_val + ')');
+                db.lang = new_val;
                 return true;
             } else {
-                err('Setting to invalid Lang ' + newVal);
+                err('Setting to invalid Lang ' + new_val);
                 return false;
             }
         },
 
-        getMarketList : function () {
-            return db.marketList;
+        get_market_list : function () {
+            return db.market_list;
         },
-        getCatList : function () {
-            return db.catList;
+        get_cat_list : function () {
+            return db.cat_list;
         },
-        getLangList : function () {
-            return db.langList;
+        get_lang_list : function () {
+            return db.lang_list;
         },
 
-        getJson : function () {
+        get_json : function () {
             return db.json;
         },
 
-        getTableJson : function (market, cat) {
-            return db.tableJson;
+        get_table_json : function (market, cat) {
+            return db.table_json;
         },
-        ajaxLists : function (callback) {
+        ajax_lists : function (callback) {
             var me = this;
             $.post("api.php", {}, function (json) {
-                db.marketList = json.markets;
-                db.catList = objectToArray(json.cats);
+                db.market_list = json.markets;
+                db.cat_list = object_to_array(json.cats);
 
-                me.setMarket(db.marketList[0]);
-                me.setCat(db.catList[0].key);
+                me.set_market(db.market_list[0]);
+                me.set_cat(db.cat_list[0].key);
                 callback();
             }, 'json');
         },
-        ajaxCatFiles : function (callback) {
+        ajax_cat_files : function (callback) {
 
             var worked = null;
 
@@ -193,18 +193,18 @@ var Kdown = function () {
                 });
             } else { // if  one is not set
                 worked = false;
-                err('ajaxToDb: Market = ' + db.market + ' Cat = ' + db.cat);
+                err('ajax_to_db: Market = ' + db.market + ' Cat = ' + db.cat);
             }
 
 
             return worked;
         },
 
-        sortTable : function (filterFeild, tableJson) {
-            // sort the tableJson
+        sort_table : function (filter_feild, table_json) {
+            // sort the table_json
         },
-        filterTable : function (searchTerm ,tableJson) {
-            // filter the tableJson
+        filter_table : function (search_term ,table_json) {
+            // filter the table_json
         },
         show : function () {
             log(db);
@@ -229,14 +229,14 @@ var Kdown = function () {
             table: {
                 all : $('.dl_table'),
                 first : $('#dl_table_first'),
-                firstBody : $("#dl_table_first").find("tbody"),
+                first_body : $("#dl_table_first").find("tbody"),
                 second : $('#dl_table_second'),
-                secondBody : $("#dl_table_second").find("tbody")
+                second_body : $("#dl_table_second").find("tbody")
             },
             error : {
                 loading : $("#dl_loading"),
                 ajax : $("#ajax_error"),
-                noneFound : $('#none_found')
+                none_found : $('#none_found')
             },
             dropdown : {
                 market : $('#market_select'),
@@ -246,15 +246,15 @@ var Kdown = function () {
                 ul: $('#vertical_nav ul'),
                 current : $(".current_page_item"),
                 cats : $(".cat_link"),
-                catLinks : $(".cat_link a")
+                cat_links : $(".cat_link a")
             }
         },
 
         /***
          * the html of the copy objects
          */
-        htmlCopy : {
-            tableRow : $("#table_copy").html(),
+        html_copy : {
+            table_row : $("#table_copy").html(),
             cat : $('#copy-cat').html() //NOTE: need to change HTML
         },
 
@@ -280,9 +280,9 @@ var Kdown = function () {
         update : {
             loading : {
                  
-            }
+            },
             table : function () {
-                var returnHtml
+                var return_html;
 
             }
         },
@@ -307,16 +307,16 @@ var Kdown = function () {
 
 var test = {
     //testing ajax load
-    ajaxFormat : function () {
+    ajax_format : function () {
         var k = new Kdown();
         var m = k.model.me();
 
-        m.ajaxLists(function () {
+        m.ajax_lists(function () {
             m.show();
-            m.setCat('applications');
-            m.ajaxCatFiles(function () {
-                m.setCat('business');
-                m.ajaxCatFiles(function () {
+            m.set_cat('applications');
+            m.ajax_cat_files(function () {
+                m.set_cat('business');
+                m.ajax_cat_files(function () {
                     m.show(); 
                 });
             });
@@ -329,7 +329,7 @@ var test = {
 
         r.listen('#cool', function (args) {
             console.log("Here's the args");
-            console.log(ags);
+            console.log(args);
         });
 
         r.show();
@@ -339,5 +339,6 @@ var test = {
     }
 };
 
+test.router();
 test.router();
 
