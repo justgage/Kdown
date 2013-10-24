@@ -6,6 +6,16 @@
  *
  * rewritten on:  Wed Oct 23 11:50:39 MDT 2013
  *
+ * style_rules: ----------------------------------------
+ * naming: snake_case_normal_vars
+ *          CONSTANT_VAR
+ *          Constructor
+ * indent:  4 spaces
+ * json:    space around the colon eg( "key" : "value" )
+ * functions: var a = function (...) { ... };
+ *                            ^ space
+ * -----------------------------------------------------
+ *
  */
 
 var Kdown = function () {
@@ -155,8 +165,27 @@ var Kdown = function () {
             return db.json;
         },
 
+        /***
+         * returns a JSON string that has market and cat in it too
+         * in case you want to list that in the table. 
+         */
         get_table_json : function (market, cat) {
-            return db.table_json;
+            // check if they are false (hopefully undefined!)
+            // if so set to the current market/cat
+            market = market || db.market;
+            cat = cat || db.cat;
+            var json = db.json[market][cat].cat;
+            var table_json = [];
+
+            for (var i = 0, l = json.length; i < l; i ++) {
+                var file = json[i];
+                file.market = market;
+                file.cat = cat;
+
+                table_json.push(file);
+            }
+
+            return table_json;
         },
         ajax_lists : function (callback) {
             var me = this;
@@ -312,12 +341,11 @@ var test = {
         var m = k.model.me();
 
         m.ajax_lists(function () {
-            m.show();
             m.set_cat('applications');
             m.ajax_cat_files(function () {
                 m.set_cat('business');
                 m.ajax_cat_files(function () {
-                    m.show(); 
+                    console.log(m.get_table_json()); 
                 });
             });
         });
@@ -339,6 +367,6 @@ var test = {
     }
 };
 
-test.router();
+test.ajax_format();
 test.router();
 
