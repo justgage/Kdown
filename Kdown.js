@@ -203,29 +203,47 @@ var Kdown = function () {
         /***
          * Jquery handlers for everything.
          */
-        ui : {
-            tables: {
+        $ui : {
+            table: {
                 all : $('.dl_table'),
                 first : $('#dl_table_first'),
-                second : $('#dl_table_second')
+                firstBody : $("#dl_table_first").find("tbody"),
+                second : $('#dl_table_second'),
+                secondBody : $("#dl_table_second").find("tbody")
             },
-            errors : {
-                ajax : $('#'),
-                noneFound : $('#')
+            error : {
+                loading : $("#dl_loading"),
+                ajax : $("#ajax_error"),
+                noneFound : $('#none_found')
+            },
+            dropdown : {
+                market : $('#market_select'),
+                lang : $("#lang_select")
+            },
+            sidebar: {
+                ul: $('#vertical_nav ul'),
+                current : $(".current_page_item"),
+                cats : $(".cat_link"),
+                catLinks : $(".cat_link a")
             }
         },
+
+        $copy : {
+            tableRow : $("#table_copy")[0].innerHTML,
+            cat : $('#copy-cat')[0].innerHTML //NOTE: need to change HTML
+        }
         /***
          * Easy way to replace traslations to other things.
          */
-        templater : function (html) {
+        templater : {
+            table : function () {
 
+            }
         },
         /***
          * bind or rebind all the dom elements
          */
-        bind : function () {
-
-        },
+        //bind : function () { },
         /***
          * This will prepare all the HTML for exporting it to the DOM
          */

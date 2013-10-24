@@ -426,7 +426,7 @@ var Kdown = function () {
             var cats = db.valid_list.cats;
 
             //hack to get outerHTML
-            var copy = this.$sel.clone().wrap('<p>').parent().html();
+            var copy = this.$sel.html();
             this.$sel.remove();
             var html = ""; //holds the return html
             var i, l;
@@ -441,7 +441,6 @@ var Kdown = function () {
                temp = temp.replace("(TITLE)", cat);
                temp = temp.replace("(HREF)", hash);
                temp = temp.replace("(CAT)", code);
-               temp = temp.replace(/dis.*;/, ''); //get rid of the display:none
 
                html += temp;
             });
