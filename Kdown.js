@@ -288,6 +288,7 @@ var Kdown = function () {
 };
 
 var test = {
+    //testing ajax load
     ajaxFormat : function () {
         var k = new Kdown();
         var m = k.model.me();
@@ -302,8 +303,24 @@ var test = {
                 });
             });
         });
+    },
+    router : function() {
+        var r = Router(true);
+
+        r.add("#cool");
+
+        r.listen('#cool', function (a, b, c) {
+            console.log("fired");
+            console.log(a);
+        });
+
+        r.show();
+
+        r.fire("#cool/a/b/c");
+
     }
+
 };
 
-test.ajaxFormat();
+test.router();
 
