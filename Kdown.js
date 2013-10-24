@@ -19,7 +19,6 @@ var Kdown = function () {
             console.log(message);
         }
     }
-
     function err(message) {
         if (logging === true && typeof console !== 'undefined') {
             console.error(message);
@@ -41,7 +40,7 @@ var Kdown = function () {
         marketList : null, // list of valid markets
         langList : null,   // list of valid markets
 
-        json : null,       // saved json from the ajax querys
+        json : {},       // saved json from the ajax querys
         tableJson : null,  // hold the current table's JSON
         pastSearch : null  // a way to filter out the file list faster.
     };
@@ -66,6 +65,21 @@ var Kdown = function () {
         return array;
     }
 
+    // search arrays that are outputed by the 
+    // above function, objectToArray
+    //
+    // returns: if it finds it it returns the index
+    //          if not -1
+    function findInAraryObj(needle, arr, prop) {
+        for (var i = 0, l = arr.length; i < l; i ++) {
+            var item =  arr[i];
+            if (item[prop] === needle) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     var model = {
         /***
          * this will choose if the console.log is used
@@ -74,40 +88,6 @@ var Kdown = function () {
         /***
          * load the json to the API
          */
-        ajaxLists : function () {
-            $.post("api.php", {}, function (json) {
-                db.marketList = json.markets;
-                db.catList = objectToArray(json.cats);
-            }, 'json');
-        },
-        ajaxCatFiles : function () {
-
-            var worked = null;
-
-            if (db.market !== null && db.cat !== null ) {
-
-
-                $.post(API_URL, { "market":db.market, "cat":db.cat }, function (json) {
-
-                    //creates an entry for the market if there isn't one
-                    db.json[ db.market ] = db.json[ db.market ] || {};
-
-                    //creates the place to store the json for reuse
-                    db.json[ db.market ][ db.cat ] = json;
-
-                    worked = true;
-
-                }, "json")
-                .fail(function () {
-                    worked = false;
-                });
-            } else { // if  one is not set
-                worked = false;
-                err('ajaxToDb: Market = ' + db.market + ' Cat = ' + db.cat);
-            }
-
-            return worked;
-        },
         formatJson : function () {
             /* format the JSON into the list spesified in
              * files/structure.json
@@ -123,40 +103,40 @@ var Kdown = function () {
         getLang : function () {
             return db.lang;
         },
-
         setMarket : function (newVal) {
             var oldMarket = db.market;
 
-            if (typeof db.marketList[market] !== 'undefined') {
-                log('SET db.market (' + oldMarket + ') -> (' + market + ')');
-                db.market = market;
+            if ($.inArray(newVal, db.marketList) !== -1) {
+                log('SET db.market (' + oldMarket + ') -> (' + newVal + ')');
+                db.market = newVal;
                 return true;
             } else {
-                err('Setting to invalid Market' + market);
+                err('Setting to invalid Market ' + newVal);
+                log(db.marketList);
                 return false;
             }
         },
         setCat : function (newVal) {
             var oldCat = db.cat;
 
-            if (typeof db.catList[cat] !== 'undefined') {
-                log('SET db.cat (' + oldCat + ') -> (' + cat + ')');
-                db.cat = cat;
+            if (findInAraryObj(newVal, db.catList, 'key') !== -1) {
+                log('SET db.cat (' + oldCat + ') -> (' + newVal + ')');
+                db.cat = newVal;
                 return true;
             } else {
-                err('Setting to invalid Cat' + cat);
+                err('Setting to invalid Cat ' + newVal);
                 return false;
             }
         },
         setLang : function (newVal) {
             var oldLang = db.lang;
 
-            if (typeof db.langList[lang] !== 'undefined') {
-                log('SET db.lang (' + oldLang + ') -> (' + lang + ')');
-                db.lang = lang;
+            if ($.inArray(newVal, db.langList) !== -1) {
+                log('SET db.lang (' + oldLang + ') -> (' + newVal + ')');
+                db.lang = newVal;
                 return true;
             } else {
-                err('Setting to invalid Lang' + lang);
+                err('Setting to invalid Lang ' + newVal);
                 return false;
             }
         },
@@ -177,6 +157,47 @@ var Kdown = function () {
 
         getTableJson : function (market, cat) {
             return db.tableJson;
+        },
+        ajaxLists : function (callback) {
+            var me = this;
+            $.post("api.php", {}, function (json) {
+                db.marketList = json.markets;
+                db.catList = objectToArray(json.cats);
+
+                me.setMarket(db.marketList[0]);
+                me.setCat(db.catList[0].key);
+                callback();
+            }, 'json');
+        },
+        ajaxCatFiles : function (callback) {
+
+            var worked = null;
+
+            if (db.market !== null && db.cat !== null ) {
+
+
+                $.post(API_URL, { "market":db.market, "cat":db.cat }, function (json) {
+
+                    //creates an entry for the market if there isn't one
+                    db.json[ db.market ] = db.json[ db.market ] || {};
+
+                    //creates the place to store the json for reuse
+                    db.json[ db.market ][ db.cat ] = json;
+
+                    worked = true;
+
+                    callback();
+                }, "json")
+                .fail(function () {
+                    worked = false;
+                });
+            } else { // if  one is not set
+                worked = false;
+                err('ajaxToDb: Market = ' + db.market + ' Cat = ' + db.cat);
+            }
+
+
+            return worked;
         },
 
         sortTable : function (filterFeild, tableJson) {
@@ -228,10 +249,13 @@ var Kdown = function () {
             }
         },
 
-        $copy : {
-            tableRow : $("#table_copy")[0].innerHTML,
-            cat : $('#copy-cat')[0].innerHTML //NOTE: need to change HTML
-        }
+        /***
+         * the html of the copy objects
+         */
+        htmlCopy : {
+            tableRow : $("#table_copy").html(),
+            cat : $('#copy-cat').html() //NOTE: need to change HTML
+        },
         /***
          * Easy way to replace traslations to other things.
          */
@@ -263,4 +287,23 @@ var Kdown = function () {
     };
 };
 
-k = Kdown();
+var test = {
+    ajaxFormat : function () {
+        var k = new Kdown();
+        var m = k.model.me();
+
+        m.ajaxLists(function () {
+            m.show();
+            m.setCat('applications');
+            m.ajaxCatFiles(function () {
+                m.setCat('business');
+                m.ajaxCatFiles(function () {
+                    m.show(); 
+                });
+            });
+        });
+    }
+};
+
+test.ajaxFormat();
+

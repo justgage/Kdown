@@ -1,13 +1,13 @@
 <html>
     <head>
-        <script src="Kdown.js" type="text/javascript"></script>
         <script type="text/javascript">
-<?php 
-   include 'files/jquery.min.js';
-   include 'files/time.js';
-   include 'router.js';
-?>
+            <?php 
+               include 'files/jquery.min.js';
+               include 'files/time.js';
+               include 'router.js';
+            ?>
         </script>
+        <script src="Kdown.js" type="text/javascript"></script>
 
     </head>
     <body>
