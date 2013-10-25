@@ -40,17 +40,17 @@ var Kdown = function () {
      * to know about the current page
      */
     var db = {
-        page : null,       // current page
+        page : null,        // current page
 
-        market : null,     // current market
-        cat : null,        // current category
-        lang : null,       // current translation selected (can be 'ALL')
+        market : null,      // current market
+        cat : null,         // current category
+        lang : null,        // current translation selected (can be 'ALL')
 
         cat_list : null,    // list of valid categorys
         market_list : null, // list of valid markets
         lang_list : null,   // list of valid markets
 
-        json : {},       // saved json from the ajax querys
+        json : {},          // saved json from the ajax querys
         table_json : null,  // hold the current table's JSON
         past_search : null  // a way to filter out the file list faster.
     };
@@ -192,11 +192,9 @@ var Kdown = function () {
             // if so set to the current market/cat
             market = market || db.market;
             cat = cat || db.cat;
+
             var json = db.json[market][cat].cat;
-            var table_json = {
-                files : [],
-                langs : db.json[market][cat].langs,
-            };
+            var table_json = [];
 
             for (var i = 0, l = json.length; i < l; i ++) {
                 var file = json[i];
@@ -210,9 +208,9 @@ var Kdown = function () {
                     }
                 }
 
-                file.lang_list = lang_list;
+                file.langs = lang_list;
 
-                table_json.files.push(file);
+                table_json.push(file);
             }
 
 
@@ -357,17 +355,17 @@ var Kdown = function () {
                 var table_html = "";
                 var row = new Template(html_copy.table_row);
 
-                for (var i = json.files.length - 1; i >= 0; i--) {
-                    var row_data = json.files[i];
+                for (var i = json.length - 1; i >= 0; i--) {
+                    var row_data = json[i];
 
                     // Tempating
                     row.put("(HEART_URL)", '#');
                     row.put("(NAME)", row_data.filename);
                     row.put("(FILE_LINK)", 'single.php?id=' + row_data.id);
-                    if (row_data.lang_list.length === 1) {
-                        row.put("(LANG)", db.lang_list[row_data.lang_list[0]] , "~langs go here~");
+                    if (row_data.langs.length === 1) {
+                        row.put("(LANG)", db.lang_list[row_data.langs[0]] , "~langs go here~");
                     } else {
-                        row.put("(LANG)", row_data.lang_list.join(', ') , "~langs go here~");
+                        row.put("(LANG)", row_data.langs.join(', ') , "~langs go here~");
                     }
                     row.put("(DL_LINK)", row_data.urlasd , "#");
 
