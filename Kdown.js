@@ -346,7 +346,7 @@ var Kdown = function () {
      * this are a collection of objects that
      * abstract the DOM
      */
-    var helper = {
+    var view = {
         table : {
             populate : function(json) {
                 if (typeof json === 'undefined') {
@@ -399,53 +399,32 @@ var Kdown = function () {
     };
 
 
-    var view = {
+    /***
+     * this is the controller, it relys on 'events'
+     * which are a collection of dom manipulations
+     * which are tied to some event in the browser
+     */
+    var event = {
+
+        start : function () {
+            model.ajax_lists(function () {
+                model.ajax_cat_files(function () {
+                    view.table.populate();
+                    view.market_DD.populate();
+                });
+            });
+        },
 
         /***
          * bind or rebind all the dom elements
          */
         bind : function () {},
-
-        /***
-         * this is the amount of things that have to be updated.
-         * by their 'update' id.
-         *
-         * when the push() command is run it will go through
-         * each of these and execute their function. 
-         *
-         * see prepare object below, and make below that. 
-         */
-        que : [],
-
-        /***
-         * a list of methods to update UI coponents
-         */
-        update : {
-            loading : {
-                 
-            },
-            table : function () {
-                var return_html;
-
-            }
-        },
-        /***
-         * this will update the dom with everything in the QUE
-         */
-        push : function () {
-            if (this.que.length > 0) {
-                this.prepare[this.que[0]]();
-                this.cue = this.cue.slice(1);
-                this.update();
-            } else {
-                return true;
-            }
-        },
     };
 
     return {
         "model" : model,
-        "helper" : helper
+        "view" : view,
+        "event" : event
     };
 };
 
@@ -482,20 +461,13 @@ var test = {
         r.fire("#cool/a/b/c");
 
     },
-    populate : function () {
+    start : function () {
         var k = new Kdown();
-
-        k.model.ajax_lists(function () {
-            k.model.ajax_cat_files(function () {
-                k.helper.table.populate();
-                k.helper.market_DD.populate();
-            });
-        });
-
+        k.event.start();
     },
 
 };
 
 test.ajax_format();
-test.populate();
+test.start();
 
