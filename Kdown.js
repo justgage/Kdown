@@ -90,16 +90,34 @@ var Kdown = function () {
         return -1;
     }
 
+    /***
+     * allows you to access the array_object
+     * like a normal object
+     * 
+     * var val = array[key];
+     * var val = array.get_val(key);
+     */
+    function get_val (key, array) {
+
+        var item = array.pop();
+
+        if (item.key === key) {
+            return item.value;
+        } else {
+            if (array.length === 0) {
+                return false;
+            } else {
+                return get_val(array);
+            }
+        }
+    }
+
     var model = {
-        /***
-         * this will choose if the console.log is used
-         */
 
         /***
          * load the json to the API
          */
-        format_json : function () {
-            /* format the JSON into the list spesified in
+        format_json : function () { /* format the JSON into the list spesified in
              * files/structure.json
              */
         },
@@ -175,15 +193,28 @@ var Kdown = function () {
             market = market || db.market;
             cat = cat || db.cat;
             var json = db.json[market][cat].cat;
-            var table_json = [];
+            var table_json = {
+                files : [],
+                langs : db.json[market][cat].langs,
+            };
 
             for (var i = 0, l = json.length; i < l; i ++) {
                 var file = json[i];
                 file.market = market;
                 file.cat = cat;
 
-                table_json.push(file);
+                var lang_list = []; 
+                for (var lang in file.langs) {
+                    if(file.langs.hasOwnProperty(lang)) {
+                        lang_list.push(lang);
+                    }
+                }
+
+                file.lang_list = lang_list;
+
+                table_json.files.push(file);
             }
+
 
             return table_json;
         },
@@ -203,8 +234,6 @@ var Kdown = function () {
             var worked = null;
 
             if (db.market !== null && db.cat !== null ) {
-
-
                 $.post(API_URL, { "market":db.market, "cat":db.cat }, function (json) {
 
                     //creates an entry for the market if there isn't one
@@ -212,6 +241,9 @@ var Kdown = function () {
 
                     //creates the place to store the json for reuse
                     db.json[ db.market ][ db.cat ] = json;
+
+                    //updates the_lang_list
+                    db.lang_list = json.langs;
 
                     worked = true;
 
@@ -245,47 +277,118 @@ var Kdown = function () {
 
     };
 
-    var controller = {
 
+    /***
+     * Jquery handlers for everything.
+     */
+    var $ui = {
+        table: {
+            all : $('.dl_table'),
+            first : $('#dl_table_first'),
+            first_body : $("#dl_table_first").find("tbody"),
+            second : $('#dl_table_second'),
+            second_body : $("#dl_table_second").find("tbody")
+        },
+        error : {
+            loading : $("#dl_loading"),
+            ajax : $("#ajax_error"),
+            none_found : $('#none_found')
+        },
+        dropdown : {
+            market : $('#market_select'),
+            lang : $("#lang_select")
+        },
+        sidebar: {
+            ul: $('#vertical_nav ul'),
+            current : $(".current_page_item"),
+            cats : $(".cat_link"),
+            cat_links : $(".cat_link a")
+        }
     };
 
-    var view = {
+    /***
+     * the html of the copy objects
+     */
+    var html_copy = {
+        table_row : '<tr>' + $("#table_copy").html() + '</tr>',
+        cat : $('#copy-cat').html() //NOTE: need to change HTML
+    };
 
-        /***
-         * Jquery handlers for everything.
-         */
-        $ui : {
-            table: {
-                all : $('.dl_table'),
-                first : $('#dl_table_first'),
-                first_body : $("#dl_table_first").find("tbody"),
-                second : $('#dl_table_second'),
-                second_body : $("#dl_table_second").find("tbody")
+    /***
+     * This is a very simple Templating system. 
+     * you hand it a string of HTML
+     *      use put()       to replace a tag with value 
+     *                      and fallback placeholder
+     *      use clear()     get the html and reset it
+     */
+    var Template = function (template) {
+        var temp = template;
+        return {
+
+            put : function(tag, replacement, placeholder) {
+                if (typeof replacement === 'function') {
+                    temp = temp.replace(tag, replacement() || placeholder);
+                } else if (typeof placeholder !== 'undefined') {
+                    temp = temp.replace(tag, replacement || placeholder);
+                } else {
+                    temp = temp.replace(tag, replacement);
+                }
             },
-            error : {
-                loading : $("#dl_loading"),
-                ajax : $("#ajax_error"),
-                none_found : $('#none_found')
+
+            empty : function () {
+                var ret = temp;
+                temp = template;
+                return ret;
             },
-            dropdown : {
-                market : $('#market_select'),
-                lang : $("#lang_select")
-            },
-            sidebar: {
-                ul: $('#vertical_nav ul'),
-                current : $(".current_page_item"),
-                cats : $(".cat_link"),
-                cat_links : $(".cat_link a")
+        };
+    };
+
+
+    /***
+     * this are a collection of objects that
+     * abstract the DOM
+     */
+    var helper = {
+        table : {
+            populate : function(json) {
+                if (typeof json === 'undefined') {
+                    json = model.get_table_json();
+                }
+                var table_html = "";
+                var row = new Template(html_copy.table_row);
+
+                for (var i = json.files.length - 1; i >= 0; i--) {
+                    var row_data = json.files[i];
+
+                    // Tempating
+                    row.put("(HEART_URL)", '#');
+                    row.put("(NAME)", row_data.filename);
+                    row.put("(FILE_LINK)", 'single.php?id=' + row_data.id);
+                    if (row_data.lang_list.length === 1) {
+                        row.put("(LANG)", db.lang_list[row_data.lang_list[0]] , "~langs go here~");
+                    } else {
+                        row.put("(LANG)", row_data.lang_list.join(', ') , "~langs go here~");
+                    }
+                    row.put("(DL_LINK)", row_data.urlasd , "#");
+
+                    table_html += row.empty();
+                }
+                
+                $ui.table.first_body.html(table_html);
             }
         },
+        cat_list : {
+            populate : function(attribute) {
+                
+            },
+            set_current : function () {
+                //code
+            }
+        }
+    };
 
-        /***
-         * the html of the copy objects
-         */
-        html_copy : {
-            table_row : $("#table_copy").html(),
-            cat : $('#copy-cat').html() //NOTE: need to change HTML
-        },
+
+    var view = {
 
         /***
          * bind or rebind all the dom elements
@@ -330,9 +433,11 @@ var Kdown = function () {
     };
 
     return {
-        "model" : model
+        "model" : model,
+        "helper" : helper
     };
 };
+
 
 var test = {
     //testing ajax load
@@ -345,6 +450,7 @@ var test = {
             m.ajax_cat_files(function () {
                 m.set_cat('business');
                 m.ajax_cat_files(function () {
+                    console.log(m.get_json()); 
                     console.log(m.get_table_json()); 
                 });
             });
@@ -364,9 +470,20 @@ var test = {
 
         r.fire("#cool/a/b/c");
 
-    }
+    },
+    populate : function () {
+        var k = new Kdown();
+
+        k.model.ajax_lists(function () {
+            k.model.ajax_cat_files(function () {
+                k.helper.table.populate();
+            });
+        });
+
+    },
+
 };
 
 test.ajax_format();
-test.router();
+test.populate();
 

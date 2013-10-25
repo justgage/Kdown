@@ -59,7 +59,7 @@ var Kdown = function () {
     LANGDD = "#lang_select",
     CAT_CURRENT = ".current_page_item",
     CAT_LINKS = ".cat_link a",
-    router = make_router(false);
+    router = new Router(true);
 
     var Model = {
         set : function (cat, market) {
@@ -541,7 +541,8 @@ var Kdown = function () {
 
          }, "json"); // JSON! Very important to include this
       },
-      Model : Model // for debuging, get rid of this later. 
+      Model : Model, // for debuging, get rid of this later. 
+      router : router
    };
 
    return returnOB;
