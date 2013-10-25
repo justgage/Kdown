@@ -376,13 +376,26 @@ var Kdown = function () {
             }
         },
         cat_list : {
-            populate : function(attribute) {
-                
-            },
+            populate : function () {
+                //code
+            }, 
             set_current : function () {
                 //code
             }
+        },
+        market_DD : {
+            populate : function () {
+                var list = model.get_market_list();
+                var html;
+                var temp = new Template('<option value="(NAME)">(NAME)</option>');
+                for (var i = list.length - 1; i >= 0; i--) {
+                    temp.put(/\(NAME\)/g, list[i]);
+                    html += temp.empty();
+                }
+                $ui.dropdown.market.html(html);
+            }
         }
+
     };
 
 
@@ -475,6 +488,7 @@ var test = {
         k.model.ajax_lists(function () {
             k.model.ajax_cat_files(function () {
                 k.helper.table.populate();
+                k.helper.market_DD.populate();
             });
         });
 
