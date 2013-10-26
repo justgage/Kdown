@@ -19,6 +19,7 @@
  */
 
 var Kdown = function () {
+
     "use strict";
 
     var API_URL = 'api.php';
@@ -55,63 +56,6 @@ var Kdown = function () {
         past_search : null  // a way to filter out the file list faster.
     };
 
-    /***
-     * Converts object to arrays using the words from
-     * php 'key' and value' this is used to transform json
-     * from the API to the proper array format that's
-     * faster to go through with a for loop
-     **/
-    function object_to_array(object) {
-        var array = [];
-        for(var prop in object) {
-            if(object.hasOwnProperty(prop)) {
-                array.push({
-                    "key" : prop,
-                    "value" : object[prop]
-                });
-            }
-        }
-
-        return array;
-    }
-
-    // search arrays that are outputed by the 
-    // above function, object_to_array
-    //
-    // returns: if it finds it it returns the index
-    //          if not -1
-    function find_in_arary_obj(needle, arr, prop) {
-        for (var i = 0, l = arr.length; i < l; i ++) {
-            var item =  arr[i];
-            if (item[prop] === needle) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    /***
-     * allows you to access the array_object
-     * like a normal object
-     * 
-     * var val = array[key];
-     * var val = array.get_val(key);
-     */
-    function get_val (key, array) {
-
-        var item = array.pop();
-
-        if (item.key === key) {
-            return item.value;
-        } else {
-            if (array.length === 0) {
-                return false;
-            } else {
-                return get_val(array);
-            }
-        }
-    }
-
     var model = {
 
         /***
@@ -121,7 +65,6 @@ var Kdown = function () {
              * files/structure.json
              */
         },
-
         get_market : function () {
             return db.market;
         },
@@ -147,7 +90,7 @@ var Kdown = function () {
         set_cat : function (new_val) {
             var old_cat = db.cat;
 
-            if (find_in_arary_obj(new_val, db.cat_list, 'key') !== -1) {
+            if (this.find_in_arary_obj(new_val, db.cat_list, 'key') !== -1) {
                 log('SET db.cat (' + old_cat + ') -> (' + new_val + ')');
                 db.cat = new_val;
                 return true;
@@ -220,7 +163,7 @@ var Kdown = function () {
             var me = this;
             $.post("api.php", {}, function (json) {
                 db.market_list = json.markets;
-                db.cat_list = object_to_array(json.cats);
+                db.cat_list = model.object_to_array(json.cats);
 
                 me.set_market(db.market_list[0]);
                 me.set_cat(db.cat_list[0].key);
@@ -270,46 +213,65 @@ var Kdown = function () {
         },
         me : function () {
             return this;
+        },
+
+        /***
+         * Converts object to arrays using the words from
+         * php 'key' and value' this is used to transform json
+         * from the API to the proper array format that's
+         * faster to go through with a for loop
+         **/
+        object_to_array : function (object) {
+            var array = [];
+            for(var prop in object) {
+                if(object.hasOwnProperty(prop)) {
+                    array.push({
+                        "key" : prop,
+                        "value" : object[prop]
+                    });
+                }
+            }
+
+            return array;
+        },
+
+        // search arrays that are outputed by the 
+        // above function, object_to_array
+        //
+        // returns: if it finds it it returns the index
+        //          if not -1
+        find_in_arary_obj : function (needle, arr, prop) {
+            for (var i = 0, l = arr.length; i < l; i ++) {
+                var item =  arr[i];
+                if (item[prop] === needle) {
+                    return i;
+                }
+            }
+            return -1;
+        },
+
+        /***
+         * allows you to access the array_object
+         * like a normal object
+         * 
+         * var val = array[key];
+         * var val = array.get_val(key);
+         */
+        get_val  : function (key, array) {
+
+            var item = array.pop();
+
+            if (item.key === key) {
+                return item.value;
+            } else {
+                if (array.length === 0) {
+                    return false;
+                } else {
+                    return get_val(array);
+                }
+            }
         }
 
-
-    };
-
-
-    /***
-     * Jquery handlers for everything.
-     */
-    var $ui = {
-        table: {
-            all : $('.dl_table'),
-            first : $('#dl_table_first'),
-            first_body : $("#dl_table_first").find("tbody"),
-            second : $('#dl_table_second'),
-            second_body : $("#dl_table_second").find("tbody")
-        },
-        error : {
-            loading : $("#dl_loading"),
-            ajax : $("#ajax_error"),
-            none_found : $('#none_found')
-        },
-        dropdown : {
-            market : $('#market_select'),
-            lang : $("#lang_select")
-        },
-        sidebar: {
-            ul: $('#vertical_nav ul'),
-            current : $(".current_page_item"),
-            cats : $(".cat_link"),
-            cat_links : $(".cat_link a")
-        }
-    };
-
-    /***
-     * the html of the copy objects
-     */
-    var html_copy = {
-        table_row : '<tr>' + $("#table_copy").html() + '</tr>',
-        cat : $('#copy-cat').html() //NOTE: need to change HTML
     };
 
     /***
@@ -341,19 +303,58 @@ var Kdown = function () {
         };
     };
 
-
     /***
      * this are a collection of objects that
-     * abstract the DOM
+     * abstract the DOM manipulation
      */
     var view = {
+
+        /***
+         * the html of the copy objects used for templating
+         */
+        copy : {
+            table_row : '<tr>' + $("#table_copy").html() + '</tr>',
+            cat : $('#copy-cat').html() //NOTE: need to change HTML
+        },
+
+        /***
+         * Jquery handlers for everything.
+         * important for preformance. 
+         */
+        $ui : {
+            table: {
+                all : $('.dl_table'),
+                first : $('#dl_table_first'),
+                first_body : $("#dl_table_first").find("tbody"),
+                second : $('#dl_table_second'),
+                second_body : $("#dl_table_second").find("tbody")
+            },
+            error : {
+                loading : $("#dl_loading"),
+                ajax : $("#ajax_error"),
+                none_found : $('#none_found')
+            },
+            DD : {
+                market : $('#market_select'),
+                lang : $("#lang_select")
+            },
+            sidebar: {
+                ul: $('#vertical_nav ul'),
+                current : $(".current_page_item"),
+                cats : $(".cat_link"),
+                cat_links : $(".cat_link a")
+            }
+        },
+        /***
+         * abstracton of the tables
+         */
         table : {
             populate : function(json) {
                 if (typeof json === 'undefined') {
                     json = model.get_table_json();
                 }
                 var table_html = "";
-                var row = new Template(html_copy.table_row);
+                var row = new Template(view.copy.table_row);
 
                 for (var i = json.length - 1; i >= 0; i--) {
                     var row_data = json[i];
@@ -371,10 +372,17 @@ var Kdown = function () {
 
                     table_html += row.empty();
                 }
-                
-                $ui.table.first_body.html(table_html);
+
+                view.$ui.table.first_body.html(table_html);
             }
         },
+        /***
+         * abstracton of the cat_list in the sidebar
+         *
+         * TODO: need a good way to handle different pages
+         *       posibly rename as 'page' or 'sidebar'?
+         *
+         */
         cat_list : {
             populate : function () {
                 //code
@@ -383,6 +391,9 @@ var Kdown = function () {
                 //code
             }
         },
+        /***
+         * Abstracts the market drop down
+         */
         market_DD : {
             populate : function () {
                 var list = model.get_market_list();
@@ -392,12 +403,10 @@ var Kdown = function () {
                     temp.put(/\(NAME\)/g, list[i]);
                     html += temp.empty();
                 }
-                $ui.dropdown.market.html(html);
+                view.$ui.DD.market.html(html);
             }
         }
-
     };
-
 
     /***
      * this is the controller, it relys on 'events'
@@ -465,9 +474,7 @@ var test = {
         var k = new Kdown();
         k.event.start();
     },
-
 };
 
-test.ajax_format();
 test.start();
 
