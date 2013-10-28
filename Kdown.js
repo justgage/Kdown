@@ -168,15 +168,18 @@ var Kdown = function () {
 
                 for (var lang in file.langs) {
                     if(file.langs.hasOwnProperty(lang)) {
+
+                        lang_list.push(lang);
+
                         // will make it 1 if it's empty or add one to the count
                         // otherwise
                         lang_count[lang] = ++lang_count[lang] || 1;
 
-                        lang_list.push(lang);
                     }
                 }
 
-                file.langs = lang_list;
+                file.langs = lang_list; // TODO bugg that sets the value to zero???
+                console.log("file",file.langs);
 
                 table_json.push(file);
             }
@@ -375,7 +378,7 @@ var Kdown = function () {
                 view.$ui.table.first_body.html(table_html);
             },
             lang_filter : function(lang) {
-                json = model.get_table_json();
+                var json = model.get_table_json();
 
                 var filtered_json = [];
 
@@ -514,6 +517,7 @@ var Kdown = function () {
                 model.ajax_cat_files(function () {
                     view.table.populate();
                     view.lang_DD.populate();
+                    view.lang_DD.populate();
                     return true;
                 });
             } else {
@@ -605,10 +609,12 @@ var test = {
 
     },
     page_load : function () {
-        var k = new Kdown();
+        k = new Kdown();
         k.event.page_load();
     },
 };
+
+
 
 test.page_load();
 
