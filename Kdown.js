@@ -147,7 +147,15 @@ var Kdown = function () {
             market = market || db.market;
             cat = cat || db.cat;
 
-            var json = db.json[market][cat].cat;
+            var json = null;
+
+            if (typeof db.json[market][cat] !== 'undefined') {
+                json = db.json[market][cat].cat;
+            } else {
+                log(market, cat, db.json);
+                err("db.json does not contain the right market / category", json);
+                return false;
+            }
             var table_json = [];
             var lang_count = {};
 
@@ -326,7 +334,8 @@ var Kdown = function () {
             },
             sidebar: {
                 ul: $('#vertical_nav ul'),
-                current : $(".current_page_item"),
+                current_class : ".current_page_item",
+                current : $(this.current_class),
                 cats : $(".cat_link"),
                 cat_links : $(".cat_link a")
             }
@@ -376,21 +385,31 @@ var Kdown = function () {
 
                 var list = model.get_cat_list();
                 var market = model.get_market();
+                var cat = model.get_cat();
                 var li = "";
                 for (var i = 0, l = list.length; i < list.length; i++) {
                     var page = list[i];
                     li = copy;
 
-                    li = li.replace("(CAT)", page.key);
+                    li = li.replace(/\(CAT\)/g, page.key);
                     li = li.replace("(HREF)", "#cat/" + market + "/" + page.key);
                     li = li.replace("(TITLE)", page.value);
 
+
                     html += li;
                 }
+                //set the sidebar
                 view.$ui.sidebar.ul.html(html);
+                this.set_current();
             }, 
             set_current : function () {
-                //code
+                var sidebar = view.$ui.sidebar;
+                //remove current one
+                sidebar.current.removeClass(sidebar.current_class.slice(1));
+
+                //change to the new one
+                sidebar.ul.find( "#cat_" + model.get_cat() ).
+                    addClass(sidebar.current_class.slice(1));
             }
         },
         /***
@@ -418,7 +437,8 @@ var Kdown = function () {
                     if(langs.hasOwnProperty(code)) {
                         var name = langs[code];
                         var option = temp.replace("(VAL)", code);
-                        var num = count[code] + "";
+                        var num = count[code] || 0;
+                        num = num + ""; // change to a string
                         var spaces = [];
                         for (var ii = 0, l = 4 - num.length; ii< l; ii++) {
                             spaces.push("\u00A0"); //this is the char for a non-breaking space
@@ -442,7 +462,7 @@ var Kdown = function () {
      * which are tied to some event in the browser
      */
     var event = {
-        router : new Router(),
+        router : new Router(true),
 
         page_load : function () {
             model.ajax_lists(function () {
@@ -456,22 +476,59 @@ var Kdown = function () {
             });
         },
         change_cat : function (cat) {
-            model.set_cat(cat);
-            view.table.populate();
-            view.lang_DD.populate();
+            if (model.set_cat(cat)) {
+                model.ajax_cat_files(function () {
+                    view.table.populate();
+                    view.lang_DD.populate();
+                    return true;
+                });
+            } else {
+                return false;
+            }
         },
         change_market : function (market) {
-            model.set_market(market);
-            view.table.populate();
-            view.lang_DD.populate();
-            view.sidebar.populate();
+            if (model.set_market(market)) {
+                model.ajax_cat_files(function () {
+                    view.table.populate();
+                    view.lang_DD.populate();
+                    view.sidebar.populate();
+                });
+                return true;
+            } else {
+                return false;
+            }
+        },
+        change_market_cat : function(market, cat) {
+            if ( model.set_market(market) && model.set_cat(cat) ) {
+                model.ajax_cat_files(function () {
+                    view.table.populate();
+                    view.lang_DD.populate();
+                    view.sidebar.populate();
+                });
+                return true;
+            } else {
+                return false;
+            }
         },
 
         /***
          * bind or rebind all the dom elements
          */
-        bind : function () {},
+        bind : function () {
+            view.$ui.DD.market.change(function () {
+                event.change_market($(this).val());
+            });
+
+            this.router.add("#cat", function (args) {
+                if ( event.change_market_cat(args[0], args[1]) === false ) { //market valid
+                    err('Bad market / cat in hash ');
+                }
+            });
+
+        },
     };
+
+    event.bind();
 
     return {
         "model" : model,

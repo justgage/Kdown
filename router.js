@@ -64,9 +64,12 @@ var Router = function (debug) {
 
     $(window).bind('hashchange', function () {
         var hash = window.location.hash;
+        log("hash change " + hash);
         var found = 0;
-        var hash_array = hash.slice(1).split("/");
+        var hash_array = hash.split("/");
         var i = 0;
+
+        log(hash_array);
 
         for (i = 0, l = hash_routes.length; i < l; i ++) {
             var route = hash_routes[i];
