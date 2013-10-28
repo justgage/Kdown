@@ -23,7 +23,9 @@ var Kdown = function () {
     "use strict";
 
     var API_URL = 'api.php';
+    var NATIVE_LANG = 'en';
     var logging = true;
+
 
     function log(message) {
         if (logging === true && typeof console !== 'undefined') {
@@ -50,6 +52,7 @@ var Kdown = function () {
         cat_list : null,    // list of valid categorys
         market_list : null, // list of valid markets
         lang_list : null,   // list of valid markets
+        lang_count : null,   // list of valid markets
 
         json : {},          // saved json from the ajax querys
         table_json : null,  // hold the current table's JSON
@@ -57,7 +60,6 @@ var Kdown = function () {
     };
 
     var model = {
-
         /***
          * load the json to the API
          */
@@ -121,7 +123,16 @@ var Kdown = function () {
         get_lang_list : function () {
             return db.lang_list;
         },
-
+        get_lang_name : function (key) {
+            return db.lang_list[key];
+        },
+        get_lang_count : function (key) {
+            if (typeof key === 'undefined') {
+                return db.lang_count;
+            } else {
+                return db.lang_count[key];
+            }
+        },
         get_json : function () {
             return db.json;
         },
@@ -138,15 +149,21 @@ var Kdown = function () {
 
             var json = db.json[market][cat].cat;
             var table_json = [];
+            var lang_count = {};
 
             for (var i = 0, l = json.length; i < l; i ++) {
-                var file = json[i];
+                var file = json[i],
+                    lang_list = [];  // a list of languages in a file.
                 file.market = market;
                 file.cat = cat;
 
-                var lang_list = []; 
+
                 for (var lang in file.langs) {
                     if(file.langs.hasOwnProperty(lang)) {
+                        // will make it 1 if it's empty or add one to the count
+                        // otherwise
+                        lang_count[lang] = ++lang_count[lang] || 1;
+
                         lang_list.push(lang);
                     }
                 }
@@ -156,6 +173,7 @@ var Kdown = function () {
                 table_json.push(file);
             }
 
+            db.lang_count = lang_count;
 
             return table_json;
         },
@@ -204,9 +222,6 @@ var Kdown = function () {
 
         sort_table : function (filter_feild, table_json) {
             // sort the table_json
-        },
-        filter_table : function (search_term ,table_json) {
-            // filter the table_json
         },
         show : function () {
             log(db);
@@ -275,35 +290,6 @@ var Kdown = function () {
     };
 
     /***
-     * This is a very simple Templating system. 
-     * you hand it a string of HTML
-     *      use put()       to replace a tag with value 
-     *                      and fallback placeholder
-     *      use clear()     get the html and reset it
-     */
-    var Template = function (template) {
-        var temp = template;
-        return {
-
-            put : function(tag, replacement, placeholder) {
-                if (typeof replacement === 'function') {
-                    temp = temp.replace(tag, replacement() || placeholder);
-                } else if (typeof placeholder !== 'undefined') {
-                    temp = temp.replace(tag, replacement || placeholder);
-                } else {
-                    temp = temp.replace(tag, replacement);
-                }
-            },
-
-            empty : function () {
-                var ret = temp;
-                temp = template;
-                return ret;
-            },
-        };
-    };
-
-    /***
      * this are a collection of objects that
      * abstract the DOM manipulation
      */
@@ -314,7 +300,7 @@ var Kdown = function () {
          */
         copy : {
             table_row : '<tr>' + $("#table_copy").html() + '</tr>',
-            cat : $('#copy-cat').html() //NOTE: need to change HTML
+            page : $('#copy-cat').html() //NOTE: need to change HTML
         },
 
         /***
@@ -354,38 +340,54 @@ var Kdown = function () {
                     json = model.get_table_json();
                 }
                 var table_html = "";
-                var row = new Template(view.copy.table_row);
+                var copy = view.copy.table_row;
+                var row = copy;
 
                 for (var i = json.length - 1; i >= 0; i--) {
                     var row_data = json[i];
+                    row = copy;
 
                     // Tempating
-                    row.put("(HEART_URL)", '#');
-                    row.put("(NAME)", row_data.filename);
-                    row.put("(FILE_LINK)", 'single.php?id=' + row_data.id);
+                    row = row.replace("(HEART_URL)", '#');
+                    row = row.replace("(NAME)", row_data.filename);
+                    row = row.replace("(FILE_LINK)", 'single.php?id=' + row_data.id);
+                    //if there is more than one. 
                     if (row_data.langs.length === 1) {
-                        row.put("(LANG)", db.lang_list[row_data.langs[0]] , "~langs go here~");
+                        row = row.replace("(LANG)", db.lang_list[row_data.langs[0]]);
                     } else {
-                        row.put("(LANG)", row_data.langs.join(', ') , "~langs go here~");
+                        row = row.replace("(LANG)", row_data.langs.join(', '));
                     }
-                    row.put("(DL_LINK)", row_data.urlasd , "#");
+                    row = row.replace("(DL_LINK)", row_data.urlasd , "#");
 
-                    table_html += row.empty();
+                    table_html += row;
                 }
 
                 view.$ui.table.first_body.html(table_html);
             }
         },
         /***
-         * abstracton of the cat_list in the sidebar
-         *
-         * TODO: need a good way to handle different pages
-         *       posibly rename as 'page' or 'sidebar'?
+         * abstracton of the sidebar
          *
          */
-        cat_list : {
+        sidebar : {
             populate : function () {
-                //code
+                var copy = view.copy.page;
+                var html = "";
+
+                var list = model.get_cat_list();
+                var market = model.get_market();
+                var li = "";
+                for (var i = 0, l = list.length; i < list.length; i++) {
+                    var page = list[i];
+                    li = copy;
+
+                    li = li.replace("(CAT)", page.key);
+                    li = li.replace("(HREF)", "#cat/" + market + "/" + page.key);
+                    li = li.replace("(TITLE)", page.value);
+
+                    html += li;
+                }
+                view.$ui.sidebar.ul.html(html);
             }, 
             set_current : function () {
                 //code
@@ -398,12 +400,38 @@ var Kdown = function () {
             populate : function () {
                 var list = model.get_market_list();
                 var html;
-                var temp = new Template('<option value="(NAME)">(NAME)</option>');
+                var temp = '<option value="(NAME)">(NAME)</option>';
                 for (var i = list.length - 1; i >= 0; i--) {
-                    temp.put(/\(NAME\)/g, list[i]);
-                    html += temp.empty();
+                    var option = temp.replace(/\(NAME\)/g, list[i]);
+                    html += option;
                 }
                 view.$ui.DD.market.html(html);
+            }
+        },
+        lang_DD : {
+            populate : function () {
+                var langs = model.get_lang_list();
+                var html;
+                var temp = '<option value="(VAL)">(NAME)</option>';
+                var count = model.get_lang_count();
+                for (var code in langs) {
+                    if(langs.hasOwnProperty(code)) {
+                        var name = langs[code];
+                        var option = temp.replace("(VAL)", code);
+                        var num = count[code] + "";
+                        var spaces = [];
+                        for (var ii = 0, l = 4 - num.length; ii< l; ii++) {
+                            spaces.push("\u00A0"); //this is the char for a non-breaking space
+                        }
+                    name = num + spaces.join(" ") + name;
+
+                    option = temp.replace("(NAME)", name );
+                    html += option;
+                        
+                    }
+                }
+                view.$ui.DD.lang.html(html);
+
             }
         }
     };
@@ -414,14 +442,29 @@ var Kdown = function () {
      * which are tied to some event in the browser
      */
     var event = {
+        router : new Router(),
 
-        start : function () {
+        page_load : function () {
             model.ajax_lists(function () {
                 model.ajax_cat_files(function () {
-                    view.table.populate();
                     view.market_DD.populate();
+                    view.sidebar.populate();
+                    view.table.populate();
+                    view.lang_DD.populate();
+                    model.show();
                 });
             });
+        },
+        change_cat : function (cat) {
+            model.set_cat(cat);
+            view.table.populate();
+            view.lang_DD.populate();
+        },
+        change_market : function (market) {
+            model.set_market(market);
+            view.table.populate();
+            view.lang_DD.populate();
+            view.sidebar.populate();
         },
 
         /***
@@ -470,11 +513,11 @@ var test = {
         r.fire("#cool/a/b/c");
 
     },
-    start : function () {
+    page_load : function () {
         var k = new Kdown();
-        k.event.start();
+        k.event.page_load();
     },
 };
 
-test.start();
+test.page_load();
 
