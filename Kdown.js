@@ -345,6 +345,7 @@ var Kdown = function () {
          */
         table : {
             populate : function(json) {
+                view.$ui.table.all.show();
                 if (typeof json === 'undefined') {
                     json = model.get_table_json();
                 }
@@ -372,7 +373,26 @@ var Kdown = function () {
                 }
 
                 view.$ui.table.first_body.html(table_html);
-            }
+            },
+            lang_filter : function(lang) {
+                json = model.get_table_json();
+
+                var filtered_json = [];
+
+                for (var i=0, l = json.length; i < l; i++) {
+                    var file = json[i];
+                    if (file.langs[lang]) {
+                        filtered_json.push(file);
+                    }
+                }
+
+                return filtered_json;
+
+            },
+            ajax_error : function () {
+                view.$ui.table.all.hide();
+                view.$ui.error.ajax.show();
+            },
         },
         /***
          * abstracton of the sidebar
@@ -433,13 +453,19 @@ var Kdown = function () {
                 var html;
                 var temp = '<option value="(VAL)">(NAME)</option>';
                 var count = model.get_lang_count();
+
+                var option = temp.replace("(VAL)", 'all');
+                option = temp.replace("(NAME)", "All" );
+                html += option;
+
                 for (var code in langs) {
                     if(langs.hasOwnProperty(code)) {
-                        var name = langs[code];
-                        var option = temp.replace("(VAL)", code);
-                        var num = count[code] || 0;
+                        var name = langs[code],
+                            num = count[code] || 0,
+                            spaces = [];
+
+                        option = temp.replace("(VAL)", code);
                         num = num + ""; // change to a string
-                        var spaces = [];
                         for (var ii = 0, l = 4 - num.length; ii< l; ii++) {
                             spaces.push("\u00A0"); //this is the char for a non-breaking space
                         }
@@ -464,6 +490,14 @@ var Kdown = function () {
     var event = {
         router : new Router(true),
 
+        ajax_cat_files :function (callback) {
+            if (model.ajax_cat_files(callback) === false) {
+                this.ajax_error();
+            }
+        },
+        ajax_error : function () {
+            view.table.ajax_error();
+        },
         page_load : function () {
             model.ajax_lists(function () {
                 model.ajax_cat_files(function () {
@@ -500,7 +534,7 @@ var Kdown = function () {
         },
         change_market_cat : function(market, cat) {
             if ( model.set_market(market) && model.set_cat(cat) ) {
-                model.ajax_cat_files(function () {
+                this.ajax_cat_files(function () {
                     view.table.populate();
                     view.lang_DD.populate();
                     view.sidebar.populate();
