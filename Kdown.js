@@ -16,6 +16,7 @@
  *                            ^ space
  * -----------------------------------------------------
  *
+ *  block comments are made like this
  */
 
 var Kdown = function () {
@@ -25,6 +26,19 @@ var Kdown = function () {
     var API_URL = 'api.php';
     var NATIVE_LANG = 'en';
     var logging = true;
+
+    if (typeof console === 'undefined') {
+        var console = {
+            log : function() {},
+            error : function() {},
+            assert : function() {},
+            warn : function() {},
+            group : function() {},
+            time : function() {},
+            timestamp : function() {},
+            trace : function() {},
+        };
+    }
 
 
     function log(message) {
