@@ -28,15 +28,26 @@ var Router = function (debug) {
     var find = function (name, callback) {
         var route;
         var found = 0;
-
+        // this is a booleen that checks if a callback was handed
         var fireable = typeof callback === "function";
 
+        // If it's a hash route
         if (name[0] === '#') {
 
             //get the arguments after the slash
             args = name.slice(1).split("/").slice(1);
-            name = name.replace(/\/.*/g, "");
+            
+            /* 
+             * get rid of everything after the slash
+             * leaving just the name to check against
+             */
+            name = name.replace(/\/.*/g, ""); 
 
+            /***
+             * check each route if it matches and then hand it
+             * to the function 'callback' if there's one
+             * supplied. 
+             */
             for (i = 0, l = hash_routes.length; i < l; i ++) {
                 route = hash_routes[i];
                 if ( name === route.name ) {
@@ -46,7 +57,14 @@ var Router = function (debug) {
                     }
                 }
             }
-        } else {
+
+        } else { // it's a trigger route
+
+            /***
+             * check each route if it matches and then hand it
+             * to the function 'callback' if there's one
+             * supplied. 
+             */
             for (i = 0, l = trigger_routes.length; i < l; i ++) {
                 route = trigger_routes[i];
                 if ( name === route.name ) {
@@ -58,8 +76,7 @@ var Router = function (debug) {
             }
         }
 
-        if (found > 0) { return true; } else { return false; }
-
+        return found > 0; // Return if any where found
     };
 
     $(window).bind('hashchange', function () {
@@ -81,9 +98,7 @@ var Router = function (debug) {
             }
         }
     });
-
-    // Make return object
-    return {
+    var returnOB = {
         add : function (route, callback) {
             if (typeof route === "string") {
                 //is a hash route
@@ -158,13 +173,14 @@ var Router = function (debug) {
 
             return worked;
         },
+        // Add a listener to a tag
         listen : function (name , callback) {
             log(name + " has new listener");
             return find(name, function (route) {
                 route.event.push(callback);
             });
         },
-        //this will get rid of a route
+        // Remove a route and all it's listeners
         remove : function (name) {
             find(name, function (route, list, i) {
                 log("route " + route + " was removed");
@@ -200,6 +216,8 @@ var Router = function (debug) {
             }
         }
     };
+
+    return returnOB;
 };
 
 
