@@ -497,7 +497,11 @@ var Kdown = function () {
                     html += option;
                 }
                 view.$ui.DD.market.html(html);
+            },
+            update : function () {
+                view.$ui.DD.market.val( model.get_market() );
             }
+
         },
         lang_DD : {
             populate : function () {
@@ -558,6 +562,8 @@ var Kdown = function () {
                     view.table.populate();
                     view.lang_DD.populate();
                     model.show();
+
+                    event.router.hashCheck();
                 });
             });
         },
@@ -585,12 +591,13 @@ var Kdown = function () {
                 return false;
             }
         },
-        change_market_cat : function(market, cat) {
+        hash_load : function(market, cat) {
             if ( model.set_market(market) && model.set_cat(cat) ) {
                 this.ajax_cat_files(function () {
                     view.table.populate();
                     view.lang_DD.populate();
                     view.sidebar.populate();
+                    view.market_DD.update();
                 });
                 return true;
             } else {
@@ -607,7 +614,7 @@ var Kdown = function () {
             });
 
             this.router.add("#cat", function (args) {
-                if ( event.change_market_cat(args[0], args[1]) === false ) { //market valid
+                if ( event.hash_change(args[0], args[1]) === false ) { //market valid
                     err('Bad market / cat in hash ');
                 }
             });
