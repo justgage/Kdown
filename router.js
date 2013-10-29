@@ -9,7 +9,7 @@
  *    returns an object with these functions
  *
  */
-var Router = function (debug, hashOnLoad) {
+var Router = function (debug) {
     var log = function (text) {
         if (debug && console) {
             console.log(text);
