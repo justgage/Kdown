@@ -9,7 +9,7 @@
  *    returns an object with these functions
  *
  */
-var Router = function (debug) {
+var Router = function (debug, hashOnLoad) {
     var log = function (text) {
         if (debug && console) {
             console.log(text);
@@ -79,7 +79,9 @@ var Router = function (debug) {
         return found > 0; // Return if any where found
     };
 
-    $(window).bind('hashchange', function () {
+    $(window).bind('hashchange', hashChangeFire);
+
+    function hashChangeFire () {
         var hash = window.location.hash;
         log("hash change " + hash);
         var found = 0;
@@ -97,8 +99,10 @@ var Router = function (debug) {
                 }
             }
         }
-    });
+    }
+
     var returnOB = {
+        hashCheck : hashChangeFire,
         add : function (route, callback) {
             if (typeof route === "string") {
                 //is a hash route
