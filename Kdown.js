@@ -387,7 +387,6 @@ var Kdown = function () {
             sidebar: {
                 ul: $('#vertical_nav ul'),
                 current_class : ".current_page_item",
-                current : $(this.current_class),
                 cats : $(".cat_link"),
                 cat_links : $(".cat_link a")
             }
@@ -419,7 +418,7 @@ var Kdown = function () {
                     } else {
                         row = row.replace("(LANG)", row_data.langs.join(', '));
                     }
-                    row = row.replace("(DL_LINK)", row_data.urlasd , "#");
+                    row = row.replace("(DL_LINK)", row_data.url || "#");
 
                     table_html += row;
                 }
@@ -444,7 +443,7 @@ var Kdown = function () {
             ajax_error : function () {
                 view.$ui.table.all.hide();
                 view.$ui.error.ajax.show();
-            },
+            }
         },
         /***
          * abstracton of the sidebar
@@ -477,7 +476,7 @@ var Kdown = function () {
             set_current : function () {
                 var sidebar = view.$ui.sidebar;
                 //remove current one
-                sidebar.current.removeClass(sidebar.current_class.slice(1));
+                $(sidebar.current_class).removeClass(sidebar.current_class.slice(1));
 
                 //change to the new one
                 sidebar.ul.find( "#cat_" + model.get_cat() ).
@@ -591,12 +590,12 @@ var Kdown = function () {
                 return false;
             }
         },
-        hash_load : function(market, cat) {
+        hash_load : function(market, cat, lang) {
             if ( model.set_market(market) && model.set_cat(cat) ) {
                 this.ajax_cat_files(function () {
+                    view.sidebar.set_current();
                     view.table.populate();
                     view.lang_DD.populate();
-                    view.sidebar.populate();
                     view.market_DD.update();
                 });
                 return true;
@@ -614,7 +613,7 @@ var Kdown = function () {
             });
 
             this.router.add("#cat", function (args) {
-                if ( event.hash_change(args[0], args[1]) === false ) { //market valid
+                if ( event.hash_load(args[0], args[1]) === false ) { //market valid
                     err('Bad market / cat in hash ');
                 }
             });
