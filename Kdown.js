@@ -1,6 +1,41 @@
 /***
  * K-DOWN ~ Kyani download interface
  *
+ * Made by:         Gage Peterson 2013 
+ *                  justgage@gmail.com, twitter @justgage.
+ * rewritten on:    Wed Oct 23 11:50:39 MDT 2013
+ *
+ * How it works:----------------------------------------
+ *
+ * The application has a few major parts (in order of apearence): 
+ *
+ * db ~ the place where all global data is stored
+ * model ~ this is the db helper, this will protect all
+ *         the changes of db, and can log whenever values
+ *         change OR atempted to change to values that are
+ *         invalid. 
+ *
+ *         also provides for a way to abstract the json
+ *         provided by the API thus we only need to change
+ *         it in once place if the API shifts the JSON
+ *         it hands us (currently not entirely implimented
+ *         at the moment)
+ *
+ *
+ * view  ~ This is the abstracton of the DOM elements such
+ *         as the "table" providing methods that are not
+ *         coupled with other views. Meaning the don't depend on 
+ *         other view objects (eg: language Drop down should never
+ *         call the table) these combinations are made in events
+ *          
+ *
+ * event ~ These are the controller actions. They are called 
+ *         events because they represent some event on the page
+ *         such as click on a sidebar link, or a hash change.
+ *         they combine the view objects to provide a easy way
+ *         to see which is running before the other and prevent
+ *         doing things twice or in the views.
+ *
  * Made by Gage Peterson 2013,
  * justgage@gmail.com, twitter @justgage.
  *
@@ -16,6 +51,7 @@
  *                            ^ space
  * -----------------------------------------------------
  *
+ *  block comments are made like this
  */
 
 var Kdown = function () {
@@ -25,6 +61,19 @@ var Kdown = function () {
     var API_URL = 'api.php';
     var NATIVE_LANG = 'en';
     var logging = true;
+
+    if (typeof console === 'undefined') {
+        var console = {
+            log : function() {},
+            error : function() {},
+            assert : function() {},
+            warn : function() {},
+            group : function() {},
+            time : function() {},
+            timestamp : function() {},
+            trace : function() {},
+        };
+    }
 
 
     function log(message) {
@@ -63,6 +112,10 @@ var Kdown = function () {
         /***
          * load the json to the API
          */
+        format_json : function () { /* format the JSON into the list spesified in
+             * files/structure.json
+             */
+        },
         get_market : function () {
             return db.market;
         },
@@ -609,6 +662,8 @@ var test = {
         k.event.page_load();
     },
 };
+
+
 
 test.page_load();
 
