@@ -100,8 +100,8 @@ var Kdown = function () {
 
         cat_list : null,    // list of valid categorys
         market_list : null, // list of valid markets
-        lang_list : null,   // list of valid markets
-        lang_count : null,   // list of valid markets
+        lang_list : {},     // list of valid markets
+        lang_count : null,  // list of valid markets
 
         json : {},          // saved json from the ajax querys
         table_json : null,  // hold the current table's JSON
@@ -169,8 +169,12 @@ var Kdown = function () {
         get_cat_list : function () {
             return db.cat_list;
         },
-        get_lang_list : function () {
-            return db.lang_list;
+        get_lang_list : function (market, cat) {
+
+            market = market || db.market;
+            cat = cat || db.cat;
+
+            return db.lang_list[market][cat];
         },
         get_lang_name : function (key) {
             return db.lang_list[key];
@@ -227,7 +231,7 @@ var Kdown = function () {
                     }
                 }
 
-                file.langs = lang_list; // TODO bugg that sets the value to zero???
+                file.lang_list = lang_list; // TODO bugg that sets the value to zero??? UPDATE: made a change
                 console.log("file",file.langs);
 
                 table_json.push(file);
@@ -252,28 +256,38 @@ var Kdown = function () {
 
             var worked = null;
 
-            if (db.market !== null && db.cat !== null ) {
-                $.post(API_URL, { "market":db.market, "cat":db.cat }, function (json) {
+            // if the entry does exist
+            if (typeof db.json[db.market] !== 'undefined' && typeof db.json[db.market][db.cat] !== 'undefined') {
 
-                    //creates an entry for the market if there isn't one
-                    db.json[ db.market ] = db.json[ db.market ] || {};
+                worked = true;
+                callback();
 
-                    //creates the place to store the json for reuse
-                    db.json[ db.market ][ db.cat ] = json;
+            } else { // if the entry doesn't
 
-                    //updates the_lang_list
-                    db.lang_list = json.langs;
+                if (db.market !== null && db.cat !== null ) {
+                    $.post(API_URL, { "market":db.market, "cat":db.cat }, function (json) {
 
-                    worked = true;
+                        //creates an entry for the market if there isn't one
+                        db.json[db.market] = db.json[db.market] || {};
 
-                    callback();
-                }, "json")
-                .fail(function () {
+                        //creates the place to store the json for reuse
+                        db.json[db.market][db.cat] = json;
+
+                        //adds the_lang_list values
+                        db.lang_list[db.market] = db.lang_list[ db.market ] || {};
+                        db.lang_list[db.market][db.cat] = json.langs;
+
+                        worked = true;
+
+                        callback();
+                    }, "json")
+                    .fail(function () {
+                        worked = false;
+                    });
+                } else { // if one is not set
                     worked = false;
-                });
-            } else { // if  one is not set
-                worked = false;
-                err('ajax_to_db: Market = ' + db.market + ' Cat = ' + db.cat);
+                    err('ajax_to_db: ERROR: Market = ' + db.market + ' Cat = ' + db.cat + ' can not load file list');
+                }
             }
 
 
@@ -414,9 +428,9 @@ var Kdown = function () {
                     row = row.replace("(FILE_LINK)", 'single.php?id=' + row_data.id);
                     //if there is more than one. 
                     if (row_data.langs.length === 1) {
-                        row = row.replace("(LANG)", db.lang_list[row_data.langs[0]]);
+                        row = row.replace("(LANG)", model.get_lang_list()[row_data.lang_list[0]]);
                     } else {
-                        row = row.replace("(LANG)", row_data.langs.join(', '));
+                        row = row.replace("(LANG)", row_data.lang_list.join(', '));
                     }
                     row = row.replace("(DL_LINK)", row_data.url || "#");
 
