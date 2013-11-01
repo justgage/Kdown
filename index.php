@@ -16,7 +16,7 @@
 
     <div id="vertical_nav">
             <ul id="copy-cat" style="display:none;">
-                <li data-cat="(CAT)" class="cat_link" ><a href="(HREF)">(TITLE)</a></li>
+                <li id="cat_(CAT)" data-cat="(CAT)" class="cat_link" ><a href="(HREF)">(TITLE)</a></li>
             </ul>
         <ul>
             <li id="" class="" style=""><a href="#search">Search</a></li>
@@ -95,7 +95,7 @@
 ?>
 </script>
 
-<script src="downloads.js" type="text/javascript" charset="utf-8">
+<script src="Kdown.js" type="text/javascript" charset="utf-8">
    
 </script>
 
