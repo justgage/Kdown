@@ -62,20 +62,6 @@ var Kdown = function () {
     var NATIVE_LANG = 'en';
     var logging = true;
 
-    if (typeof console === 'undefined') {
-        var console = {
-            log : function() {},
-            error : function() {},
-            assert : function() {},
-            warn : function() {},
-            group : function() {},
-            time : function() {},
-            timestamp : function() {},
-            trace : function() {},
-        };
-    }
-
-
     function log(message) {
         if (logging === true && typeof console !== 'undefined') {
             console.log(message);
@@ -108,6 +94,9 @@ var Kdown = function () {
         past_search : null  // a way to filter out the file list faster.
     };
 
+    /***
+     * The abstraction of db
+     */
     var model = {
         /***
          * load the json to the API
@@ -153,7 +142,12 @@ var Kdown = function () {
         set_lang : function (new_val) {
             var old_lang = db.lang;
 
-            if ($.inArray(new_val, db.lang_list) !== -1) {
+            if (new_val === 'all') {
+                log('SET db.lang (' + old_lang + ') -> (' + new_val + ')');
+                db.lang = new_val;
+                return true;
+            }
+            if (typeof db.lang_list[db.market][db.cat][new_val] !== 'undefined') {
                 log('SET db.lang (' + old_lang + ') -> (' + new_val + ')');
                 db.lang = new_val;
                 return true;
@@ -231,8 +225,7 @@ var Kdown = function () {
                     }
                 }
 
-                file.lang_list = lang_list; // TODO bugg that sets the value to zero??? UPDATE: made a change
-                console.log("file",file.langs);
+                file.lang_list = lang_list; 
 
                 table_json.push(file);
             }
@@ -368,7 +361,6 @@ var Kdown = function () {
      * abstract the DOM manipulation
      */
     var view = {
-
         /***
          * the html of the copy objects used for templating
          */
@@ -405,9 +397,6 @@ var Kdown = function () {
                 cat_links : $(".cat_link a")
             }
         },
-        /***
-         * abstracton of the tables
-         */
         table : {
             populate : function(json) {
                 view.$ui.table.all.show();
@@ -440,29 +429,35 @@ var Kdown = function () {
                 view.$ui.table.first_body.html(table_html);
             },
             lang_filter : function(lang) {
-                var json = model.get_table_json();
+                var json = model.get_table_json(),
+                filtered_json = [],
+                i = 0;
+                lang = lang || model.get_lang();
 
-                var filtered_json = [];
-
-                for (var i=0, l = json.length; i < l; i++) {
-                    var file = json[i];
-                    if (file.langs[lang]) {
-                        filtered_json.push(file);
+                if (lang === 'all') {
+                    this.populate();
+                    i = 1;
+                } else {
+                    for (i = 0, l = json.length; i < l; i++) {
+                        var file = json[i];
+                        if (file.langs[lang]) {
+                            filtered_json.push(file);
+                        }
                     }
+                    this.populate(filtered_json);
                 }
 
-                return filtered_json;
-
+                return i > 0;
             },
             ajax_error : function () {
                 view.$ui.table.all.hide();
                 view.$ui.error.ajax.show();
+            },
+            no_files_error : function () {
+                view.$ui.table.all.hide();
+                view.$ui.error.ajax.show();
             }
         },
-        /***
-         * abstracton of the sidebar
-         *
-         */
         sidebar : {
             populate : function () {
                 var copy = view.copy.page;
@@ -497,9 +492,6 @@ var Kdown = function () {
                     addClass(sidebar.current_class.slice(1));
             }
         },
-        /***
-         * Abstracts the market drop down
-         */
         market_DD : {
             populate : function () {
                 var list = model.get_market_list();
@@ -522,25 +514,25 @@ var Kdown = function () {
                 var html;
                 var temp = '<option value="(VAL)">(NAME)</option>';
                 var count = model.get_lang_count();
-
                 var option = temp.replace("(VAL)", 'all');
-                option = temp.replace("(NAME)", "All" );
+                option = option.replace("(NAME)", "All" );
                 html += option;
 
                 for (var code in langs) {
+                    option = temp;
                     if(langs.hasOwnProperty(code)) {
                         var name = langs[code],
                             num = count[code] || 0,
                             spaces = [];
 
-                        option = temp.replace("(VAL)", code);
+                        option = option.replace("(VAL)", code);
                         num = num + ""; // change to a string
                         for (var ii = 0, l = 4 - num.length; ii< l; ii++) {
                             spaces.push("\u00A0"); //this is the char for a non-breaking space
                         }
                     name = num + spaces.join(" ") + name;
 
-                    option = temp.replace("(NAME)", name );
+                    option = option.replace("(NAME)", name );
                     html += option;
                         
                     }
@@ -604,6 +596,18 @@ var Kdown = function () {
                 return false;
             }
         },
+        change_lang : function (lang) {
+            if (model.set_lang(lang)) {
+                model.ajax_cat_files(function () {
+                    if( !view.table.lang_filter() ) {
+                        //if theres not any results
+                    }
+                });
+                return true;
+            } else {
+                return false;
+            }
+        },
         hash_load : function(market, cat, lang) {
             if ( model.set_market(market) && model.set_cat(cat) ) {
                 this.ajax_cat_files(function () {
@@ -624,6 +628,10 @@ var Kdown = function () {
         bind : function () {
             view.$ui.DD.market.change(function () {
                 event.change_market($(this).val());
+            });
+
+            view.$ui.DD.lang.change(function () {
+                event.change_lang($(this).val());
             });
 
             this.router.add("#cat", function (args) {
