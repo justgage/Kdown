@@ -54,8 +54,8 @@
                 <img alt="" src="files/AjaxLoader.gif" />
                 <!-- this can contain text for clarity -->
             </div>
+            <h3 style="display:none; text-align:center;" id="none_found">Sorry, no files where found.</h3>
             <div id="dl_table_first" class="dl_table" >
-            <h3 style="display:none;" id="none_found">Sorry, no files where found.</h3>
                 <table>
                     <thead>
                         <tr>

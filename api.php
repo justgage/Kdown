@@ -23,6 +23,17 @@
 *       all files in all markets (for search methods)
 *
  ***********************************************************/
+
+// NOTE: this is just to show what it would be like over a slower internet connection
+sleep(0.5);
+
+$work = rand(1, 4);
+
+// randomly fails 1/4th of the time
+if ($work < 3) {
+    return array("error" => true, "mess" => "Random Fail, this is code in the api.php, for testing, remove if annoying");
+}
+
 $json = file_get_contents("files/info.json");
 $markets = json_decode($json, true);
 

@@ -234,31 +234,56 @@ var Kdown = function () {
 
             return table_json;
         },
+        /***
+         * Gets a list of categories and markets from the API
+         *
+         * @callback {function} ({boolean} failed, {string} message)} 
+         *      a function that is called after request was success or failure 
+         */
         ajax_lists : function (callback) {
             var me = this;
-            $.post("api.php", {}, function (json) {
-                db.market_list = json.markets;
-                db.cat_list = model.object_to_array(json.cats);
+            var request = $.post("api.php", {}, function (json) {
+                if (json.error === false) {
+                    // Save a list of valid markets
+                    db.market_list = json.markets;
 
-                me.set_market(db.market_list[0]);
-                me.set_cat(db.cat_list[0].key);
-                callback();
+                    // Save a list of valid categories
+                    db.cat_list = model.object_to_array(json.cats);
+
+                    // Set the first one in each list as a default
+                    me.set_market(db.market_list[0]);
+                    me.set_cat(db.cat_list[0].key);
+
+                    callback(true, json.mes);
+                } else {
+                    callback(false, json.mess);
+                }
             }, 'json');
+
+            // If there was an Error with the API call
+            request.fail(function (mess) {
+                log(mess);
+                callback(false, "API was not reached, ");
+            });
         },
+        /***
+         * Get's a list of files in a category
+         */
         ajax_cat_files : function (callback) {
 
             var worked = null;
 
-            // if the entry does exist
-            if (typeof db.json[db.market] !== 'undefined' && typeof db.json[db.market][db.cat] !== 'undefined') {
+            // if the entry already exist in local storage
+            if (db.json.hasOwnProperty(db.market) &&
+                db.json[db.market].hasOwnProperty(db.cat) ) {
 
                 worked = true;
                 callback();
 
-            } else { // if the entry doesn't
+            } else { // if the entry doesn't, load it into the storage
 
                 if (db.market !== null && db.cat !== null ) {
-                    $.post(API_URL, { "market":db.market, "cat":db.cat }, function (json) {
+                    var request = $.post(API_URL, { "market":db.market, "cat":db.cat }, function (json) {
 
                         //creates an entry for the market if there isn't one
                         db.json[db.market] = db.json[db.market] || {};
@@ -273,13 +298,15 @@ var Kdown = function () {
                         worked = true;
 
                         callback();
-                    }, "json")
-                    .fail(function () {
+                    }, "json");
+
+                    request.fail(function () {
                         worked = false;
                     });
+
                 } else { // if one is not set
                     worked = false;
-                    err('ajax_to_db: ERROR: Market = ' + db.market + ' Cat = ' + db.cat + ' can not load file list');
+                    err('ajax_to_db: ERROR: db.market = ' + db.market + ' db.cat = ' + db.cat + ' can not load file list');
                 }
             }
 
@@ -399,7 +426,6 @@ var Kdown = function () {
         },
         table : {
             populate : function(json) {
-                view.$ui.table.all.show();
                 if (typeof json === 'undefined') {
                     json = model.get_table_json();
                 }
@@ -427,36 +453,33 @@ var Kdown = function () {
                 }
 
                 view.$ui.table.first_body.html(table_html);
+                view.error.clear();
             },
             lang_filter : function(lang) {
                 var json = model.get_table_json(),
-                filtered_json = [],
-                i = 0;
+                    filtered_json = [],
+                    num_found = 0,
+                    i = 0;
+
                 lang = lang || model.get_lang();
 
                 if (lang === 'all') {
+                    num_found = json.length; 
                     this.populate();
                     i = 1;
                 } else {
                     for (i = 0, l = json.length; i < l; i++) {
                         var file = json[i];
                         if (file.langs[lang]) {
+                            num_found += 1;
                             filtered_json.push(file);
                         }
                     }
                     this.populate(filtered_json);
                 }
 
-                return i > 0;
+                return num_found > 0;
             },
-            ajax_error : function () {
-                view.$ui.table.all.hide();
-                view.$ui.error.ajax.show();
-            },
-            no_files_error : function () {
-                view.$ui.table.all.hide();
-                view.$ui.error.ajax.show();
-            }
         },
         sidebar : {
             populate : function () {
@@ -540,39 +563,73 @@ var Kdown = function () {
                 view.$ui.DD.lang.html(html);
 
             }
+        },
+        error: {
+            hide_all : function () {
+                view.$ui.table.all.hide();
+                for (var single in view.$ui.error) {
+                    if(view.$ui.error.hasOwnProperty(single)) {
+                        view.$ui.error[single].hide();
+                    }
+                }
+                return true;
+            },
+            ajax : function () {
+                this.hide_all();
+                view.$ui.error.ajax.fadeIn();
+            },
+            none_found : function () {
+                this.hide_all();
+                view.$ui.error.none_found.fadeIn();
+            },
+            clear : function () {
+                this.hide_all();
+                view.$ui.table.all.fadeIn();
+            }
         }
     };
 
     /***
-     * this is the controller, it relys on 'events'
-     * which are a collection of dom manipulations
+     * this is the controller, it relies on 'events'
+     * which are a collection of DOM manipulations
      * which are tied to some event in the browser
      */
     var event = {
-        router : new Router(true),
+        router : new Router(true), // true = log messages
 
-        ajax_cat_files :function (callback) {
-            if (model.ajax_cat_files(callback) === false) {
-                this.ajax_error();
-            }
-        },
-        ajax_error : function () {
-            view.table.ajax_error();
-        },
+        /***
+         * To be fired on page load (jQuery event)
+         */
         page_load : function () {
-            model.ajax_lists(function () {
-                model.ajax_cat_files(function () {
-                    view.market_DD.populate();
-                    view.sidebar.populate();
-                    view.table.populate();
-                    view.lang_DD.populate();
-                    model.show();
+            model.ajax_lists(function (worked, mess) {
+                if (worked === true) {
+                    model.ajax_cat_files(function () {
+                        view.market_DD.populate();
+                        view.sidebar.populate();
+                        view.table.populate();
+                        view.lang_DD.populate();
+                        model.show();
 
-                    event.router.hashCheck();
-                });
+                        event.router.hashCheck();
+                    });
+                } else {
+                    view.error.ajax();
+                }
             });
         },
+        /***
+         * Loads a file list of the current category
+         */
+        ajax_cat_files :function (callback) {
+            if (model.ajax_cat_files(callback) === false) {
+                view.error.ajax();
+            }
+        },
+        /***
+         * Changes which category page we're on
+         */
         change_cat : function (cat) {
+            view.error.clear();
             if (model.set_cat(cat)) {
                 model.ajax_cat_files(function () {
                     view.table.populate();
@@ -584,7 +641,11 @@ var Kdown = function () {
                 return false;
             }
         },
+        /***
+         * Changes which market we're in
+         */
         change_market : function (market) {
+            view.error.clear();
             if (model.set_market(market)) {
                 model.ajax_cat_files(function () {
                     view.table.populate();
@@ -596,11 +657,17 @@ var Kdown = function () {
                 return false;
             }
         },
+        /***
+         * Filters out all files in another language
+         */
         change_lang : function (lang) {
+            view.error.clear();
             if (model.set_lang(lang)) {
                 model.ajax_cat_files(function () {
-                    if( !view.table.lang_filter() ) {
-                        //if theres not any results
+                    var worked = view.table.lang_filter();
+                    console.log(worked);
+                    if (worked === false) {
+                        view.error.none_found();
                     }
                 });
                 return true;
@@ -608,6 +675,9 @@ var Kdown = function () {
                 return false;
             }
         },
+        /***
+         * Loads market and category if they exist in the hash. 
+         */
         hash_load : function(market, cat, lang) {
             if ( model.set_market(market) && model.set_cat(cat) ) {
                 this.ajax_cat_files(function () {
@@ -636,7 +706,7 @@ var Kdown = function () {
 
             this.router.add("#cat", function (args) {
                 if ( event.hash_load(args[0], args[1]) === false ) { //market valid
-                    err('Bad market / cat in hash ');
+                    err('market / cat in hash doesn\'t exist in list');
                 }
             });
 
