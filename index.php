@@ -49,6 +49,8 @@
 
             <div id="ajax_error" style="display:none;" >
                 Sorry there was an error loading the page! click a category to your left or refresh the page. 
+<a href="#reload" id="reload_img"> <img src="files/reload.png" alt="Reload" /> </a>
+
             </div>
             <div id="dl_loading" style="display:none;" >
                 <img alt="" src="files/AjaxLoader.gif" />

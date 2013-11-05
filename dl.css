@@ -194,3 +194,18 @@ border-bottom: 2px solid;
 	text-align: center;
 }
 
+#reload_img {
+    text-align:center;
+    display:block;
+    background-color:lightgrey;
+    width: 130px;
+    margin:20px auto;
+}
+
+#reload_img:hover {
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+	filter: alpha(opacity=50);
+	opacity: 0.50;
+
+}
+

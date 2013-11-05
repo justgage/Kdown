@@ -12,13 +12,13 @@
 var Router = function (debug) {
     var log = function (text) {
         if (debug && console) {
-            console.log(text);
+            console.log("router.js: ",text);
         }
     };
 
     var err = function (text) {
         if (debug && console) {
-            console.error(text);
+            console.error("router.js: ",text);
         }
     };
 
@@ -109,11 +109,11 @@ var Router = function (debug) {
                 if (route[0] === "#") {
                     if (find(route) === false) {
                         if (typeof callback === 'function') {
-                            err("ADDED : " + route + "\t\tWITH function");
+                            log("ADDED : " + route + "\t\tWITH function");
 
                             hash_routes.push( { name: route , event : [callback] } );
                         } else {
-                            err("ADDED : " + route + "\t\tNO function");
+                            log("ADDED : " + route + "\t\tNO function");
                             hash_routes.push( { name: route , event : [] } );
                         }
                     } else {

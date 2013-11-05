@@ -62,9 +62,17 @@ var Kdown = function () {
     var NATIVE_LANG = 'en';
     var logging = true;
 
-    function log(message) {
+    function log(message, indent) {
+        if (typeof indent === 'undefined') {
+            indent = 0;
+        }
+        
         if (logging === true && typeof console !== 'undefined') {
-            console.log(message);
+            var spaces = "";
+            for (var i=0, l = indent.length; i < l; i++) {
+                spaces += "   ";
+            }
+            console.log(spaces, message);
         }
     }
     function err(message) {
@@ -98,13 +106,10 @@ var Kdown = function () {
      * The abstraction of db
      */
     var model = {
+        logging : false,
         /***
          * load the json to the API
          */
-        format_json : function () { /* format the JSON into the list spesified in
-             * files/structure.json
-             */
-        },
         get_market : function () {
             return db.market;
         },
@@ -115,10 +120,13 @@ var Kdown = function () {
             return db.lang;
         },
         set_market : function (new_val) {
-            var old_market = db.market;
+        var old_market = db.market;
 
             if ($.inArray(new_val, db.market_list) !== -1) {
-                log('SET db.market (' + old_market + ') -> (' + new_val + ')');
+                if (this.logging === true) {
+                    log('SET db.market (' + old_market + ') -> (' + new_val + ')');
+                }
+
                 db.market = new_val;
                 return true;
             } else {
@@ -131,7 +139,9 @@ var Kdown = function () {
             var old_cat = db.cat;
 
             if (this.find_in_arary_obj(new_val, db.cat_list, 'key') !== -1) {
-                log('SET db.cat (' + old_cat + ') -> (' + new_val + ')');
+                if (this.logging === true) {
+                    log('SET db.cat (' + old_cat + ') -> (' + new_val + ')');
+                }
                 db.cat = new_val;
                 return true;
             } else {
@@ -143,12 +153,16 @@ var Kdown = function () {
             var old_lang = db.lang;
 
             if (new_val === 'all') {
-                log('SET db.lang (' + old_lang + ') -> (' + new_val + ')');
+                if (this.logging === true) {
+                    log('SET db.lang (' + old_lang + ') -> (' + new_val + ')');
+                }
                 db.lang = new_val;
                 return true;
             }
             if (typeof db.lang_list[db.market][db.cat][new_val] !== 'undefined') {
-                log('SET db.lang (' + old_lang + ') -> (' + new_val + ')');
+                if (this.logging === true) {
+                    log('SET db.lang (' + old_lang + ') -> (' + new_val + ')');
+                }
                 db.lang = new_val;
                 return true;
             } else {
@@ -185,6 +199,15 @@ var Kdown = function () {
         },
 
         /***
+         * Checks if lists where loaded properly
+         *
+         * @returns {booleen} did lists for the sidebar and market load properly
+         */
+        are_lists_loaded : function () {
+            return (db.market_list !== null && db.cat_list !== null );
+        },
+
+        /***
          * returns a JSON string that has market and cat in it too
          * in case you want to list that in the table. 
          */
@@ -208,7 +231,7 @@ var Kdown = function () {
 
             for (var i = 0, l = json.length; i < l; i ++) {
                 var file = json[i],
-                    lang_list = [];  // a list of languages in a file.
+                lang_list = [];  // a list of languages in a file.
                 file.market = market;
                 file.cat = cat;
 
@@ -267,18 +290,18 @@ var Kdown = function () {
             });
         },
         /***
-         * Get's a list of files in a category
+         * Gets a list of files in a category
+         * @callback {function} ({boolean} worked)
+         *      function to be run after the AJAX failed or ran
+         *      passing a boolean if worked or not. 
          */
-        ajax_cat_files : function (callback) {
-
-            var worked = null;
+        files_load : function (callback) {
 
             // if the entry already exist in local storage
             if (db.json.hasOwnProperty(db.market) &&
                 db.json[db.market].hasOwnProperty(db.cat) ) {
 
-                worked = true;
-                callback();
+                callback(true);
 
             } else { // if the entry doesn't, load it into the storage
 
@@ -295,23 +318,18 @@ var Kdown = function () {
                         db.lang_list[db.market] = db.lang_list[ db.market ] || {};
                         db.lang_list[db.market][db.cat] = json.langs;
 
-                        worked = true;
-
-                        callback();
+                        callback(true);
                     }, "json");
 
                     request.fail(function () {
-                        worked = false;
+                        err('ajax_to_db: Unable to connect to API');
+                        callback(false);
                     });
 
                 } else { // if one is not set
-                    worked = false;
                     err('ajax_to_db: ERROR: db.market = ' + db.market + ' db.cat = ' + db.cat + ' can not load file list');
                 }
             }
-
-
-            return worked;
         },
 
         sort_table : function (filter_feild, table_json) {
@@ -457,9 +475,9 @@ var Kdown = function () {
             },
             lang_filter : function(lang) {
                 var json = model.get_table_json(),
-                    filtered_json = [],
-                    num_found = 0,
-                    i = 0;
+                filtered_json = [],
+                num_found = 0,
+                i = 0;
 
                 lang = lang || model.get_lang();
 
@@ -490,7 +508,7 @@ var Kdown = function () {
                 var market = model.get_market();
                 var cat = model.get_cat();
                 var li = "";
-                for (var i = 0, l = list.length; i < list.length; i++) {
+                for (var i = 0, l = list.length; i < l; i++) {
                     var page = list[i];
                     li = copy;
 
@@ -542,26 +560,25 @@ var Kdown = function () {
                 html += option;
 
                 for (var code in langs) {
-                    option = temp;
                     if(langs.hasOwnProperty(code)) {
+                        option = temp;
                         var name = langs[code],
-                            num = count[code] || 0,
-                            spaces = [];
+                        num = count[code] || 0,
+                        spaces = [];
 
                         option = option.replace("(VAL)", code);
                         num = num + ""; // change to a string
                         for (var ii = 0, l = 4 - num.length; ii< l; ii++) {
                             spaces.push("\u00A0"); //this is the char for a non-breaking space
                         }
-                    name = num + spaces.join(" ") + name;
+                        name = num + spaces.join(" ") + name;
 
-                    option = option.replace("(NAME)", name );
-                    html += option;
-                        
+                        option = option.replace("(NAME)", name );
+                        html += option;
+
                     }
                 }
-                view.$ui.DD.lang.html(html);
-
+                view.$ui.DD.lang.html(html).val(NATIVE_LANG);
             }
         },
         error: {
@@ -576,15 +593,19 @@ var Kdown = function () {
             },
             ajax : function () {
                 this.hide_all();
-                view.$ui.error.ajax.fadeIn();
+                view.$ui.error.ajax.show();
             },
             none_found : function () {
                 this.hide_all();
-                view.$ui.error.none_found.fadeIn();
+                view.$ui.error.none_found.show();
             },
             clear : function () {
                 this.hide_all();
-                view.$ui.table.all.fadeIn();
+                view.$ui.table.all.show();
+            },
+            loading : function () {
+                this.hide_all();
+                view.$ui.error.loading.show();
             }
         }
     };
@@ -595,119 +616,157 @@ var Kdown = function () {
      * which are tied to some event in the browser
      */
     var event = {
-        router : new Router(true), // true = log messages
+
+        /***
+         * Create a router in router.js
+         * @arg {booleen} if you want to log or not.
+         */
+        router : new Router(false), 
 
         /***
          * To be fired on page load (jQuery event)
+         *
+         * NOTE: ASYNC
          */
-        page_load : function () {
-            model.ajax_lists(function (worked, mess) {
-                if (worked === true) {
-                    model.ajax_cat_files(function () {
-                        view.market_DD.populate();
-                        view.sidebar.populate();
-                        view.table.populate();
-                        view.lang_DD.populate();
-                        model.show();
+        ajax_page_load : function () {
+            if (model.are_lists_loaded() === true) {
 
-                        event.router.hashCheck();
-                    });
+                event.ajax_table_populate();
+
+            } else {
+
+                model.ajax_lists(function (worked, mess) {
+
+                    if (worked === true) {
+                        view.sidebar.populate();
+                        view.lang_DD.populate();
+                        view.market_DD.populate();
+                        event.ajax_table_populate();
+                    } else {
+                        view.error.ajax();
+                    }
+
+                });
+
+            }
+        },
+
+        /***
+         * This will load the file list into the table from the API
+         * NOTE: ASYNC 
+         */
+        ajax_table_populate : function () {
+            console.log("event.ajax_table_populate");
+
+            /***
+             * create a function as a callback
+             * to model.files_load below
+             */
+            var table_load = function(worked) {
+                if (worked === true) {
+                    console.log("   AJAX worked");
+                    console.log("   populating table");
+                    view.table.populate();
                 } else {
                     view.error.ajax();
                 }
-            });
+            };
+
+            model.files_load(table_load);
         },
-        /***
-         * Loads a file list of the current category
-         */
-        ajax_cat_files :function (callback) {
-            if (model.ajax_cat_files(callback) === false) {
-                view.error.ajax();
-            }
-        },
+
         /***
          * Changes which category page we're on
+         *
+         * NOTE: USED?
          */
         change_cat : function (cat) {
             view.error.clear();
             if (model.set_cat(cat)) {
-                model.ajax_cat_files(function () {
-                    view.table.populate();
-                    view.lang_DD.populate();
-                    view.lang_DD.populate();
-                    return true;
-                });
+                event.ajax_page_load();
             } else {
                 return false;
             }
         },
+
         /***
          * Changes which market we're in
          */
         change_market : function (market) {
             view.error.clear();
             if (model.set_market(market)) {
-                model.ajax_cat_files(function () {
-                    view.table.populate();
-                    view.lang_DD.populate();
-                    view.sidebar.populate();
-                });
+                event.ajax_page_load();
                 return true;
             } else {
                 return false;
             }
         },
+
         /***
          * Filters out all files in another language
          */
         change_lang : function (lang) {
             view.error.clear();
             if (model.set_lang(lang)) {
-                model.ajax_cat_files(function () {
-                    var worked = view.table.lang_filter();
-                    console.log(worked);
-                    if (worked === false) {
-                        view.error.none_found();
-                    }
+                model.files_load(function (no_error) {
+
+                    if (no_error === true) {
+                        if (view.table.lang_filter()) {
+                            view.error.none_found();
+                        }
+                    } else { view.error.ajax(); }
+
                 });
-                return true;
-            } else {
-                return false;
             }
         },
+
         /***
          * Loads market and category if they exist in the hash. 
          */
         hash_load : function(market, cat, lang) {
+
             if ( model.set_market(market) && model.set_cat(cat) ) {
-                this.ajax_cat_files(function () {
-                    view.sidebar.set_current();
-                    view.table.populate();
-                    view.lang_DD.populate();
-                    view.market_DD.update();
+
+                setTimeout(view.sidebar.set_current, 0);
+
+                this.ajax_table_populate(function (worked) {
+                    if (worked === true) {
+                        setTimeout(function () {
+                            view.lang_DD.populate();
+                            view.market_DD.update();
+                            view.table.populate();
+                            model.show();
+                        }, 0);
+                    } else {
+                        view.error.ajax();
+                    }
                 });
-                return true;
-            } else {
-                return false;
-            }
+
+            }  
         },
 
         /***
          * bind or rebind all the dom elements
          */
         bind : function () {
-            view.$ui.DD.market.change(function () {
+            var $ui = view.$ui;
+            $ui.DD.market.change(function () {
                 event.change_market($(this).val());
             });
 
-            view.$ui.DD.lang.change(function () {
+            $ui.DD.lang.change(function () {
                 event.change_lang($(this).val());
             });
 
             this.router.add("#cat", function (args) {
-                if ( event.hash_load(args[0], args[1]) === false ) { //market valid
-                    err('market / cat in hash doesn\'t exist in list');
-                }
+                event.hash_load(args[0], args[1]);
+            });
+
+
+            $ui.error.ajax.find("a").click(function (e) {
+                e.preventDefault();
+                view.error.loading();
+                event.ajax_page_load();
             });
 
         },
@@ -722,46 +781,5 @@ var Kdown = function () {
     };
 };
 
-
-var test = {
-    //testing ajax load
-    ajax_format : function () {
-        var k = new Kdown();
-        var m = k.model.me();
-
-        m.ajax_lists(function () {
-            m.set_cat('applications');
-            m.ajax_cat_files(function () {
-                m.set_cat('business');
-                m.ajax_cat_files(function () {
-                    console.log(m.get_json()); 
-                    console.log(m.get_table_json()); 
-                });
-            });
-        });
-    },
-    router : function() {
-        var r = Router(true);
-
-        r.add("#cool");
-
-        r.listen('#cool', function (args) {
-            console.log("Here's the args");
-            console.log(args);
-        });
-
-        r.show();
-
-        r.fire("#cool/a/b/c");
-
-    },
-    page_load : function () {
-        k = new Kdown();
-        k.event.page_load();
-    },
-};
-
-
-
-test.page_load();
-
+var k = new Kdown();
+k.event.ajax_page_load();
