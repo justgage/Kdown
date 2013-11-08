@@ -108,93 +108,122 @@ var Kdown = function () {
     var model = {
         logging : false,
         /***
-         * load the json to the API
+         * These are getters and setters jQuery style
+         * If there IS somthing passed it will set it
+         * and return if it worked
+         * 
+         * if not it will simply get the value
          */
-        get_market : function () {
-            return db.market;
-        },
-        get_cat : function () {
-            return db.cat;
-        },
-        get_lang : function () {
-            return db.lang;
-        },
-        set_market : function (new_val) {
-        var old_market = db.market;
+        market : function (new_val) {
 
-            if ($.inArray(new_val, db.market_list) !== -1) {
-                if (this.logging === true) {
-                    log('SET db.market (' + old_market + ') -> (' + new_val + ')');
+            // GET the value
+            if (typeof new_val === 'undefined') {
+
+                return db.market;
+
+            } else { // SET the value
+
+                var old_market = db.market;
+
+                if ($.inArray(new_val, db.market_list) !== -1) {
+                    if (this.logging === true) {
+                        log('SET db.market (' + old_market + ') -> (' + new_val + ')');
+                    }
+
+                    db.market = new_val;
+                    return true;
+                } else {
+                    err('Setting to invalid Market ' + new_val);
+                    log(db.market_list);
+                    return false;
                 }
+            }
 
-                db.market = new_val;
-                return true;
+        },
+        cat : function (new_val) {
+            if (typeof new_val === 'undefined') {
+
+                return db.cat;
+
             } else {
-                err('Setting to invalid Market ' + new_val);
-                log(db.market_list);
-                return false;
+                var old_cat = db.cat;
+
+                if (this.find_in_arary_obj(new_val, db.cat_list, 'key') !== -1) {
+                    if (this.logging === true) {
+                        log('SET db.cat (' + old_cat + ') -> (' + new_val + ')');
+                    }
+                    db.cat = new_val;
+                    return true;
+                } else {
+                    err('Setting to invalid Cat ' + new_val);
+                    return false;
+                }
             }
         },
-        set_cat : function (new_val) {
-            var old_cat = db.cat;
+        lang : function (new_val) {
+            if (typeof new_val === 'undefined') {
 
-            if (this.find_in_arary_obj(new_val, db.cat_list, 'key') !== -1) {
-                if (this.logging === true) {
-                    log('SET db.cat (' + old_cat + ') -> (' + new_val + ')');
-                }
-                db.cat = new_val;
-                return true;
+                return db.lang;
+
             } else {
-                err('Setting to invalid Cat ' + new_val);
-                return false;
+                var old_lang = db.lang;
+
+                if (new_val === 'all') {
+                    if (this.logging === true) {
+                        log('SET db.lang (' + old_lang + ') -> (' + new_val + ')');
+                    }
+                    db.lang = new_val;
+                    return true;
+                }
+                if (typeof db.lang_list[db.market][db.cat][new_val] !== 'undefined') {
+                    if (this.logging === true) {
+                        log('SET db.lang (' + old_lang + ') -> (' + new_val + ')');
+                    }
+                    db.lang = new_val;
+                    return true;
+                } else {
+                    err('Setting to invalid Lang ' + new_val);
+                    return false;
+                }
             }
         },
-        set_lang : function (new_val) {
-            var old_lang = db.lang;
-
-            if (new_val === 'all') {
-                if (this.logging === true) {
-                    log('SET db.lang (' + old_lang + ') -> (' + new_val + ')');
-                }
-                db.lang = new_val;
-                return true;
-            }
-            if (typeof db.lang_list[db.market][db.cat][new_val] !== 'undefined') {
-                if (this.logging === true) {
-                    log('SET db.lang (' + old_lang + ') -> (' + new_val + ')');
-                }
-                db.lang = new_val;
-                return true;
-            } else {
-                err('Setting to invalid Lang ' + new_val);
-                return false;
-            }
-        },
-
-        get_market_list : function () {
+        market_list : function () {
             return db.market_list;
         },
-        get_cat_list : function () {
+        cat_list : function () {
             return db.cat_list;
         },
-        get_lang_list : function (market, cat) {
+        /***
+         * Get the lang list for the spesified market and category
+         * default to the current one. 
+         */
+        lang_list : function (market, cat) {
 
             market = market || db.market;
             cat = cat || db.cat;
 
-            return db.lang_list[market][cat];
+            return db.lang_list[market][cat]; // ERROR:  Cannot read property 'applications' of undefined 
         },
-        get_lang_name : function (key) {
+        /***
+         * pass in the langage local code
+         * get the language name
+         */
+        lang_name : function (key) {
             return db.lang_list[key];
         },
-        get_lang_count : function (key) {
+        /***
+         * this one kinda breaks convention
+         * if a key is passed it will return a spesific language
+         * if not it will return the whole list
+         */
+        lang_count : function (key) {
             if (typeof key === 'undefined') {
                 return db.lang_count;
             } else {
                 return db.lang_count[key];
             }
         },
-        get_json : function () {
+        json : function () {
             return db.json;
         },
 
@@ -211,7 +240,7 @@ var Kdown = function () {
          * returns a JSON string that has market and cat in it too
          * in case you want to list that in the table. 
          */
-        get_table_json : function (market, cat) {
+        table_json : function (market, cat) {
             // check if they are false (hopefully undefined!)
             // if so set to the current market/cat
             market = market || db.market;
@@ -274,8 +303,8 @@ var Kdown = function () {
                     db.cat_list = model.object_to_array(json.cats);
 
                     // Set the first one in each list as a default
-                    me.set_market(db.market_list[0]);
-                    me.set_cat(db.cat_list[0].key);
+                    me.market(db.market_list[0]);
+                    me.cat(db.cat_list[0].key);
 
                     callback(true, json.mes);
                 } else {
@@ -445,7 +474,7 @@ var Kdown = function () {
         table : {
             populate : function(json) {
                 if (typeof json === 'undefined') {
-                    json = model.get_table_json();
+                    json = model.table_json();
                 }
                 var table_html = "";
                 var copy = view.copy.table_row;
@@ -461,7 +490,7 @@ var Kdown = function () {
                     row = row.replace("(FILE_LINK)", 'single.php?id=' + row_data.id);
                     //if there is more than one. 
                     if (row_data.langs.length === 1) {
-                        row = row.replace("(LANG)", model.get_lang_list()[row_data.lang_list[0]]);
+                        row = row.replace("(LANG)", model.lang_list()[row_data.lang_list[0]]);
                     } else {
                         row = row.replace("(LANG)", row_data.lang_list.join(', '));
                     }
@@ -474,12 +503,12 @@ var Kdown = function () {
                 view.error.clear();
             },
             lang_filter : function(lang) {
-                var json = model.get_table_json(),
+                var json = model.table_json(),
                 filtered_json = [],
                 num_found = 0,
                 i = 0;
 
-                lang = lang || model.get_lang();
+                lang = lang || model.lang();
 
                 if (lang === 'all') {
                     num_found = json.length; 
@@ -504,9 +533,9 @@ var Kdown = function () {
                 var copy = view.copy.page;
                 var html = "";
 
-                var list = model.get_cat_list();
-                var market = model.get_market();
-                var cat = model.get_cat();
+                var list = model.cat_list();
+                var market = model.market();
+                var cat = model.cat();
                 var li = "";
                 for (var i = 0, l = list.length; i < l; i++) {
                     var page = list[i];
@@ -529,13 +558,13 @@ var Kdown = function () {
                 $(sidebar.current_class).removeClass(sidebar.current_class.slice(1));
 
                 //change to the new one
-                sidebar.ul.find( "#cat_" + model.get_cat() ).
+                sidebar.ul.find( "#cat_" + model.cat() ).
                     addClass(sidebar.current_class.slice(1));
             }
         },
         market_DD : {
             populate : function () {
-                var list = model.get_market_list();
+                var list = model.market_list();
                 var html;
                 var temp = '<option value="(NAME)">(NAME)</option>';
                 for (var i = list.length - 1; i >= 0; i--) {
@@ -545,16 +574,16 @@ var Kdown = function () {
                 view.$ui.DD.market.html(html);
             },
             update : function () {
-                view.$ui.DD.market.val( model.get_market() );
+                view.$ui.DD.market.val( model.market() );
             }
 
         },
         lang_DD : {
             populate : function () {
-                var langs = model.get_lang_list();
+                var langs = model.lang_list();
                 var html;
                 var temp = '<option value="(VAL)">(NAME)</option>';
-                var count = model.get_lang_count();
+                var count = model.lang_count();
                 var option = temp.replace("(VAL)", 'all');
                 option = option.replace("(NAME)", "All" );
                 html += option;
@@ -624,6 +653,51 @@ var Kdown = function () {
         router : new Router(false), 
 
         /***
+         * the way to load any page
+         *
+         * @peram {string} tag of page.
+         */
+        page_load: function(page) {
+            /***
+             * populate the table when there's files
+             */
+            function table_populate() {
+                ajax_load_table(function () {
+                    if (worked === true) {
+                        view.table.populate();
+                        view.langs_DD.populate();
+                        view.market_DD.update();
+                        view.errors.clear();
+                    } else  {
+                        view.errors.table_ajax();
+                    }
+                });
+            }
+
+            if (model.page_setup() === true) {
+
+                table_populate();
+
+            } else { // page needs to be loaded
+
+                // load API data into the model
+                ajax_load_lists(function(worked) {
+                    if (worked === true) {
+                        view.market_DD.populate();
+                        view.pages.populate();
+                    } else {
+                        view.error.page_load();
+                    }
+                });
+
+            }
+        },
+
+        hash_load : function () {
+            router.get_hash();
+        },
+
+        /***
          * To be fired on page load (jQuery event)
          *
          * NOTE: ASYNC
@@ -682,7 +756,7 @@ var Kdown = function () {
          */
         change_cat : function (cat) {
             view.error.clear();
-            if (model.set_cat(cat)) {
+            if (model.cat(cat)) {
                 event.ajax_page_load();
             } else {
                 return false;
@@ -694,7 +768,7 @@ var Kdown = function () {
          */
         change_market : function (market) {
             view.error.clear();
-            if (model.set_market(market)) {
+            if (model.market(market)) {
                 event.ajax_page_load();
                 return true;
             } else {
@@ -707,7 +781,7 @@ var Kdown = function () {
          */
         change_lang : function (lang) {
             view.error.clear();
-            if (model.set_lang(lang)) {
+            if (model.lang(lang)) {
                 model.files_load(function (no_error) {
 
                     if (no_error === true) {
@@ -723,9 +797,9 @@ var Kdown = function () {
         /***
          * Loads market and category if they exist in the hash. 
          */
-        hash_load : function(market, cat, lang) {
+        hash_load_cat : function(market, cat, lang) {
 
-            if ( model.set_market(market) && model.set_cat(cat) ) {
+            if ( model.market(market) && model.cat(cat) ) {
 
                 setTimeout(view.sidebar.set_current, 0);
 
