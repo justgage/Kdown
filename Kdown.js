@@ -86,7 +86,7 @@ var Kdown = function () {
      * to know about the current page
      */
     var db = {
-        page : null,        // current page
+        page : 'cats',        // current page
 
         market : null,      // current market
         cat : null,         // current category
@@ -99,7 +99,7 @@ var Kdown = function () {
 
         json : {},          // saved json from the ajax querys
         table_json : null,  // hold the current table's JSON
-        past_search : null  // a way to filter out the file list faster.
+        past_search : null, // a way to filter out the file list faster.
     };
 
     /***
@@ -226,11 +226,17 @@ var Kdown = function () {
         json : function () {
             return db.json;
         },
+        /***
+         * @returns {boolean} if the page has the market_list loaded
+         */
+        page_setup : function ()  {
+            return db.market_list !== null;
+        },
 
         /***
          * Checks if lists where loaded properly
          *
-         * @returns {booleen} did lists for the sidebar and market load properly
+         * @returns {boolean} did lists for the sidebar and market load properly
          */
         are_lists_loaded : function () {
             return (db.market_list !== null && db.cat_list !== null );
@@ -681,7 +687,7 @@ var Kdown = function () {
             } else { // page needs to be loaded
 
                 // load API data into the model
-                ajax_load_lists(function(worked) {
+                ajax_lists(function(worked) {
                     if (worked === true) {
                         view.market_DD.populate();
                         view.pages.populate();
@@ -691,10 +697,6 @@ var Kdown = function () {
                 });
 
             }
-        },
-
-        hash_load : function () {
-            router.get_hash();
         },
 
         /***
