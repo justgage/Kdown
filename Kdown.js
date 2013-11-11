@@ -1,3 +1,4 @@
+
 /***
  * K-DOWN ~ Kyani download interface
  *
@@ -61,6 +62,7 @@ var Kdown = function () {
     var API_URL = 'api.php';
     var NATIVE_LANG = 'en';
     var logging = true;
+    var router = new Router(true); // false means no logging 
 
     function log(message, indent) {
         if (typeof indent === 'undefined') {
@@ -103,6 +105,15 @@ var Kdown = function () {
     };
 
     /***
+     * Router: some events we use throughout the script
+     */
+
+    router.add('ajax_load');
+    router.add('market_change');
+    router.add('cat_change');
+    router.add('lang_change');
+
+    /***
      * The abstraction of db
      */
     var model = {
@@ -126,17 +137,19 @@ var Kdown = function () {
                 var old_market = db.market;
 
                 if ($.inArray(new_val, db.market_list) !== -1) {
-                    if (this.logging === true) {
+                    if (this.logging) {
                         log('SET db.market (' + old_market + ') -> (' + new_val + ')');
                     }
 
                     db.market = new_val;
+                    router.fire('market_change');
                     return true;
                 } else {
                     err('Setting to invalid Market ' + new_val);
                     log(db.market_list);
                     return false;
                 }
+
             }
 
         },
@@ -149,10 +162,11 @@ var Kdown = function () {
                 var old_cat = db.cat;
 
                 if (this.find_in_arary_obj(new_val, db.cat_list, 'key') !== -1) {
-                    if (this.logging === true) {
+                    if (this.logging) {
                         log('SET db.cat (' + old_cat + ') -> (' + new_val + ')');
                     }
                     db.cat = new_val;
+                    router.fire('cat_change');
                     return true;
                 } else {
                     err('Setting to invalid Cat ' + new_val);
@@ -168,18 +182,27 @@ var Kdown = function () {
             } else {
                 var old_lang = db.lang;
 
+                // SET TO ALL
                 if (new_val === 'all') {
-                    if (this.logging === true) {
+                    if (this.logging) {
                         log('SET db.lang (' + old_lang + ') -> (' + new_val + ')');
                     }
+
                     db.lang = new_val;
+                    
+                    router.fire('lang_change');
                     return true;
                 }
+
+                // SET TO new_val
                 if (typeof db.lang_list[db.market][db.cat][new_val] !== 'undefined') {
-                    if (this.logging === true) {
+                    if (this.logging) {
                         log('SET db.lang (' + old_lang + ') -> (' + new_val + ')');
                     }
+
                     db.lang = new_val;
+
+                    router.fire('lang_change');
                     return true;
                 } else {
                     err('Setting to invalid Lang ' + new_val);
@@ -299,6 +322,17 @@ var Kdown = function () {
          *      a function that is called after request was success or failure 
          */
         ajax_lists : function (callback) {
+
+            var promise = $.post("api.php");
+
+            promise.done(function () {
+                router.fire("ajax_load");
+            });
+
+            promise.fail();
+
+
+
             var me = this;
             var request = $.post("api.php", {}, function (json) {
                 if (json.error === false) {
@@ -656,7 +690,6 @@ var Kdown = function () {
          * Create a router in router.js
          * @arg {booleen} if you want to log or not.
          */
-        router : new Router(false), 
 
         /***
          * the way to load any page
@@ -769,13 +802,7 @@ var Kdown = function () {
          * Changes which market we're in
          */
         change_market : function (market) {
-            view.error.clear();
-            if (model.market(market)) {
-                event.ajax_page_load();
-                return true;
-            } else {
-                return false;
-            }
+            return model.market(market)
         },
 
         /***
@@ -834,10 +861,19 @@ var Kdown = function () {
                 event.change_lang($(this).val());
             });
 
-            this.router.add("#cat", function (args) {
+            router.add("#cat", function (args) {
                 event.hash_load(args[0], args[1]);
             });
 
+            // clear all errors when market changes
+            router.listen("market_change", function () {
+                view.error.clear();
+            });
+
+            // reload the page element
+            router.listen("market_change", function () {
+                event.ajax_page_load();
+            });
 
             $ui.error.ajax.find("a").click(function (e) {
                 e.preventDefault();
