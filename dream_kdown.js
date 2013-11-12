@@ -161,6 +161,27 @@ Kdown = function () {
     };
 
     /***
+     * Validators
+     */
+
+    validator = {
+        cat : function (cat) {
+            return $.inArray(cat, db.cat_list().map(url_safe)) !== -1;
+        },
+        market : function (market) {
+            return $.inArray(market, db.market_list()) !== -1;
+        },
+        lang : function (lang) {
+            return $.inArray(lang, db.lang_list()) !== -1;
+        }
+    };
+
+    var url_safe = function (unsafe) {
+        return unsafe.toLowerCase().replace(/[^a-zA-Z0-9]+/g,'-');
+    };
+
+
+    /***
      * helpers with handling the DOM
      */
     var view = {
@@ -171,7 +192,24 @@ Kdown = function () {
             table_row : '<tr>' + $("#table_copy").html() + '</tr>',
             page : $('#copy-cat').html() //NOTE: need to change HTML
         },
+        hash : {
+            import : function () {
+                var hash = window.location.hash;
 
+                hash = hash.split('/');
+
+                if (hash[0] === "#cat") {
+                    db.market(hash[1], validator.market);
+                    db.cat(hash[2], validator.cat);
+                }
+            },
+
+            /***
+             * replace anything that's not alpha-numeric to a dash
+             * and make it all lower case
+             */
+
+        },
         table : {
             populate : function(file_list) {
                 if (typeof file_list === 'undefined') {
@@ -236,8 +274,7 @@ Kdown = function () {
                     var page = cat_list[i];
                     li = copy;
                     
-                    var code = page.replace(/ /g, "-");
-                    code = page.replace(/\//g, "-");
+                    var code = url_safe(page);
 
                     li = li.replace(/\(CAT\)/g, code);
                     li = li.replace("(HREF)", "#cat/" + market + "/" + code);
@@ -253,7 +290,8 @@ Kdown = function () {
             set_current : function () {
                 var sidebar = $ui.sidebar;
                 //remove current one
-                $(sidebar.current_class).removeClass(sidebar.current_class.slice(1));
+                $($ui.sidebar.current_class).
+                    removeClass($ui.sidebar.current_class.slice(1));
 
                 //change to the new one
                 sidebar.ul.find( "#cat_" + db.cat() ).
@@ -413,10 +451,23 @@ Kdown = function () {
     };
 
     /***
-     * Bind the events
+     * Listen to events
      */
     $.subscribe("ajax/load", function () {
         view.table.populate();
+    });
+
+    $.subscribe("page", function () {
+        view.table.populate();
+        console.log("Page Change: ", db.cat(), db.market());
+    });
+
+    $.subscribe("page/market", function () {
+        view.sidebar.populate();
+    });
+
+    $.subscribe("page/cat", function () {
+        view.sidebar.set_current();
     });
 
     $.subscribe("list/markets", function () {
@@ -429,9 +480,21 @@ Kdown = function () {
         view.sidebar.populate();
     });
 
+    /***
+     * Make events
+     */
+    $ui.DD.market.change(function () {
+        db.market( $(this).val() );
+    });
+
+    $ui.sidebar.ul.on('click', 'a', function () {
+        db.cat( $(this).parent().data('cat') );
+    });
+
     return {
         "view" : view,
         "db" : db,
+        "$ui" : $ui,
         "server" : server
     };
 };
