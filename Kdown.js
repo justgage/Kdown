@@ -62,6 +62,10 @@ var Kdown = function () {
     var API_URL = 'api.php';
     var NATIVE_LANG = 'en';
     var logging = true;
+    /***
+     * Create a router in router.js
+     * @arg {booleen} if you want to log or not.
+     */
     var router = new Router(true); // false means no logging 
 
     function log(message, indent) {
@@ -329,11 +333,10 @@ var Kdown = function () {
                 router.fire("ajax_load");
             });
 
-            promise.fail();
+            promise.fail(function () {
+                router.fire("ajax_failed");
+            });
 
-
-
-            var me = this;
             var request = $.post("api.php", {}, function (json) {
                 if (json.error === false) {
                     // Save a list of valid markets
@@ -469,6 +472,11 @@ var Kdown = function () {
         }
 
     };
+
+
+    router.listen("ajax_load", function () {
+        //code
+    });
 
     /***
      * this are a collection of objects that
@@ -686,10 +694,6 @@ var Kdown = function () {
      */
     var event = {
 
-        /***
-         * Create a router in router.js
-         * @arg {booleen} if you want to log or not.
-         */
 
         /***
          * the way to load any page
