@@ -39,7 +39,6 @@ Kdown = function () {
     var LOGGING = false,
         API_URL = "files/dream_api.php";
 
-
     /***
      * UI handlers
      */
@@ -68,8 +67,6 @@ Kdown = function () {
         }
     };
 
-
-
     /***
      * an object that publishes events when it changes
      *
@@ -89,6 +86,7 @@ Kdown = function () {
         }
 
         var value = preset;
+        var validator = validator;
 
         /***
          * Will change value to new_val
@@ -104,54 +102,62 @@ Kdown = function () {
          *
          */
         var change = function (new_val, silent) {
-            if (value !== new_val) {
+            if (validator(new_val) === true) { // passed 
+                if (value !== new_val) {
 
-                if (LOGGING === true) {
-                    console.log(publish_name.join("/") + " changed " + value + " => " , new_val);
-                }
-
-                value = new_val;
-
-                // publish all events 
-                var i = publish_name.length;
-                
-                if (silent !== true) {
-                    while(i--) {
-                        var pub_name = publish_name.slice(0, i + 1).join("/");
-                        $.publish(pub_name, value); 
+                    if (LOGGING === true) {
+                        console.log(publish_name.join("/") + " changed " + value + " => " , new_val);
                     }
+
+                    value = new_val;
+
+                    // publish all events 
+                    var i = publish_name.length;
+
+                    if (silent !== true) {
+                        while(i--) {
+                            var pub_name = publish_name.slice(0, i + 1).join("/");
+                            $.publish(pub_name, value); 
+                        }
+                    }
+
+                    return true;
+                     
+                } else {
+                    if (LOGGING === true) {
+                        console.log("WARN: " + publish_name + " set not fired due to no change -> " + value);
+                    }
+                    return false;
                 }
 
-            } else {
-                if (LOGGING === true) {
-                    console.log("WARN: " + publish_name + " set not fired due to no change -> " + value);
-                }
+            } else { // validation failed
+                console.error(publish_name + " validation failed! => " + new_val);
+                return false;
             }
         };
 
-        // getter / setter function 
-        return function (new_val, validator, silent) {
-            validator = validator || null;
-            if (typeof new_val === 'undefined') {
-                return value; // get 
-            } else {
-                if (validator === null) {
+        var get = function () {
+            return value; // get 
+        };
 
-                    change(new_val, silent);
+        var set = function (new_val) {
+            change(new_val, false);
+        };
 
-                } else {
+        var set_silent = function (new_val) {
+            change(new_val, true);
+        };
 
-                    if (validator(new_val) === true) { // passed 
-                        change(new_val, silent);
-                    } else { 
-                        console.error(publish_name + " being set to invalid value, " + new_val);
-                    }
-
-                }
-            }
-
+        return {
+            get : get,
+            set : set,
+            set_silent : set_silent
         };
     };
+
+
+        // getter / setter function 
+        return {
 
     var db = {
         page : Kobj('page_change', 'cat'),        // current page
@@ -175,13 +181,13 @@ Kdown = function () {
 
     validator = {
         cat : function (cat) {
-            return $.inArray(cat, db.cat_list().map(url_safe)) !== -1;
+            return $.inArray(cat, db.cat_list.get().map(url_safe)) !== -1;
         },
         market : function (market) {
-            return $.inArray(market, db.market_list()) !== -1;
+            return $.inArray(market, db.market_list.get()) !== -1;
         },
         lang : function (lang) {
-            return $.inArray(lang, db.lang_list()) !== -1;
+            return $.inArray(lang, db.lang_list.get()) !== -1;
         }
     };
 
@@ -208,8 +214,11 @@ Kdown = function () {
                 hash = hash.split('/');
 
                 if (hash[0] === "#cat") {
-                    db.market(hash[1], validator.market);
-                    db.cat(hash[2], validator.cat);
+                    db.market.set_silent(hash[1], validator.market);
+                    db.cat.set(hash[2], validator.cat);
+                } else {
+                    db.market.set_silent( db.market_list.get()[0] )
+                    db.cat.set( db.cat_list.get()[0] );
                 }
             },
 
@@ -223,9 +232,9 @@ Kdown = function () {
             populate : function(file_list) {
                 if (typeof file_list === 'undefined') {
                     //file_list = db.file_list(); // all files
-                    var tree = db.file_tree(); // all files
+                    var tree = db.file_tree.get(); // all files
 
-                    file_list = tree[ db.maret() ][ db.cat() ];
+                    file_list = tree[ db.market.get() ][ db.cat.get() ];
                 }
                 var table_html = "";
                 var copy = view.copy.table_row;
@@ -249,12 +258,12 @@ Kdown = function () {
                 view.error.clear();
             },
             lang_filter : function(lang) {
-                var json = db.table_json(), // TODO: table_json is invalid
+                var json = db.table_json.get(), // TODO: table_json is invalid
                 filtered_json = [],
                 num_found = 0,
                 i = 0;
 
-                lang = lang || db.lang();
+                lang = lang || db.lang.get();
 
                 if (lang === 'all') {
                     num_found = json.length; 
@@ -279,9 +288,9 @@ Kdown = function () {
                 var copy = view.copy.page;
                 var html = "";
 
-                var cat_list = db.cat_list();
-                var market = db.market();
-                var cat = db.cat();
+                var cat_list = db.cat_list.get();
+                var market = db.market.get();
+                var cat = db.cat.get();
                 var li = "";
                 for (var i = 0, l = cat_list.length; i < l; i++) {
                     var page = cat_list[i];
@@ -307,13 +316,13 @@ Kdown = function () {
                     removeClass($ui.sidebar.current_class.slice(1));
 
                 //change to the new one
-                sidebar.ul.find( "#cat_" + db.cat() ).
+                sidebar.ul.find( "#cat_" + db.cat.get() ).
                     addClass(sidebar.current_class.slice(1));
             }
         },
         market_DD : {
             populate : function () {
-                var list = db.market_list();
+                var list = db.market_list.get();
                 var html;
                 var temp = '<option value="(NAME)">(NAME)</option>';
                 for (var i = list.length - 1; i >= 0; i--) {
@@ -323,16 +332,16 @@ Kdown = function () {
                 $ui.DD.market.html(html);
             },
             update : function () {
-                $ui.DD.market.val( db.market() );
+                $ui.DD.market.val( db.market.get() );
             }
 
         },
         lang_DD : {
             populate : function () {
-                var langs = db.lang_list();
+                var langs = db.lang_list.get();
                 var html;
                 var temp = '<option value="(VAL)">(NAME)</option>';
-                var count = db.lang_count();
+                var count = db.lang_count.get();
                 var option = temp.replace("(VAL)", 'all');
                 option = option.replace("(NAME)", "All" );
                 html += option;
@@ -393,6 +402,17 @@ Kdown = function () {
         /***
          * save the json in the proper formats
          */
+        load_json : function () {
+            var promise = $.post(API_URL, {}, null, 'json');
+
+            promise.done(server.save_json);
+
+            promise.fail(function (code) {
+                console.log("FAIL", code);
+                $.publish("ajax/fail");
+            });
+
+        },
         save_json : function (json) {
 
             console.log("json response", json);
@@ -427,7 +447,7 @@ Kdown = function () {
                     }
 
                     if (typeof file_tree[ file.market ][ file.category ]   === 'undefined') {
-                        file_tree[ file.market ][ file.category ] = [];
+                        file_tree[ file.market ][ url_safe(file.category) ] = [];
                     }
 
                     // add entry for lang if not already there
@@ -440,38 +460,30 @@ Kdown = function () {
                      * tree -> market -> category -> file
                      */
                     console.log("file tree add", file_tree);
-                    file_tree[ file.market ][ file.category ].push(file);
+                    file_tree[ file.market ][ url_safe(file.category) ].push(file);
 
                 } // end while
 
                 // stick it all in the local storage
-                db.file_list(file_list);
-                db.market_list(market_list);
-                db.lang_list(lang_list);
-                db.cat_list(cat_list);
-                db.file_tree(file_tree);  // publishes ("ajax/load")
-        },
-        load_json : function () {
-            var promise = $.post(API_URL, {}, null, 'json');
-
-            promise.done(server.save_json);
-            promise.fail(function (code) {
-                console.log("FAIL", code);
-                $.publish("ajax/fail");
-            });
-        },
+                db.file_list.set(file_list);
+                db.market_list.set(market_list);
+                db.lang_list.set(lang_list);
+                db.cat_list.set(cat_list);
+                db.file_tree.set(file_tree);  // publishes ("ajax/load")
+        }
     };
 
     /***
      * Listen to events
      */
     $.subscribe("ajax/load", function () {
+        view.hash.import();
         view.table.populate();
     });
 
     $.subscribe("page", function () {
         view.table.populate();
-        console.log("Page Change: ", db.cat(), db.market());
+        console.log("Page Change: ", db.cat.get(), db.market.get());
     });
 
     $.subscribe("page/market", function () {
@@ -496,11 +508,11 @@ Kdown = function () {
      * Make events
      */
     $ui.DD.market.change(function () {
-        db.market( $(this).val() );
+        db.market.set( $(this).val() );
     });
 
     $ui.sidebar.ul.on('click', 'a', function () {
-        db.cat( $(this).parent().data('cat') );
+        db.cat.set( $(this).parent().data('cat') );
     });
 
     return {
