@@ -5,7 +5,7 @@
             "name":"First Document",
             "translated_name":"Uno Documena",
             "language" : "en",
-            "category":"Business Library",
+            "category":"Accounts",
             "market":"Canada",
             "url":"#",
             "note":""
@@ -166,7 +166,7 @@
             "translated_name":"Testare Documena",
             "language" : "en",
             "category":"Business Library",
-            "market":"USA",
+            "market":"Europe",
             "url":"#",
             "note":""
         },
@@ -175,8 +175,8 @@
             "name":"Last Document",
             "translated_name":"Lastea Documena",
             "language" : "en",
-            "category":"Business Library",
-            "market":"USA",
+            "category":"Social Docs",
+            "market":"Europe",
             "url":"#",
             "note":""
         }

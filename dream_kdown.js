@@ -355,13 +355,14 @@ Kdown = function () {
 
 
                 // go through every file (backwards!)
-                while (i--) {
+                while (--i) {
                     var file = file_list[i];
 
                      
                     // add entry for market if not already there
                     if ( $.inArray(file.market, market_list) === -1 ) {
 
+                        console.log("add to market list ",file.market);
                         market_list.push(file.market);
 
                         file_tree[file.market] = {};
@@ -370,8 +371,12 @@ Kdown = function () {
                     // add entry for category if not already there
                     if ( $.inArray(file.category, cat_list) === -1 ) {
 
+                        console.log("add to cat list ",file.category);
                         cat_list.push(file.category);
 
+                    }
+
+                    if (typeof file_tree[ file.market ][ file.category ]   === 'undefined') {
                         file_tree[ file.market ][ file.category ] = [];
                     }
 
@@ -384,6 +389,7 @@ Kdown = function () {
                      * add file to the tree
                      * tree -> market -> category -> file
                      */
+                    console.log("file tree add", file_tree);
                     file_tree[ file.market ][ file.category ].push(file);
 
                 } // end while
