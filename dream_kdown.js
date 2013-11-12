@@ -1,3 +1,6 @@
+/***
+ * PLUGINS: 
+ */
 
 /*
  * jQuery Tiny Pub/Sub
@@ -97,8 +100,10 @@ Kdown = function () {
          * fire: "namespace/object/"
          * fire: "namespace"
          *
+         * @arg {booleen} silent if to publish or not
+         *
          */
-        var change = function (new_val) {
+        var change = function (new_val, silent) {
             if (value !== new_val) {
 
                 if (LOGGING === true) {
@@ -109,9 +114,12 @@ Kdown = function () {
 
                 // publish all events 
                 var i = publish_name.length;
-                while(i--) {
-                    var pub_name = publish_name.slice(0, i + 1).join("/");
-                    $.publish(pub_name, value); 
+                
+                if (silent !== true) {
+                    while(i--) {
+                        var pub_name = publish_name.slice(0, i + 1).join("/");
+                        $.publish(pub_name, value); 
+                    }
                 }
 
             } else {
@@ -122,18 +130,19 @@ Kdown = function () {
         };
 
         // getter / setter function 
-        return function (new_val, validator) {
+        return function (new_val, validator, silent) {
+            validator = validator || null;
             if (typeof new_val === 'undefined') {
                 return value; // get 
             } else {
-                if (typeof validator === 'undefined') {
+                if (validator === null) {
 
-                    change(new_val);
+                    change(new_val, silent);
 
                 } else {
 
                     if (validator(new_val) === true) { // passed 
-                        change(new_val);
+                        change(new_val, silent);
                     } else { 
                         console.error(publish_name + " being set to invalid value, " + new_val);
                     }
@@ -213,12 +222,16 @@ Kdown = function () {
         table : {
             populate : function(file_list) {
                 if (typeof file_list === 'undefined') {
-                    file_list = db.file_list();
+                    //file_list = db.file_list(); // all files
+                    var tree = db.file_tree(); // all files
+
+                    file_list = tree[ db.maret() ][ db.cat() ];
                 }
                 var table_html = "";
                 var copy = view.copy.table_row;
                 var row = copy;
 
+                // backwards
                 for (var i = file_list.length - 1; i >= 0; i--) {
                     var file = file_list[i];
                     row = copy;
@@ -411,7 +424,6 @@ Kdown = function () {
 
                         console.log("add to cat list ",file.category);
                         cat_list.push(file.category);
-
                     }
 
                     if (typeof file_tree[ file.market ][ file.category ]   === 'undefined') {
