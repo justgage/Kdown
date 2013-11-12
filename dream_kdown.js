@@ -33,7 +33,7 @@ Kdown = function () {
     /***
      * config 
      */
-    var LOGGING = true,
+    var LOGGING = false,
         API_URL = "files/dream_api.php";
 
 
@@ -102,7 +102,7 @@ Kdown = function () {
             if (value !== new_val) {
 
                 if (LOGGING === true) {
-                    console.log(publish_name + " changed " + value + " => " , new_val);
+                    console.log(publish_name.join("/") + " changed " + value + " => " , new_val);
                 }
 
                 value = new_val;
@@ -110,7 +110,7 @@ Kdown = function () {
                 // publish all events 
                 var i = publish_name.length;
                 while(i--) {
-                    var pub_name = publish_name.slice(0, i).join("/");
+                    var pub_name = publish_name.slice(0, i + 1).join("/");
                     $.publish(pub_name, value); 
                 }
 
@@ -152,10 +152,10 @@ Kdown = function () {
         lang : new Kobj('page/lang'),             // current translation selected (can be 'ALL')
         lang_count : new Kobj('lang_count'),      // each language's count [lang] => count
 
-        file_list : new Kobj('list/cat_list'),          // list of valid categories
-        cat_list : new Kobj('list/cat_list'),          // list of valid categories
-        market_list : new Kobj('list/market_list'),    // list of valid markets
-        lang_list : new Kobj('list/lang_list', {}),    // list of valid languages
+        file_list : new Kobj('list/files'),          // list of valid categories
+        cat_list : new Kobj('list/cats'),          // list of valid categories
+        market_list : new Kobj('list/markets'),    // list of valid markets
+        lang_list : new Kobj('list/langs', {}),    // list of valid languages
 
         file_tree : new Kobj('ajax/load'), // hold the current table's JSON
     };
@@ -173,43 +173,37 @@ Kdown = function () {
         },
 
         table : {
-            populate : function(json) {
-                if (typeof json === 'undefined') {
-                    json = model.table_json();
+            populate : function(file_list) {
+                if (typeof file_list === 'undefined') {
+                    file_list = db.file_list();
                 }
                 var table_html = "";
                 var copy = view.copy.table_row;
                 var row = copy;
 
-                for (var i = json.length - 1; i >= 0; i--) {
-                    var row_data = json[i];
+                for (var i = file_list.length - 1; i >= 0; i--) {
+                    var file = file_list[i];
                     row = copy;
 
                     // Tempating
                     row = row.replace("(HEART_URL)", '#');
-                    row = row.replace("(NAME)", row_data.filename);
-                    row = row.replace("(FILE_LINK)", 'single.php?id=' + row_data.id);
-                    //if there is more than one. 
-                    if (row_data.langs.length === 1) {
-                        row = row.replace("(LANG)", model.lang_list()[row_data.lang_list[0]]);
-                    } else {
-                        row = row.replace("(LANG)", row_data.lang_list.join(', '));
-                    }
-                    row = row.replace("(DL_LINK)", row_data.url || "#");
+                    row = row.replace("(NAME)", file.name);
+                    row = row.replace("(FILE_LINK)", 'single.php?id=' + file.id);
+                    row = row.replace("(LANG)", file.language);
 
                     table_html += row;
                 }
 
-                view.$ui.table.first_body.html(table_html);
+                $ui.table.first_body.html(table_html);
                 view.error.clear();
             },
             lang_filter : function(lang) {
-                var json = model.table_json(),
+                var json = db.table_json(), // TODO: table_json is invalid
                 filtered_json = [],
                 num_found = 0,
                 i = 0;
 
-                lang = lang || model.lang();
+                lang = lang || db.lang();
 
                 if (lang === 'all') {
                     num_found = json.length; 
@@ -234,57 +228,60 @@ Kdown = function () {
                 var copy = view.copy.page;
                 var html = "";
 
-                var list = model.cat_list();
-                var market = model.market();
-                var cat = model.cat();
+                var cat_list = db.cat_list();
+                var market = db.market();
+                var cat = db.cat();
                 var li = "";
-                for (var i = 0, l = list.length; i < l; i++) {
-                    var page = list[i];
+                for (var i = 0, l = cat_list.length; i < l; i++) {
+                    var page = cat_list[i];
                     li = copy;
+                    
+                    var code = page.replace(/ /g, "-");
+                    code = page.replace(/\//g, "-");
 
-                    li = li.replace(/\(CAT\)/g, page.key);
-                    li = li.replace("(HREF)", "#cat/" + market + "/" + page.key);
-                    li = li.replace("(TITLE)", page.value);
+                    li = li.replace(/\(CAT\)/g, code);
+                    li = li.replace("(HREF)", "#cat/" + market + "/" + code);
+                    li = li.replace("(TITLE)", page);
 
 
                     html += li;
                 }
                 //set the sidebar
-                view.$ui.sidebar.ul.html(html);
+                $ui.sidebar.ul.html(html);
                 this.set_current();
             }, 
             set_current : function () {
-                var sidebar = view.$ui.sidebar;
+                var sidebar = $ui.sidebar;
                 //remove current one
                 $(sidebar.current_class).removeClass(sidebar.current_class.slice(1));
 
                 //change to the new one
-                sidebar.ul.find( "#cat_" + model.cat() ).
+                sidebar.ul.find( "#cat_" + db.cat() ).
                     addClass(sidebar.current_class.slice(1));
             }
         },
         market_DD : {
             populate : function () {
-                var list = model.market_list();
+                var list = db.market_list();
                 var html;
                 var temp = '<option value="(NAME)">(NAME)</option>';
                 for (var i = list.length - 1; i >= 0; i--) {
                     var option = temp.replace(/\(NAME\)/g, list[i]);
                     html += option;
                 }
-                view.$ui.DD.market.html(html);
+                $ui.DD.market.html(html);
             },
             update : function () {
-                view.$ui.DD.market.val( model.market() );
+                $ui.DD.market.val( db.market() );
             }
 
         },
         lang_DD : {
             populate : function () {
-                var langs = model.lang_list();
+                var langs = db.lang_list();
                 var html;
                 var temp = '<option value="(VAL)">(NAME)</option>';
-                var count = model.lang_count();
+                var count = db.lang_count();
                 var option = temp.replace("(VAL)", 'all');
                 option = option.replace("(NAME)", "All" );
                 html += option;
@@ -308,34 +305,34 @@ Kdown = function () {
 
                     }
                 }
-                view.$ui.DD.lang.html(html).val(NATIVE_LANG);
+                $ui.DD.lang.html(html).val(NATIVE_LANG);
             }
         },
         error: {
             hide_all : function () {
-                view.$ui.table.all.hide();
-                for (var single in view.$ui.error) {
-                    if(view.$ui.error.hasOwnProperty(single)) {
-                        view.$ui.error[single].hide();
+                $ui.table.all.hide();
+                for (var single in $ui.error) {
+                    if($ui.error.hasOwnProperty(single)) {
+                        $ui.error[single].hide();
                     }
                 }
                 return true;
             },
             ajax : function () {
                 this.hide_all();
-                view.$ui.error.ajax.show();
+                $ui.error.ajax.show();
             },
             none_found : function () {
                 this.hide_all();
-                view.$ui.error.none_found.show();
+                $ui.error.none_found.show();
             },
             clear : function () {
                 this.hide_all();
-                view.$ui.table.all.show();
+                $ui.table.all.show();
             },
             loading : function () {
                 this.hide_all();
-                view.$ui.error.loading.show();
+                $ui.error.loading.show();
             }
         }
     };
@@ -409,11 +406,22 @@ Kdown = function () {
         },
     };
 
+    /***
+     * Bind the events
+     */
     $.subscribe("ajax/load", function () {
         view.table.populate();
     });
 
-    console.log('Kdown Loaded');
+    $.subscribe("list/markets", function () {
+        console.log("market_list");
+        view.market_DD.populate();
+    });
+
+    $.subscribe("list/cats", function () {
+        console.log("cat_list");
+        view.sidebar.populate();
+    });
 
     return {
         "view" : view,
