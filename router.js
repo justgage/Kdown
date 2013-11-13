@@ -120,8 +120,7 @@ var Router = function (debug) {
                         err("ERROR: route already exists, use listen -> route");
                         return  false;
                     }
-                }
-
+                } 
                 // not a hash route
                 else {
                     if (find(route) === false) {
