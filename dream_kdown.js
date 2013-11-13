@@ -13,17 +13,37 @@
 (function($) {
 
   var o = $({});
+  var ignore = 0;
 
+  /***
+   * Listen to an event
+   */
   $.subscribe = function() {
     o.on.apply(o, arguments);
   };
 
+  /***
+   * Stop listening to an event
+   */
   $.unsubscribe = function() {
     o.off.apply(o, arguments);
   };
 
+  /***
+   * to ignore events or not
+   * @arg {boolean} state if to ignore or not
+   */
+  $.mute = function(state) {
+      ignore = state;
+  };
+
+  /***
+   * Try to publish to an event if not ignored
+   */
   $.publish = function() {
-    o.trigger.apply(o, arguments);
+      if (ignore === false) {
+          o.trigger.apply(o, arguments);
+      }
   };
 
 }(jQuery));
@@ -32,7 +52,8 @@
 /***
  * Kdown ~ Kyani download interface
  */
-Kdown = function () {
+var Kdown = function () {
+    "use strict";
     /***
      * config 
      */
@@ -77,16 +98,14 @@ Kdown = function () {
      * a string of a publishing name, which can be namespaced like so
      *  
      */
-    Kobj = function (publish_name, preset) {
+    var Kobj = function (publish_name, preset, validator) {
 
         publish_name = publish_name.split("/");
-
+        validator = validator || null;
         if (typeof preset === 'undefined') {
             preset = null;
         }
-
         var value = preset;
-        var validator = validator;
 
         /***
          * Will change value to new_val
@@ -95,14 +114,14 @@ Kdown = function () {
          * also will fire all the subscriptions in a bubbling way,
          * eg:
          * fire: "namespace/object/smaller"
-         * fire: "namespace/object/"
+         * fire: "namespace/object"
          * fire: "namespace"
          *
          * @arg {booleen} silent if to publish or not
          *
          */
         var change = function (new_val, silent) {
-            if (validator(new_val) === true) { // passed 
+            if (validator === null || validator(new_val) === true) { // passed 
                 if (value !== new_val) {
 
                     if (LOGGING === true) {
@@ -156,11 +175,9 @@ Kdown = function () {
     };
 
 
-        // getter / setter function 
-        return {
 
     var db = {
-        page : Kobj('page_change', 'cat'),        // current page
+        page : new Kobj('page_change', 'cat'),        // current page
 
         market : new Kobj('page/market'),         // current market
         cat : new Kobj('page/cat'),               // current category
@@ -178,8 +195,7 @@ Kdown = function () {
     /***
      * Validators
      */
-
-    validator = {
+    var validator = {
         cat : function (cat) {
             return $.inArray(cat, db.cat_list.get().map(url_safe)) !== -1;
         },
@@ -217,7 +233,7 @@ Kdown = function () {
                     db.market.set_silent(hash[1], validator.market);
                     db.cat.set(hash[2], validator.cat);
                 } else {
-                    db.market.set_silent( db.market_list.get()[0] )
+                    db.market.set_silent( db.market_list.get()[0] );
                     db.cat.set( db.cat_list.get()[0] );
                 }
             },
@@ -418,9 +434,9 @@ Kdown = function () {
             console.log("json response", json);
 
             var file_list  = json.files,
-                market_list = [],
-                lang_list   = [],
-                cat_list    = [],
+                market_list = {},
+                lang_list   = {},
+                cat_list    = {},
                 file_tree   = {},
                 i           = file_list.length;
 
@@ -428,13 +444,16 @@ Kdown = function () {
                 // go through every file (backwards!)
                 while (--i) {
                     var file = file_list[i];
+                    file.safe_market = url_safe(file.market);
+                    file.safe_cat = url_safe(file.cat);
+
 
                      
                     // add entry for market if not already there
                     if ( $.inArray(file.market, market_list) === -1 ) {
 
                         console.log("add to market list ",file.market);
-                        market_list.push(file.market);
+                        market_list[file.safe_market] = file.market;
 
                         file_tree[file.market] = {};
                     }
@@ -507,9 +526,11 @@ Kdown = function () {
     /***
      * Make events
      */
+    $.mute(true);
     $ui.DD.market.change(function () {
         db.market.set( $(this).val() );
     });
+    $.mute(false);
 
     $ui.sidebar.ul.on('click', 'a', function () {
         db.cat.set( $(this).parent().data('cat') );
