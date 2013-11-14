@@ -93,7 +93,7 @@
 ?>
 </script>
 
-<script src="pubsub.js" type="text/javascript" charset="utf-8">
+<script src="bubpub/bubpub.js" type="text/javascript" charset="utf-8">
 <script src="dream_kdown.js" type="text/javascript" charset="utf-8">
    
 </script>
