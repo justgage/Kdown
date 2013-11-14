@@ -5,6 +5,19 @@ var pubsub = {
     listeners : {},
     timeout_fired: false,
 
+    listen : function (topic_str, callback) {
+        // if it already exists
+        if (!(topic_str in this.listeners)) {
+            this.listeners[topic_str] = [];
+        }
+
+        if (typeof callback === "function" ) {
+            this.listeners[topic_str].push(callback);
+        } else {
+            console.error("no callback function!");
+        }
+    },
+
     say : function (topic_str) {
         console.log("SAY");
         var topics = topic_str.split(" ");
@@ -20,23 +33,13 @@ var pubsub = {
          */
         if (this.timeout_fired === false) {
             this.timeout_fired = true;
+            var that = this;
             setTimeout(function () {
-              pubsub.fire(); // NOT GOOD, BREAK ON GLOBAL
-            }, 0);
+              pubsub.fire(that); // NOT GOOD, BREAK ON GLOBAL
+            }, 1); // IE doesn't like -> 0
         }
     },
     
-    listen : function (topic_str, callback) {
-        if (!(topic_str in this.listeners)) {
-            this.listeners[topic_str] = [];
-        }
-
-        if (typeof callback === "function" ) {
-            this.listeners[topic_str].push(callback);
-        } else {
-            console.error("no callback function!");
-        }
-    },
 
     bubble : function (topic) {
         var chain = topic.split("/");
@@ -63,9 +66,9 @@ var pubsub = {
         }
     },
 
-    fire : function () {
+    fire : function (that) {
         console.error("FIRE");
-        pubsub.timeout_fired = false;
+        that.timeout_fired = false;
 
         var runEach = function (que, listeners) {
             var i, l, j, ll, item;
@@ -81,13 +84,13 @@ var pubsub = {
             }
         };
 
-        runEach(this.que, this.listeners);
-        runEach(this.bubble_que, this.listeners);
+        runEach(that.que, that.listeners);
+        runEach(that.bubble_que, that.listeners);
 
         // clear all the ques
-        this.que = [];
-        this.bubble_que = [];
-        this.bubble_hash = {};
+        that.que = [];
+        that.bubble_que = [];
+        that.bubble_hash = {};
     }
 };
 
@@ -104,6 +107,11 @@ pubsub.listen("people/spanish", function () {
     console.log("olah people");
 });
 
-pubsub.say("people/hi");
-pubsub.say("people/spanish");
-pubsub.say("people/hi");
+pubsub.say("people/hi people/hi people/spanish");
+
+
+pubsub.listen("people/spanish", function () {
+    console.log("sorry I'm late!");
+});
+
+pubsub.say("people/hi people/hi people/spanish");
