@@ -1,53 +1,3 @@
-/***
- * PLUGINS: 
- */
-
-/*
- * jQuery Tiny Pub/Sub
- * https://github.com/cowboy/jquery-tiny-pubsub
- *
- * Copyright (c) 2013 "Cowboy" Ben Alman
- * Licensed under the MIT license.
- */
-
-(function($) {
-
-  var o = $({});
-  var ignore = 0;
-
-  /***
-   * Listen to an event
-   */
-  $.subscribe = function() {
-    o.on.apply(o, arguments);
-  };
-
-  /***
-   * Stop listening to an event
-   */
-  $.unsubscribe = function() {
-    o.off.apply(o, arguments);
-  };
-
-  /***
-   * to ignore events or not
-   * @arg {boolean} state if to ignore or not
-   */
-  $.mute = function(state) {
-      ignore = state;
-  };
-
-  /***
-   * Try to publish to an event if not ignored
-   */
-  $.publish = function() {
-      if (ignore === false) {
-          o.trigger.apply(o, arguments);
-      }
-  };
-
-}(jQuery));
-
 
 /***
  * Kdown ~ Kyani download interface
@@ -100,12 +50,11 @@ var Kdown = function () {
      */
     var Kobj = function (publish_name, preset, validator) {
 
-        publish_name = publish_name.split("/");
-        validator = validator || null;
         if (typeof preset === 'undefined') {
             preset = null;
         }
-        var value = preset;
+        var value = preset; // save as a local var
+        validator = validator || null;
 
         /***
          * Will change value to new_val
@@ -117,28 +66,17 @@ var Kdown = function () {
          * fire: "namespace/object"
          * fire: "namespace"
          *
-         * @arg {booleen} silent if to publish or not
          *
          */
-        var change = function (new_val, silent) {
+        var change = function (new_val) {
             if (validator === null || validator(new_val) === true) { // passed 
                 if (value !== new_val) {
 
                     if (LOGGING === true) {
-                        console.log(publish_name.join("/") + " changed " + value + " => " , new_val);
+                        console.log(publish_name + " changed " + value + " => " , new_val);
                     }
 
-                    value = new_val;
-
-                    // publish all events 
-                    var i = publish_name.length;
-
-                    if (silent !== true) {
-                        while(i--) {
-                            var pub_name = publish_name.slice(0, i + 1).join("/");
-                            $.publish(pub_name, value); 
-                        }
-                    }
+                    bubpub.say(publish_name);
 
                     return true;
                      
@@ -160,17 +98,12 @@ var Kdown = function () {
         };
 
         var set = function (new_val) {
-            change(new_val, false);
-        };
-
-        var set_silent = function (new_val) {
-            change(new_val, true);
+            change(new_val);
         };
 
         return {
             get : get,
             set : set,
-            set_silent : set_silent
         };
     };
 
@@ -230,11 +163,20 @@ var Kdown = function () {
                 hash = hash.split('/');
 
                 if (hash[0] === "#cat") {
-                    db.market.set_silent(hash[1], validator.market);
+                    db.market.set(hash[1], validator.market);
                     db.cat.set(hash[2], validator.cat);
                 } else {
-                    db.market.set_silent( db.market_list.get()[0] );
-                    db.cat.set( db.cat_list.get()[0] );
+                    
+                    /***
+                     * Hackish way to get first element in the object
+                     *      NOT the same in all browsers!!!!
+                     *      a better way is needed
+                     */
+                    for(var def_market in db.market_list.get()[0] ) break;
+                    for(var def_cat in db.cat_list.get()[0] ) break;
+
+                    db.market.set( def_market );
+                    db.cat.set( def_cat );
                 }
             },
 
@@ -308,19 +250,21 @@ var Kdown = function () {
                 var market = db.market.get();
                 var cat = db.cat.get();
                 var li = "";
-                for (var i = 0, l = cat_list.length; i < l; i++) {
-                    var page = cat_list[i];
-                    li = copy;
-                    
-                    var code = url_safe(page);
 
-                    li = li.replace(/\(CAT\)/g, code);
-                    li = li.replace("(HREF)", "#cat/" + market + "/" + code);
-                    li = li.replace("(TITLE)", page);
+                for (var code in cat_list) {
+                    if(cat_list.hasOwnProperty(code)) {
+                        var page = cat_list[code];
+                        li = copy;
+
+                        li = li.replace(/\(CAT\)/g, code);
+                        li = li.replace("(HREF)", "#cat/" + market + "/" + code);
+                        li = li.replace("(TITLE)", page);
 
 
-                    html += li;
+                        html += li;
+                    }
                 }
+
                 //set the sidebar
                 $ui.sidebar.ul.html(html);
                 this.set_current();
@@ -341,9 +285,11 @@ var Kdown = function () {
                 var list = db.market_list.get();
                 var html;
                 var temp = '<option value="(NAME)">(NAME)</option>';
-                for (var i = list.length - 1; i >= 0; i--) {
-                    var option = temp.replace(/\(NAME\)/g, list[i]);
-                    html += option;
+                for (var item in list) {
+                    if(list.hasOwnProperty(item)) {
+                        var option = temp.replace(/\(NAME\)/g, list[item]);
+                        html += option;
+                    }
                 }
                 $ui.DD.market.html(html);
             },
@@ -425,7 +371,7 @@ var Kdown = function () {
 
             promise.fail(function (code) {
                 console.log("FAIL", code);
-                $.publish("ajax/fail");
+                bubpub.say("ajax/fail");
             });
 
         },
@@ -443,43 +389,30 @@ var Kdown = function () {
 
                 // go through every file (backwards!)
                 while (--i) {
-                    var file = file_list[i];
-                    file.safe_market = url_safe(file.market);
-                    file.safe_cat = url_safe(file.cat);
+                    var f = file_list[i]; // single file
 
+                    f.safe_market = url_safe(f.market);
+                    f.safe_cat = url_safe(f.category);
 
-                     
-                    // add entry for market if not already there
-                    if ( $.inArray(file.market, market_list) === -1 ) {
+                    /***
+                     * add them all the object (overwrites if already there)
+                     */
+                    cat_list[ f.safe_cat ]       = f.category;
+                    lang_list[ f.safe_lang ]     = f.language;
+                    market_list[ f.safe_market ] = f.market;
 
-                        console.log("add to market list ",file.market);
-                        market_list[file.safe_market] = file.market;
-
-                        file_tree[file.market] = {};
-                    }
-                    
-                    // add entry for category if not already there
-                    if ( $.inArray(file.category, cat_list) === -1 ) {
-
-                        console.log("add to cat list ",file.category);
-                        cat_list.push(file.category);
-                    }
-
-                    if (typeof file_tree[ file.market ][ file.category ]   === 'undefined') {
-                        file_tree[ file.market ][ url_safe(file.category) ] = [];
-                    }
-
-                    // add entry for lang if not already there
-                    if ( $.inArray(file.language, lang_list) === -1 ) {
-                        lang_list.push(file.language);
-                    }
+                    /***
+                     * create entrys if needed
+                     */
+                    file_tree[ f.safe_market ] = file_tree[ f.safe_market ] || {};
+                    file_tree[ f.safe_market ][ f.safe_cat ] =
+                        file_tree[ f.safe_market ][ f.safe_cat ] || [];
 
                     /***
                      * add file to the tree
                      * tree -> market -> category -> file
                      */
-                    console.log("file tree add", file_tree);
-                    file_tree[ file.market ][ url_safe(file.category) ].push(file);
+                    file_tree[ f.safe_market ][ f.safe_cat ].push(f);
 
                 } // end while
 
@@ -495,30 +428,30 @@ var Kdown = function () {
     /***
      * Listen to events
      */
-    $.subscribe("ajax/load", function () {
+    bubpub.listen("ajax/load", function () {
         view.hash.import();
         view.table.populate();
     });
 
-    $.subscribe("page", function () {
+    bubpub.listen("page", function () {
         view.table.populate();
         console.log("Page Change: ", db.cat.get(), db.market.get());
     });
 
-    $.subscribe("page/market", function () {
+    bubpub.listen("page/market", function () {
         view.sidebar.populate();
     });
 
-    $.subscribe("page/cat", function () {
+    bubpub.listen("page/cat", function () {
         view.sidebar.set_current();
     });
 
-    $.subscribe("list/markets", function () {
+    bubpub.listen("list/markets", function () {
         console.log("market_list");
         view.market_DD.populate();
     });
 
-    $.subscribe("list/cats", function () {
+    bubpub.listen("list/cats", function () {
         console.log("cat_list");
         view.sidebar.populate();
     });
@@ -526,11 +459,9 @@ var Kdown = function () {
     /***
      * Make events
      */
-    $.mute(true);
     $ui.DD.market.change(function () {
         db.market.set( $(this).val() );
     });
-    $.mute(false);
 
     $ui.sidebar.ul.on('click', 'a', function () {
         db.cat.set( $(this).parent().data('cat') );
