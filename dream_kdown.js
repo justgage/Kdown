@@ -57,24 +57,19 @@ var Kdown = function () {
         validator = validator || null;
 
         /***
-         * Will change value to new_val
-         * IF: the value is different
-         *
-         * also will fire all the subscriptions in a bubbling way,
-         * eg:
-         * fire: "namespace/object/smaller"
-         * fire: "namespace/object"
-         * fire: "namespace"
-         *
-         *
+         * Will change value to new_val if the values are different
          */
         var change = function (new_val) {
+
             if (validator === null || validator(new_val) === true) { // passed 
                 if (value !== new_val) {
 
                     if (LOGGING === true) {
-                        console.log(publish_name + " changed " + value + " => " , new_val);
+                        console.log(publish_name + " changed " +
+                                    value + " => " , new_val);
                     }
+
+                    value = new_val;
 
                     bubpub.say(publish_name);
 
@@ -82,7 +77,9 @@ var Kdown = function () {
                      
                 } else {
                     if (LOGGING === true) {
-                        console.log("WARN: " + publish_name + " set not fired due to no change -> " + value);
+                        console.warn("WARN: " +
+                                    publish_name +
+                                    " no change to value -> " + value);
                     }
                     return false;
                 }
@@ -112,7 +109,9 @@ var Kdown = function () {
     var db = {
         page : new Kobj('page_change', 'cat'),        // current page
 
-        market : new Kobj('page/market'),         // current market
+        market : new Kobj('page/market', null, function (test) {
+            return test in  db.market_list.get === false;
+        }),         // current market
         cat : new Kobj('page/cat'),               // current category
         lang : new Kobj('page/lang'),             // current translation selected (can be 'ALL')
         lang_count : new Kobj('lang_count'),      // each language's count [lang] => count
@@ -123,6 +122,23 @@ var Kdown = function () {
         lang_list : new Kobj('list/langs', {}),    // list of valid languages
 
         file_tree : new Kobj('ajax/load'), // hold the current table's JSON
+
+        current_file_tree : function () {
+
+            var tree = db.file_tree.get(); // all files
+            var market = url_safe( db.market.get() );
+            var cat = url_safe( db.cat.get() );
+            
+            if (typeof tree[market] === 'undefined') {
+                return null;
+            }
+
+            if (typeof tree[market][cat] === 'undefined') {
+                return null;
+            }
+
+            return  tree[market][cat];
+        }
     };
 
     /***
@@ -163,8 +179,8 @@ var Kdown = function () {
                 hash = hash.split('/');
 
                 if (hash[0] === "#cat") {
-                    db.market.set(hash[1], validator.market);
-                    db.cat.set(hash[2], validator.cat);
+                    db.market.set(hash[1]);
+                    db.cat.set(hash[2]);
                 } else {
                     
                     /***
@@ -172,11 +188,11 @@ var Kdown = function () {
                      *      NOT the same in all browsers!!!!
                      *      a better way is needed
                      */
-                    for(var def_market in db.market_list.get()[0] ) break;
-                    for(var def_cat in db.cat_list.get()[0] ) break;
+                    for(var def_market in db.market_list.get() ) break;
+                    for(var def_cat    in db.cat_list.get()    ) break;
 
-                    db.market.set( def_market );
-                    db.cat.set( def_cat );
+                    db.market.set( url_safe(def_market) );
+                    db.cat.set( url_safe(def_cat) );
                 }
             },
 
@@ -188,12 +204,20 @@ var Kdown = function () {
         },
         table : {
             populate : function(file_list) {
+
+
                 if (typeof file_list === 'undefined') {
                     //file_list = db.file_list(); // all files
-                    var tree = db.file_tree.get(); // all files
+                    file_list = db.current_file_tree(); // all files
 
-                    file_list = tree[ db.market.get() ][ db.cat.get() ];
+                    if (file_list === null) {
+                        bubpub.say("error/none_found");
+                        return false;
+                    } else {
+                        bubpub.say("error/clear");
+                    }
                 }
+
                 var table_html = "";
                 var copy = view.copy.table_row;
                 var row = copy;
@@ -213,7 +237,8 @@ var Kdown = function () {
                 }
 
                 $ui.table.first_body.html(table_html);
-                view.error.clear();
+
+                return true;
             },
             lang_filter : function(lang) {
                 var json = db.table_json.get(), // TODO: table_json is invalid
@@ -247,7 +272,8 @@ var Kdown = function () {
                 var html = "";
 
                 var cat_list = db.cat_list.get();
-                var market = db.market.get();
+                var market = db.market.get(); 
+                console.assert(market !== null, "Sidebar");
                 var cat = db.cat.get();
                 var li = "";
 
@@ -422,6 +448,7 @@ var Kdown = function () {
                 db.lang_list.set(lang_list);
                 db.cat_list.set(cat_list);
                 db.file_tree.set(file_tree);  // publishes ("ajax/load")
+                view.hash.import();
         }
     };
 
@@ -429,13 +456,12 @@ var Kdown = function () {
      * Listen to events
      */
     bubpub.listen("ajax/load", function () {
-        view.hash.import();
         view.table.populate();
     });
 
     bubpub.listen("page", function () {
-        view.table.populate();
         console.log("Page Change: ", db.cat.get(), db.market.get());
+        view.table.populate();
     });
 
     bubpub.listen("page/market", function () {
@@ -456,8 +482,17 @@ var Kdown = function () {
         view.sidebar.populate();
     });
 
+    bubpub.listen("error/clear", function () {
+        view.error.clear();
+    });
+
+    bubpub.listen("error/none_found", function () {
+        console.log("none_found fire");
+        view.error.none_found();
+    });
+
     /***
-     * Make events
+     * Bind events to the DOM
      */
     $ui.DD.market.change(function () {
         db.market.set( $(this).val() );
