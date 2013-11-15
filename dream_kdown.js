@@ -104,8 +104,6 @@ var Kdown = function () {
         };
     };
 
-
-
     var db = {
         page : new Kobj('page_change', 'cat'),        // current page
 
@@ -138,21 +136,6 @@ var Kdown = function () {
             }
 
             return  tree[market][cat];
-        }
-    };
-
-    /***
-     * Validators
-     */
-    var validator = {
-        cat : function (cat) {
-            return $.inArray(cat, db.cat_list.get().map(url_safe)) !== -1;
-        },
-        market : function (market) {
-            return $.inArray(market, db.market_list.get()) !== -1;
-        },
-        lang : function (lang) {
-            return $.inArray(lang, db.lang_list.get()) !== -1;
         }
     };
 
@@ -242,9 +225,9 @@ var Kdown = function () {
             },
             lang_filter : function(lang) {
                 var json = db.table_json.get(), // TODO: table_json is invalid
-                filtered_json = [],
-                num_found = 0,
-                i = 0;
+                    filtered_json = [],
+                    num_found = 0,
+                    i = 0, l;
 
                 lang = lang || db.lang.get();
 
@@ -268,14 +251,13 @@ var Kdown = function () {
         },
         sidebar : {
             populate : function () {
-                var copy = view.copy.page;
-                var html = "";
+                var copy = view.copy.page,
+                    html = "",
+                    li = "",
+                    cat_list = db.cat_list.get(),
+                    market = db.market.get();
 
-                var cat_list = db.cat_list.get();
-                var market = db.market.get(); 
                 console.assert(market !== null, "Sidebar");
-                var cat = db.cat.get();
-                var li = "";
 
                 for (var code in cat_list) {
                     if(cat_list.hasOwnProperty(code)) {
@@ -453,56 +435,64 @@ var Kdown = function () {
     };
 
     /***
-     * Listen to events
+     * first funciton to run 
      */
-    bubpub.listen("ajax/load", function () {
-        view.table.populate();
-    });
+    var start = function () {
 
-    bubpub.listen("page", function () {
-        console.log("Page Change: ", db.cat.get(), db.market.get());
-        view.table.populate();
-    });
+        bubpub.listen("ajax/load", function () {
+            view.table.populate();
+        });
 
-    bubpub.listen("page/market", function () {
-        view.sidebar.populate();
-    });
+        bubpub.listen("page", function () {
+            console.log("Page Change: ", db.cat.get(), db.market.get());
+            view.table.populate();
+            view..populate();
+        });
 
-    bubpub.listen("page/cat", function () {
-        view.sidebar.set_current();
-    });
+        bubpub.listen("page/market", function () {
+            view.sidebar.populate();
+        });
 
-    bubpub.listen("list/markets", function () {
-        console.log("market_list");
-        view.market_DD.populate();
-    });
+        bubpub.listen("page/cat", function () {
+            view.sidebar.set_current();
+        });
 
-    bubpub.listen("list/cats", function () {
-        console.log("cat_list");
-        view.sidebar.populate();
-    });
+        bubpub.listen("list/markets", function () {
+            console.log("market_list");
+            view.market_DD.populate();
+        });
 
-    bubpub.listen("error/clear", function () {
-        view.error.clear();
-    });
+        bubpub.listen("list/cats", function () {
+            console.log("cat_list");
+            view.sidebar.populate();
+        });
 
-    bubpub.listen("error/none_found", function () {
-        console.log("none_found fire");
-        view.error.none_found();
-    });
+        bubpub.listen("error/clear", function () {
+            view.error.clear();
+        });
 
-    /***
-     * Bind events to the DOM
-     */
-    $ui.DD.market.change(function () {
-        db.market.set( $(this).val() );
-    });
+        bubpub.listen("error/none_found", function () {
+            console.log("none_found fire");
+            view.error.none_found();
+        });
 
-    $ui.sidebar.ul.on('click', 'a', function () {
-        db.cat.set( $(this).parent().data('cat') );
-    });
+        /***
+         * Bind events to the DOM
+         */
+        $ui.DD.market.change(function () {
+            db.market.set( $(this).val() );
+        });
+
+        $ui.sidebar.ul.on('click', 'a', function () {
+            db.cat.set( $(this).parent().data('cat') );
+        });
+
+        server.load_json();
+
+    };
 
     return {
+        "start" : start,
         "view" : view,
         "db" : db,
         "$ui" : $ui,
@@ -513,6 +503,5 @@ var Kdown = function () {
 var Kdown = Kdown();
 
 
-Kdown.server.load_json();
 
 
