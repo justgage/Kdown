@@ -2,7 +2,7 @@
 /***
  * Kdown ~ Kyani download interface
  */
-var Kdown = function () {
+Kdown = function () {
     "use strict";
     /***
      * config 
@@ -104,6 +104,9 @@ var Kdown = function () {
         };
     };
 
+    /***
+     * holds all the information in Kojs (see above)
+     */
     var db = {
         page : new Kobj('page_change', 'cat'),        // current page
 
@@ -136,13 +139,22 @@ var Kdown = function () {
             }
 
             return  tree[market][cat];
+        },
+        current_lang_list : function () {
+            var tree = this.current_file_tree();
+
+            var i = tree.length;
         }
     };
 
+    /***
+     * a little helper function to make things URL safe 
+     * that changes it to lowercase and replaces anything 
+     * that's not alphanumeric to a dash
+     */
     var url_safe = function (unsafe) {
         return unsafe.toLowerCase().replace(/[^a-zA-Z0-9]+/g,'-');
     };
-
 
     /***
      * helpers with handling the DOM
@@ -156,34 +168,49 @@ var Kdown = function () {
             page : $('#copy-cat').html() //NOTE: need to change HTML
         },
         hash : {
+
+            /***
+             * get out of the hash
+             */
             import : function () {
                 var hash = window.location.hash;
 
                 hash = hash.split('/');
 
-                if (hash[0] === "#cat") {
+                var page = hash[0].slice(1);
+
+                db.page.set(page);
+
+                if (page === "#cat") {
                     db.market.set(hash[1]);
                     db.cat.set(hash[2]);
                 } else {
                     
-                    /***
-                     * Hackish way to get first element in the object
-                     *      NOT the same in all browsers!!!!
-                     *      a better way is needed
-                     */
+                    // Hackish way to get first element in the object
+                    //      NOT the same in all browsers!!!!
+                    //      a better way is needed
                     for(var def_market in db.market_list.get() ) break;
                     for(var def_cat    in db.cat_list.get()    ) break;
 
                     db.market.set( url_safe(def_market) );
                     db.cat.set( url_safe(def_cat) );
                 }
+
             },
-
             /***
-             * replace anything that's not alpha-numeric to a dash
-             * and make it all lower case
+             * export data to the hash
              */
+            export : function () {
+                var page = db.page.get();
+                var hash = "#" + page;
 
+                if (page === "cat") {
+                    hash += "/" + db.market.get();
+                    hash += "/" + db.cat.get();
+                }
+
+                window.location.hash = hash;
+            }
         },
         table : {
             populate : function(file_list) {
@@ -366,8 +393,9 @@ var Kdown = function () {
             }
         }
     };
-
-
+    /***
+     * Handles all the AJAX requests.
+     */
     var server = {
         /***
          * save the json in the proper formats
@@ -396,7 +424,7 @@ var Kdown = function () {
 
 
                 // go through every file (backwards!)
-                while (--i) {
+                while (i--) {
                     var f = file_list[i]; // single file
 
                     f.safe_market = url_safe(f.market);
@@ -430,12 +458,14 @@ var Kdown = function () {
                 db.lang_list.set(lang_list);
                 db.cat_list.set(cat_list);
                 db.file_tree.set(file_tree);  // publishes ("ajax/load")
+
+                // set the defaults (from the hash if needed)
                 view.hash.import();
         }
     };
 
     /***
-     * first funciton to run 
+     * first function to run 
      */
     var start = function () {
 
@@ -446,7 +476,7 @@ var Kdown = function () {
         bubpub.listen("page", function () {
             console.log("Page Change: ", db.cat.get(), db.market.get());
             view.table.populate();
-            view..populate();
+            //view..populate();
         });
 
         bubpub.listen("page/market", function () {
@@ -501,6 +531,8 @@ var Kdown = function () {
 };
 
 var Kdown = Kdown();
+
+Kdown.start();
 
 
 
