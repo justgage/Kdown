@@ -579,21 +579,19 @@ Kdown = function () {
 
         });
 
-        bubpub.listen("page/market", function () {
-            /***
-             * check if this language exists in the newe market
-             */
-
-            var lang = db.lang.get();
-
-            if ( (lang === 'all' || lang in db.current_lang_list()) === false) {
-                db.lang.set('all');
-            }
-        });
-
         bubpub.listen("page/market page/lang", function () {
             view.sidebar.populate();
             bubpub.say("hash/export");
+        });
+
+        bubpub.listen("page/market", function () {
+            var lang = db.lang.get();
+
+            // check if new market has current lang
+            if ( (lang === 'all' || lang in db.current_lang_list()) === false) {
+                db.lang.set('all');
+            }
+            view.market_DD.update();
         });
 
         bubpub.listen("page/cat", function () {
@@ -602,9 +600,6 @@ Kdown = function () {
 
         bubpub.listen("list/markets", function () {
             view.market_DD.populate();
-
-            var lang = db.lang.get();
-
         });
 
         bubpub.listen("list/cats", function () {
