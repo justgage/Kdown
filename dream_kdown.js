@@ -142,7 +142,7 @@ Kdown = function () {
 
             return  tree[market][cat];
         },
-        current_lang_list : function (tree) {
+        current_lang_count : function (tree) {
 
             tree = tree ||  this.current_file_tree();
 
@@ -151,13 +151,19 @@ Kdown = function () {
 
             while(i--) {
                 var lang = tree[i].language;
-
-                console.log(lang);
                 lang_count[lang] = ++lang_count[lang] || 1;
-
             }
 
             return lang_count;
+        },
+        /***
+         * gets the current lang_list
+         */
+        current_lang_list : function (market, cat) {
+            market = market || db.market.get();
+            cat = cat || db.cat.get();
+            
+            return db.lang_list.get()[market];
         }
     };
 
@@ -198,6 +204,7 @@ Kdown = function () {
                 if (page === "cat") {
                     db.market.set(hash[1]);
                     db.cat.set(hash[2]);
+                    db.lang.set(hash[3]);
                 } else {
                     
                     // Hackish way to get first element in the object
@@ -208,6 +215,7 @@ Kdown = function () {
 
                     db.market.set( url_safe(def_market) );
                     db.cat.set( url_safe(def_cat) );
+                    db.lang.set(NATIVE_LANG);
                 }
 
             },
@@ -221,6 +229,7 @@ Kdown = function () {
                 if (page === "cat") {
                     hash += "/" + db.market.get();
                     hash += "/" + db.cat.get();
+                    hash += "/" + db.lang.get();
                 }
 
                 window.location.hash = hash;
@@ -228,19 +237,6 @@ Kdown = function () {
         },
         table : {
             populate : function(file_list) {
-
-
-                if (typeof file_list === 'undefined') {
-                    //file_list = db.file_list(); // all files
-                    file_list = db.current_file_tree(); // all files
-
-                    if (file_list === null) {
-                        bubpub.say("error/none_found");
-                        return false;
-                    } else {
-                        bubpub.say("error/clear");
-                    }
-                }
 
                 var table_html = "";
                 var copy = view.copy.table_row;
@@ -296,7 +292,8 @@ Kdown = function () {
                     html = "",
                     li = "",
                     cat_list = db.cat_list.get(),
-                    market = db.market.get();
+                    market = db.market.get(),
+                    lang = db.lang.get();
 
                 console.assert(market !== null, "Sidebar");
 
@@ -306,7 +303,7 @@ Kdown = function () {
                         li = copy;
 
                         li = li.replace(/\(CAT\)/g, code);
-                        li = li.replace("(HREF)", "#cat/" + url_safe(market) + "/" + code);
+                        li = li.replace("(HREF)", "#cat/" + url_safe(market) + "/" + code + "/" + lang);
                         li = li.replace("(TITLE)", page);
 
 
@@ -349,26 +346,32 @@ Kdown = function () {
 
         },
         lang_DD : {
-            populate : function () {
-                var langs = db.lang_list.get();
+            populate : function (count) {
+               
+                count = count || db.current_lang_count();
+                var langs = db.current_lang_list();
                 var html;
                 var temp = '<option value="(VAL)">(NAME)</option>';
-                var count = db.lang_count.get();
                 var option = temp.replace("(VAL)", 'all');
+                var padding = 4;  //number of spaces for padding
+
+                //add the all option at the top
                 option = option.replace("(NAME)", "All" );
                 html += option;
 
+                // add each lang to the drop down HTML
                 for (var code in langs) {
                     if(langs.hasOwnProperty(code)) {
-                        option = temp;
                         var name = langs[code],
-                        num = count[code] || 0,
-                        spaces = [];
+                            num = count[code] || 0,
+                            spaces = [];
+                        option = temp;              // clear option html
 
                         option = option.replace("(VAL)", code);
-                        num = num + ""; // change to a string
-                        for (var ii = 0, l = 4 - num.length; ii< l; ii++) {
-                            spaces.push("\u00A0"); //this is the char for a non-breaking space
+
+                        num = num + "";             // change to a string
+                        for (var ii = 0, l = padding - num.length; ii< l; ii++) {
+                            spaces.push("\u00A0");  //this is the char for a non-breaking space
                         }
                         name = num + spaces.join(" ") + name;
 
@@ -377,7 +380,7 @@ Kdown = function () {
 
                     }
                 }
-                $ui.DD.lang.html(html).val(NATIVE_LANG);
+                $ui.DD.lang.html(html).val(db.lang.get());
             }
         },
         error: {
@@ -415,7 +418,7 @@ Kdown = function () {
         /***
          * save the json in the proper formats
          */
-        load_json : function () {
+        ajax_load_json : function () {
             var promise = $.post(API_URL, {}, null, 'json');
             var lists_promise = $.get(NAMES_URL, {}, null, 'json');
 
@@ -438,6 +441,10 @@ Kdown = function () {
             });
 
         },
+        /***
+         * Save all the ajax information from API
+         * in proper format
+         */
         save_json : function (json) {
 
             console.group("save_json");
@@ -489,9 +496,19 @@ Kdown = function () {
                 console.groupEnd("save_json");
 
         },
+        /***
+         * Save all list from market_lang.json
+         */
         save_lists_json : function (json) {
+            console.group("save_lists_json");
+
+            console.log("market_list", json.markets);
+            console.log("langs_list", json.langs);
+
             db.market_list.set(json.markets);
             db.lang_list.set(json.langs);
+
+            console.groupEnd("save_lists_json");
         }
     };
 
@@ -501,16 +518,30 @@ Kdown = function () {
     var start = function () {
 
         bubpub.listen("ajax/load", function () {
-            view.table.populate();
+            // necisary?
         });
 
         bubpub.listen("page", function () {
             console.log("Page Change: ", db.cat.get(), db.market.get());
-            view.table.populate();
-            //view..populate();
+            var file_list = db.current_file_tree(); 
+            var lang_list = db.current_lang_list(file_list); 
+
+            // check if file list exists
+            //
+            if (file_list === null) { 
+                bubpub.say("error/none_found");
+            } else { 
+                //yes files
+                bubpub.say("error/clear");
+
+                view.table.populate(file_list);
+                view.lang_DD.populate(lang_list);
+            }
+
         });
 
-        bubpub.listen("page/market", function () {
+        bubpub.listen("page/market page/lang", function () {
+            console.warn("sidebar.populate()");
             view.sidebar.populate();
         });
 
@@ -542,13 +573,18 @@ Kdown = function () {
             view.hash.url_export();
         });
 
+        $ui.DD.lang.change(function () {
+            db.lang.set( $(this).val() );
+            view.hash.url_export();
+        });
+
         $ui.sidebar.ul.on('click', 'a', function () {
             db.cat.set( $(this).parent().data('cat') );
         });
 
         $(window).bind('hashchange', view.hash.url_import);
 
-        server.load_json();
+        server.ajax_load_json();
 
     };
 
