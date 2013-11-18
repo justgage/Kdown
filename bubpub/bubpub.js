@@ -5,15 +5,22 @@ var bubpub = {
     timeout_fired: false,
 
     listen : function (topic_str, callback) {
-        // if it already exists
-        if (!(topic_str in this.listeners)) {
-            this.listeners[topic_str] = [];
-        }
+        var topics = topic_str.split(" ");
 
-        if (typeof callback === "function" ) {
-            this.listeners[topic_str].push(callback);
-        } else {
-            console.error("no callback function!");
+        for (var i=0, l = topics.length; i < l; i++) {
+            var topic = topics[i];
+
+            // if it already exists
+            if (!(topic in this.listeners)) {
+                this.listeners[topic] = [];
+            }
+
+            if (typeof callback === "function" ) {
+                this.listeners[topic].push(callback);
+            } else {
+                console.error("no callback function!");
+            }
+
         }
     },
 
