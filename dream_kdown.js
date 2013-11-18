@@ -241,19 +241,23 @@ Kdown = function () {
                 var table_html = "";
                 var copy = view.copy.table_row;
                 var row = copy;
+                var lang = db.lang.get();
 
                 // backwards
                 for (var i = file_list.length - 1; i >= 0; i--) {
                     var file = file_list[i];
-                    row = copy;
 
-                    // Tempating
-                    row = row.replace("(HEART_URL)", '#');
-                    row = row.replace("(NAME)", file.name);
-                    row = row.replace("(FILE_LINK)", 'single.php?id=' + file.id);
-                    row = row.replace("(LANG)", file.language);
+                    if (lang === "all" || lang === file.language) {
+                        row = copy;
 
-                    table_html += row;
+                        // Tempating
+                        row = row.replace("(HEART_URL)", '#');
+                        row = row.replace("(NAME)", file.name);
+                        row = row.replace("(FILE_LINK)", 'single.php?id=' + file.id);
+                        row = row.replace("(LANG)", file.language);
+
+                        table_html += row;
+                    }
                 }
 
                 $ui.table.first_body.html(table_html);
@@ -541,7 +545,6 @@ Kdown = function () {
         });
 
         bubpub.listen("page/market page/lang", function () {
-            console.warn("sidebar.populate()");
             view.sidebar.populate();
         });
 
