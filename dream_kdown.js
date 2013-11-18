@@ -195,7 +195,7 @@ Kdown = function () {
 
                 db.page.set(page);
 
-                if (page === "#cat") {
+                if (page === "cat") {
                     db.market.set(hash[1]);
                     db.cat.set(hash[2]);
                 } else {
@@ -333,10 +333,11 @@ Kdown = function () {
             populate : function () {
                 var list = db.market_list.get();
                 var html;
-                var temp = '<option value="(NAME)">(NAME)</option>';
+                var temp = '<option value="(CODE)">(NAME)</option>';
                 for (var item in list) {
                     if(list.hasOwnProperty(item)) {
-                        var option = temp.replace(/\(NAME\)/g, list[item]);
+                        var option = temp.replace("(NAME)", list[item]);
+                        option = option.replace("(CODE)", item);
                         html += option;
                     }
                 }
@@ -538,11 +539,14 @@ Kdown = function () {
          */
         $ui.DD.market.change(function () {
             db.market.set( $(this).val() );
+            view.hash.url_export();
         });
 
         $ui.sidebar.ul.on('click', 'a', function () {
             db.cat.set( $(this).parent().data('cat') );
         });
+
+        $(window).bind('hashchange', view.hash.url_import);
 
         server.load_json();
 
