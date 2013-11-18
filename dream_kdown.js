@@ -126,6 +126,12 @@ Kdown = function () {
 
         file_tree : new Kobj('ajax/load'), // hold the current table's JSON
 
+        /***
+         * current_file_tree
+         *
+         * @arg {string} lang pass in a language to filter by 'all' get's all.
+         * @returns {array} list of files in the current market, cat, and lang
+         */
         current_file_tree : function (lang) {
 
             var tree = db.file_tree.get(); // all files
@@ -141,15 +147,20 @@ Kdown = function () {
                 return [];
             }
 
+            // filter out all files in other languages
             var result = $.map(tree[market][cat], function (file) {
                 if (lang === 'all' || file.language === lang) {
-                 
                     return file;
                 } 
             });
 
             return  result;
         },
+        /***
+         * Returns a list of langs in the current market and the amount in the current cateogry
+         *
+         * eg: { 'en' : 6, 'hk' 0 }
+         */
         current_lang_count : function (tree) {
 
             tree = tree ||  this.current_file_tree('all');
@@ -166,6 +177,9 @@ Kdown = function () {
         },
         /***
          * gets the current lang_list
+         */
+        /***
+         * Return the langs in the current market
          */
         current_lang_list : function (market, cat) {
             market = market || db.market.get();
@@ -189,6 +203,13 @@ Kdown = function () {
      * that changes it to lowercase and replaces anything 
      * that's not alphanumeric to a dash
      */
+    /***
+     * url_safe - escape strings for the URL
+     *
+     * @arg {string} undsafe string to make URL safe
+     * @return {string} string with all spaces and non 
+     *                  alpha-numeric characters turned to a '-'
+     */ 
     var url_safe = function (unsafe) {
         return unsafe.toLowerCase().replace(/[^a-zA-Z0-9]+/g,'-');
     };
@@ -541,10 +562,6 @@ Kdown = function () {
      */
     var start = function () {
 
-        bubpub.listen("ajax/load", function () {
-            // necisary?
-        });
-
         bubpub.listen("page", function () {
             console.log("Page Change: ", db.cat.get(), db.market.get());
             var file_list = db.current_file_tree(); 
@@ -646,7 +663,5 @@ Kdown = function () {
 var Kdown = Kdown();
 
 Kdown.start();
-
-
 
 
