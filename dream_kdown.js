@@ -143,7 +143,7 @@ Kdown = function () {
 
             var result = $.map(tree[market][cat], function (file) {
                 if (lang === 'all' || file.language === lang) {
-                    console.log("return");
+                 
                     return file;
                 } 
             });
@@ -170,8 +170,15 @@ Kdown = function () {
         current_lang_list : function (market, cat) {
             market = market || db.market.get();
             cat = cat || db.cat.get();
+            var lang_list = db.lang_list.get();
 
-            var current = db.lang_list.get()[market];
+            var current = lang_list[market];
+
+            if (typeof current === 'undefined') {
+                console.error("lang list doesn't exist?", market, "<-", lang_list);
+                current = {};
+            }
+            
             
             return current;
         }
@@ -555,8 +562,21 @@ Kdown = function () {
 
         });
 
+        bubpub.listen("page/market", function () {
+            /***
+             * check if this language exists in the newe market
+             */
+
+            var lang = db.lang.get();
+
+            if ( (lang === 'all' || lang in db.current_lang_list()) === false) {
+                db.lang.set('all');
+            }
+        });
+
         bubpub.listen("page/market page/lang", function () {
             view.sidebar.populate();
+            bubpub.say("hash/export");
         });
 
         bubpub.listen("page/cat", function () {
@@ -565,6 +585,9 @@ Kdown = function () {
 
         bubpub.listen("list/markets", function () {
             view.market_DD.populate();
+
+            var lang = db.lang.get();
+
         });
 
         bubpub.listen("list/cats", function () {
@@ -579,24 +602,33 @@ Kdown = function () {
             view.error.none_found();
         });
 
+        bubpub.listen("hash/export", function () {
+            view.hash.url_export();
+        });
+
+        bubpub.listen("hash/import", function () {
+            view.hash.url_import();
+        });
+
         /***
          * Bind events to the DOM
          */
         $ui.DD.market.change(function () {
             db.market.set( $(this).val() );
-            view.hash.url_export();
         });
 
         $ui.DD.lang.change(function () {
-            db.lang.set( $(this).val() );
-            view.hash.url_export();
+            var lang = $(this).val();
+            db.lang.set(lang);
         });
 
         $ui.sidebar.ul.on('click', 'a', function () {
             db.cat.set( $(this).parent().data('cat') );
         });
 
-        $(window).bind('hashchange', view.hash.url_import);
+        $(window).bind('hashchange', function () {
+            bubpub.say('hash/import');
+        });
 
         server.ajax_load_json();
 

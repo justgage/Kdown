@@ -7,9 +7,9 @@
       "hk":"Hong Kong (香港)",
       "jp":"Japan",
       "ko":"Korea",
+      "sg":"Singapore",
       "my":"Malaysia",
       "mx":"Mexico",
-      "sg":"Singapore",
       "tw":"Taiwan (台灣)"
    },
    "langs":{
@@ -49,23 +49,23 @@
          "hk":"香港-繁體",
          "en":"English"
       },
-      "Japan":{
+      "jp":{
          "ja":"日本人"
       },
-      "korea":{
+      "ko":{
          "ko":"한국어"
       },
-      "sea":{
+      "sg":{
+         "en":"English"
+      },
+      "my":{
          "my":"Bahasa Melayu",
          "en":"English"
       },
-      "Mexico":{
+      "mx":{
          "es":"Español"
       },
-      "au":{
-         "en":"English"
-      },
-      "cn":{
+      "tw":{
          "tw":"台灣-繁體",
          "en":"English"
       }

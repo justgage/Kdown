@@ -23,7 +23,6 @@ var bubpub = {
 
         }
     },
-
     say : function (topic_str, args_obj) {
         console.group("SAY");
 
@@ -53,7 +52,14 @@ var bubpub = {
         }
         console.groupEnd("SAY");
     },
-    
+    say_callback : function (topic_str, args_obj) {
+        console.log("making callback", topic_str, args_obj);
+        var that = this;
+        return function (topic_str, args_obj) {
+            that.say(topic_str, args_obj);
+        };
+    },
+  
     /***
      * add's a event to each part of the que
      */
