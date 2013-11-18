@@ -90,6 +90,7 @@
 <?php 
     //combine all the js files;
    include 'files/jquery.min.js';
+   include 'console_fix.js';
 ?>
 </script>
 

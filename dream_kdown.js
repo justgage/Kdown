@@ -8,7 +8,9 @@ Kdown = function () {
      * config 
      */
     var LOGGING = false,
-        API_URL = "files/dream_api.php";
+        NATIVE_LANG = 'en',
+        API_URL = "files/dream_api.php",
+        NAMES_URL = "files/market_lang.json";
 
     /***
      * UI handlers
@@ -127,8 +129,8 @@ Kdown = function () {
         current_file_tree : function () {
 
             var tree = db.file_tree.get(); // all files
-            var market = url_safe( db.market.get() );
-            var cat = url_safe( db.cat.get() );
+            var market = db.market.get();
+            var cat = db.cat.get();
             
             if (typeof tree[market] === 'undefined') {
                 return null;
@@ -140,10 +142,22 @@ Kdown = function () {
 
             return  tree[market][cat];
         },
-        current_lang_list : function () {
-            var tree = this.current_file_tree();
+        current_lang_list : function (tree) {
 
-            var i = tree.length;
+            tree = tree ||  this.current_file_tree();
+
+            var lang_count = {},
+                i = tree.length;
+
+            while(i--) {
+                var lang = tree[i].language;
+
+                console.log(lang);
+                lang_count[lang] = ++lang_count[lang] || 1;
+
+            }
+
+            return lang_count;
         }
     };
 
@@ -172,7 +186,7 @@ Kdown = function () {
             /***
              * get out of the hash
              */
-            import : function () {
+            url_import : function () {
                 var hash = window.location.hash;
 
                 hash = hash.split('/');
@@ -200,7 +214,7 @@ Kdown = function () {
             /***
              * export data to the hash
              */
-            export : function () {
+            url_export : function () {
                 var page = db.page.get();
                 var hash = "#" + page;
 
@@ -274,7 +288,7 @@ Kdown = function () {
                 }
 
                 return num_found > 0;
-            },
+            }
         },
         sidebar : {
             populate : function () {
@@ -292,7 +306,7 @@ Kdown = function () {
                         li = copy;
 
                         li = li.replace(/\(CAT\)/g, code);
-                        li = li.replace("(HREF)", "#cat/" + market + "/" + code);
+                        li = li.replace("(HREF)", "#cat/" + url_safe(market) + "/" + code);
                         li = li.replace("(TITLE)", page);
 
 
@@ -402,8 +416,20 @@ Kdown = function () {
          */
         load_json : function () {
             var promise = $.post(API_URL, {}, null, 'json');
+            var lists_promise = $.get(NAMES_URL, {}, null, 'json');
 
-            promise.done(server.save_json);
+            // When BOTH are done, do this:
+            $.when(promise, lists_promise).done(function (a1, a2) {
+                server.save_lists_json( a2[0] );
+                server.save_json( a1[0] );
+                view.hash.url_import();
+            });
+
+            // If either Error out: 
+            lists_promise.fail(function (code) {
+                console.log("FAIL", code);
+                bubpub.say("ajax/fail");
+            });
 
             promise.fail(function (code) {
                 console.log("FAIL", code);
@@ -413,11 +439,11 @@ Kdown = function () {
         },
         save_json : function (json) {
 
-            console.log("json response", json);
+            console.group("save_json");
+            console.log("json", json);
 
             var file_list  = json.files,
                 market_list = {},
-                lang_list   = {},
                 cat_list    = {},
                 file_tree   = {},
                 i           = file_list.length;
@@ -427,40 +453,44 @@ Kdown = function () {
                 while (i--) {
                     var f = file_list[i]; // single file
 
-                    f.safe_market = url_safe(f.market);
-                    f.safe_cat = url_safe(f.category);
+                    var safe_market = url_safe(f.market);
+                    var safe_cat = url_safe(f.category);
 
                     /***
-                     * add them all the object (overwrites if already there)
+                     * add the categorys to the list
                      */
-                    cat_list[ f.safe_cat ]       = f.category;
-                    lang_list[ f.safe_lang ]     = f.language;
-                    market_list[ f.safe_market ] = f.market;
+                    cat_list[ safe_cat ] = f.category;
 
                     /***
                      * create entrys if needed
                      */
-                    file_tree[ f.safe_market ] = file_tree[ f.safe_market ] || {};
-                    file_tree[ f.safe_market ][ f.safe_cat ] =
-                        file_tree[ f.safe_market ][ f.safe_cat ] || [];
+                    file_tree[ safe_market ] = file_tree[ safe_market ] || {};
+                    file_tree[ safe_market ][ safe_cat ] =
+                        file_tree[ safe_market ][ safe_cat ] || [];
 
                     /***
                      * add file to the tree
                      * tree -> market -> category -> file
                      */
-                    file_tree[ f.safe_market ][ f.safe_cat ].push(f);
+                    file_tree[ safe_market ][ safe_cat ].push(f);
 
-                } // end while
+                } // while()
 
                 // stick it all in the local storage
                 db.file_list.set(file_list);
-                db.market_list.set(market_list);
-                db.lang_list.set(lang_list);
                 db.cat_list.set(cat_list);
                 db.file_tree.set(file_tree);  // publishes ("ajax/load")
 
-                // set the defaults (from the hash if needed)
-                view.hash.import();
+                console.log("file_list", file_list);
+                console.log("cat_list", cat_list);
+                console.log("file_tree", file_tree);
+
+                console.groupEnd("save_json");
+
+        },
+        save_lists_json : function (json) {
+            db.market_list.set(json.markets);
+            db.lang_list.set(json.langs);
         }
     };
 
@@ -488,12 +518,10 @@ Kdown = function () {
         });
 
         bubpub.listen("list/markets", function () {
-            console.log("market_list");
             view.market_DD.populate();
         });
 
         bubpub.listen("list/cats", function () {
-            console.log("cat_list");
             view.sidebar.populate();
         });
 
@@ -502,7 +530,6 @@ Kdown = function () {
         });
 
         bubpub.listen("error/none_found", function () {
-            console.log("none_found fire");
             view.error.none_found();
         });
 
