@@ -24,14 +24,12 @@ var bubpub = {
         }
     },
     say : function (topic_str, args_obj) {
-        console.group("SAY");
+        var topics = topic_str.split(" ");
 
         // merge the two objects together
         $.extend(this.args[topic_str], args_obj );
 
-        var topics = topic_str.split(" ");
-
-        console.log("topics" , topics);
+        console.groupCollapsed("SAY" , topics);
 
         for (var i=0, l = topics.length; i < l; i++) {
             this.bubble(topics[i]);
@@ -88,7 +86,7 @@ var bubpub = {
         var que = that.que;
         that.que = [];
         that.timeout_fired = false;
-        console.group("FIRE");
+        console.group("FIRE", que);
 
         i = que.length;
 
@@ -119,7 +117,8 @@ var bubpub = {
 
                 }
             }
-            console.groupEnd("FIRE");
         }
+
+        console.groupEnd("FIRE");
     }
 };

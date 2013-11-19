@@ -19,7 +19,7 @@
                 <li id="cat_(CAT)" data-cat="(CAT)" class="cat_link" ><a href="(HREF)">(TITLE)</a></li>
             </ul>
         <ul>
-            <li id="" class="" style=""><a href="#search">Search</a></li>
+            <li id="copy-page" class="" style=""><a href="#search">Search</a></li>
         </ul>
     </div>
     <div id="main_content">

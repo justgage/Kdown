@@ -110,13 +110,13 @@ Kdown = function () {
      * holds all the information in Kojs (see above)
      */
     var db = {
-        page : new Kobj('page_change', 'cat'),        // current page
-
-        market : new Kobj('page/market', null, function (test) {
+        page : new Kobj('page', 'cat'),        // current page
+              
+        market : new Kobj('cat/market', null, function (test) {
             return test in  db.market_list.get === false;
         }),         // current market
-        cat : new Kobj('page/cat'),               // current category
-        lang : new Kobj('page/lang'),             // current translation selected (can be 'ALL')
+        cat : new Kobj('cat/cat'),               // current category
+        lang : new Kobj('cat/lang'),             // current translation selected (can be 'ALL')
         lang_count : new Kobj('lang_count'),      // each language's count [lang] => count
 
         file_list : new Kobj('list/files'),          // list of valid categories
@@ -125,6 +125,10 @@ Kdown = function () {
         lang_list : new Kobj('list/langs', {}),    // list of valid languages
 
         file_tree : new Kobj('ajax/load'), // hold the current table's JSON
+        // a list of pages that are aditional to the category ones
+        pages : {
+            all : "All Downloads"
+        },
 
         /***
          * current_file_tree
@@ -221,9 +225,22 @@ Kdown = function () {
         /***
          * the html of the copy objects used for tempesting
          */
+        page : {
+            all : function () {
+                view.error.clear();
+                $ui.table.first.show();
+                $ui.table.second.show();
+            },
+            cat : function () {
+                view.error.clear();
+                $ui.table.first.show();
+                $ui.table.second.hide();
+            }
+        },
         copy : {
             table_row : '<tr>' + $("#table_copy").html() + '</tr>',
-            page : $('#copy-cat').html() //NOTE: need to change HTML
+            cat : $('#copy-cat').html(), 
+            page : $('#copy-page').html()
         },
         hash : {
 
@@ -243,7 +260,7 @@ Kdown = function () {
                     db.market.set(hash[1]);
                     db.cat.set(hash[2]);
                     db.lang.set(hash[3]);
-                } else {
+                } else if (hash[0][0] !== "#") { 
                     
                     // Hackish way to get first element in the object
                     //      NOT the same in all browsers!!!!
@@ -328,28 +345,42 @@ Kdown = function () {
         },
         sidebar : {
             populate : function () {
-                var copy = view.copy.page,
+                var copy_cat = view.copy.cat,
+                    copy_page = view.copy.page,
+                    pages = db.pages,
                     html = "",
-                    li = "",
                     cat_list = db.cat_list.get(),
                     market = db.market.get(),
                     lang = db.lang.get();
 
                 console.assert(market !== null, "Sidebar");
 
+                var make_page = function(copy, code, href, title) {
+
+                    var li = copy;
+
+                    li = li.replace(/\(CAT\)/g, code);
+                    li = li.replace("(HREF)", href);
+                    li = li.replace("(TITLE)", title);
+
+                    return li;
+                };
+
+                // make a page for each category
                 for (var code in cat_list) {
                     if(cat_list.hasOwnProperty(code)) {
-                        var page = cat_list[code];
-                        li = copy;
-
-                        li = li.replace(/\(CAT\)/g, code);
-                        li = li.replace("(HREF)", "#cat/" + url_safe(market) + "/" + code + "/" + lang);
-                        li = li.replace("(TITLE)", page);
-
-
-                        html += li;
+                        var cat_name = cat_list[code];
+                        html += make_page(copy_cat, code, "#cat/" + market + "/" + code + "/" + lang, cat_name);
                     }
-                }
+                 }
+
+                 // add all other pages
+                 for (var page_code in pages) {
+                     if(pages.hasOwnProperty(page_code)) {
+                         var page_name = pages[page_code];
+                        html += make_page(copy_cat, page_code, "#page/" + page_code, page_name);
+                     }
+                 }
 
                 //set the sidebar
                 $ui.sidebar.ul.html(html);
@@ -562,7 +593,7 @@ Kdown = function () {
      */
     var start = function () {
 
-        bubpub.listen("page", function () {
+        bubpub.listen("cat", function () {
             console.log("Page Change: ", db.cat.get(), db.market.get());
             var file_list = db.current_file_tree(); 
             var lang_list = db.current_lang_list(); 
@@ -579,12 +610,12 @@ Kdown = function () {
 
         });
 
-        bubpub.listen("page/market page/lang", function () {
-            view.sidebar.populate();
+        bubpub.listen("cat/market cat/lang", function () {
+            bubpub.say("sidebar/update");
             bubpub.say("hash/export");
         });
 
-        bubpub.listen("page/market", function () {
+        bubpub.listen("cat/market", function () {
             var lang = db.lang.get();
 
             // check if new market has current lang
@@ -594,7 +625,17 @@ Kdown = function () {
             view.market_DD.update();
         });
 
-        bubpub.listen("page/cat", function () {
+        bubpub.listen("page", function () {
+            var page = db.page.get();
+            if (page === "cat") {
+                view.page.cat();
+            } else if (page === "all") {
+                view.page.all();
+            }
+              
+        });
+
+        bubpub.listen("cat/cat", function () {
             view.sidebar.set_current();
         });
 
@@ -603,7 +644,7 @@ Kdown = function () {
         });
 
         bubpub.listen("list/cats", function () {
-            view.sidebar.populate();
+            bubpub.say("sidebar/update");
         });
 
         bubpub.listen("error/clear", function () {
@@ -620,6 +661,10 @@ Kdown = function () {
 
         bubpub.listen("hash/import", function () {
             view.hash.url_import();
+        });
+
+        bubpub.listen("sidebar/update", function () {
+            view.sidebar.populate();
         });
 
         /***
