@@ -30,7 +30,7 @@
                 <div class="search_round">
                     <input type="text" name="dl_search" id="dl_search_box" value="" />
                     <!-- Translate the "SEARCH" below -->
-                    <input id="search_go" type="submit" value="SEARCH" />
+                    <input id="search_go" type="submit" value="GO" />
                 </div>
             </form>
         </div>

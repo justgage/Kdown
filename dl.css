@@ -13,8 +13,6 @@
 
 .search_round {
 	border: solid 1px #C0C0C0;
-	border-radius: 30px;
-
 	-webkit-background-clip: padding-box;
 	-moz-background-clip: padding-box;
 	background-clip: padding-box;
@@ -46,19 +44,18 @@
 
 #search_go {
 	font-size: 12px;
-	color: #0D5200;
+	color: #FFF;
 	height: 30px;
 	padding: 0 10px;
 	margin: 0;
 	border: 0;
-	background-color: #5BC938;
-	border-radius: 0 30px 30px 0;
+	background-color: #7098D3;
 	overflow: hidden;
-	background-image: url(files/download_bg.png);
+
 }
 
 #search_go:hover {
-	background-color: #68E73F;
+	background-color: #1C467F;
 }
 
 #search_go:active {
