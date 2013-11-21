@@ -111,7 +111,7 @@ Kdown = function () {
      */
     var db = {
         page : new Kobj('page', 'cat'),        // current page
-              
+
         market : new Kobj('cat/market', null, function (test) {
             return test in  db.market_list.get === false;
         }),         // current market
@@ -210,7 +210,7 @@ Kdown = function () {
     /***
      * url_safe - escape strings for the URL
      *
-     * @arg {string} undsafe string to make URL safe
+     * @arg {string} unsafe string to make URL safe
      * @return {string} string with all spaces and non 
      *                  alpha-numeric characters turned to a '-'
      */ 
@@ -243,12 +243,15 @@ Kdown = function () {
             page : $('#copy-page').html()
         },
         hash : {
-
             /***
              * get out of the hash
              */
             url_import : function () {
                 var hash = window.location.hash;
+                
+                if (hash.indexOf('null') === -1) {
+                    hash = "";
+                }
 
                 hash = hash.split('/');
 
@@ -256,11 +259,12 @@ Kdown = function () {
 
                 db.page.set(page);
 
+
                 if (page === "cat") {
                     db.market.set(hash[1]);
                     db.cat.set(hash[2]);
                     db.lang.set(hash[3]);
-                } else if (hash[0][0] !== "#") { 
+                } else if (hash[0][0] !== "#" || hash.indexOf('null') > 0) { 
                     
                     // Hackish way to get first element in the object
                     //      NOT the same in all browsers!!!!
@@ -615,6 +619,10 @@ Kdown = function () {
             bubpub.say("hash/export");
         });
 
+        bubpub.listen("sidebar/update", function () {
+            view.sidebar.populate();
+        });
+
         bubpub.listen("cat/market", function () {
             var lang = db.lang.get();
 
@@ -663,9 +671,6 @@ Kdown = function () {
             view.hash.url_import();
         });
 
-        bubpub.listen("sidebar/update", function () {
-            view.sidebar.populate();
-        });
 
         /***
          * Bind events to the DOM
@@ -679,8 +684,9 @@ Kdown = function () {
             db.lang.set(lang);
         });
 
+        // NOTE: hash only should work. 
         $ui.sidebar.ul.on('click', 'a', function () {
-            db.cat.set( $(this).parent().data('cat') );
+            //db.cat.set( $(this).parent().data('cat') );
         });
 
         $(window).bind('hashchange', function () {
