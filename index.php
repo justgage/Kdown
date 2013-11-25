@@ -19,7 +19,7 @@
                 <li id="cat_(CAT)" data-cat="(CAT)" class="cat_link" ><a href="(HREF)">(TITLE)</a></li>
             </ul>
         <ul>
-            <li id="" class="" style=""><a href="#search">Search</a></li>
+            <li id="copy-page" class="" style=""><a href="#search">Search</a></li>
         </ul>
     </div>
     <div id="main_content">
@@ -30,7 +30,7 @@
                 <div class="search_round">
                     <input type="text" name="dl_search" id="dl_search_box" value="" />
                     <!-- Translate the "SEARCH" below -->
-                    <input id="search_go" type="submit" value="SEARCH" />
+                    <input id="search_go" type="submit" value="GO" />
                 </div>
             </form>
         </div>
@@ -88,18 +88,15 @@
 
 <script type="text/javascript" charset="utf-8">
 <?php 
-//combine all the js files;
+    //combine all the js files;
    include 'files/jquery.min.js';
-   include 'files/time.js';
-   include 'router.js';
-   include 'klog.js';
-   //include 'downloads.js';
+   include 'console_fix.js';
 ?>
 </script>
 
-<script src="Kdown.js" type="text/javascript" charset="utf-8">
+<script src="bubpub/bubpub.js" type="text/javascript" charset="utf-8"> </script>
+<script src="kdown.js" type="text/javascript" charset="utf-8"> </script>
    
-</script>
 
 </body>
 </html>
