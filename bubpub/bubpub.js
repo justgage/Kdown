@@ -86,7 +86,7 @@ var bubpub = {
         var que = that.que;
         that.que = [];
         that.timeout_fired = false;
-        console.group("FIRE", que);
+        console.group("FIRE");
 
         i = que.length;
 
