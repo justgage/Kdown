@@ -12,45 +12,45 @@ Kdown = function () {
         MY_LANG = 'en',
         MY_MARKET = 'usa-can',
         MY_CAT = null,
-        API_URL = "files/dream_api.php",
-        NAMES_URL = "files/market_lang.json";
+        API_URL = 'files/dream_api.php',
+        NAMES_URL = 'files/market_lang.json';
 
     /***
      * UI handlers
      */
     var $ui = {
         table: {
-            all : $('.dl_table'),
+            all : $('#dl_table_all'),
             first : $('#dl_table_first'),
-            first_body : $("#dl_table_first").find("tbody"),
+            first_body : $('#dl_table_first').find('tbody'),
             second : $('#dl_table_second'),
-            second_body : $("#dl_table_second").find("tbody")
+            second_body : $('#dl_table_second').find('tbody')
         },
         error : {
-            loading : $("#dl_loading"),
-            ajax : $("#ajax_error"),
+            loading : $('#dl_loading'),
+            ajax : $('#ajax_error'),
             none_found : $('#none_found')
         },
         DD : {
             market : $('#market_select'),
-            lang : $("#lang_select")
+            lang : $('#lang_select')
         },
         sidebar: {
             ul: $('#vertical_nav ul'),
-            current_class : ".current_page_item",
-            cats : $(".cat_link"),
-            cat_links : $(".cat_link a")
+            current_class : '.current_page_item',
+            cats : $('.cat_link'),
+            cat_links : $('.cat_link a')
         }
     };
 
     /***
      * an object that publishes events when it changes
      *
-     * also has abilithy to have a validator funciton passed
+     * also has ability to have a validator function passed
      * in to test if the input is valid or not. 
      *
      * @arg  {string} publish_name 
-     * a string of a publishing name, which can be namespaced like so
+     * a string of a publishing name, which can be name spaced like so
      *  
      */
     var Kobj = function (publish_name, preset, validator) {
@@ -75,12 +75,12 @@ Kdown = function () {
             if (validator === null || validator(new_val) === true) {
                 // make sure we're changing it
                 if (value !== new_val) {
-                    console.trace("SET" ,value, "-> " + publish_name + " ->", new_val);
+                    console.log('SET' ,value, '-> ' + publish_name + ' ->', new_val);
                     value = new_val;
                     bubpub.say(publish_name);
                 } 
             } else {
-                console.error(publish_name, " trying to set to ", new_val);
+                console.error(publish_name, ' trying to set to ', new_val);
             }
         };
 
@@ -88,7 +88,7 @@ Kdown = function () {
             // GET
             if (typeof new_val === 'undefined') {
                 if (value === null) {
-                    console.error(publish_name + " returning NULL");
+                    console.error(publish_name + ' returning NULL');
                 }
                 return value; // get 
             } else {
@@ -100,7 +100,7 @@ Kdown = function () {
     };
 
     /***
-     * holds all the information in Kojs (see above)
+     * holds all the information in kobjs (see above)
      */
     var db = {
         page : new Kobj('page', 'cat'),                   // current page
@@ -124,7 +124,7 @@ Kdown = function () {
         file_tree : new Kobj('ajax/load'),                // hold the current table's JSON
 
         pages : {
-            all : "All Downloads"
+            all : 'All Downloads'
         },
 
         /***
@@ -165,7 +165,7 @@ Kdown = function () {
          */
         current_lang_count : function (tree) {
 
-            tree = tree ||  this.current_file_tree('all');
+            tree = tree || this.current_file_tree('all');
 
             var lang_count = {},
                 i = tree.length;
@@ -197,7 +197,7 @@ Kdown = function () {
             return current;
         }, 
         set_defaults : function () {
-            console.groupCollapsed("DEFAULTS");
+            console.groupCollapsed('DEFAULTS');
             if (this.market() === null) {
                 this.market(MY_MARKET);
             }
@@ -209,7 +209,7 @@ Kdown = function () {
             if (this.lang() === null) {
                 this.lang(MY_LANG);
             }
-            console.groupEnd("DEFAULTS");
+            console.groupEnd('DEFAULTS');
         }
     };
     /***
@@ -243,7 +243,7 @@ Kdown = function () {
             }
         },
         copy : {
-            table_row : '<tr>' + $("#table_copy").html() + '</tr>',
+            table_row : '<tr>' + $('#table_copy').html() + '</tr>',
             cat : $('#copy-cat').html(), 
             page : $('#copy-page').html()
         },
@@ -254,13 +254,13 @@ Kdown = function () {
             url_import : function () {
                 var hash_str = window.location.hash;
 
-                if (hash_str === "") {
+                if (hash_str === '') {
                     return null;
                 }
                 
                 // if anything is null. 
                 if (hash_str.indexOf('null') !== -1) {
-                    hash_str = "#cat";
+                    hash_str = '#cat';
                 }
 
                 var hash = hash_str.split('/');
@@ -273,23 +273,18 @@ Kdown = function () {
                     db.cat(hash[2]);
                     db.lang(hash[3]);
                 }
-
-                if (page === 'page') {
-                    bubpub.say( hash_str.slice(1) );
-                }
-
             },
             /***
              * export data to the hash
              */
             url_export : function () {
                 var page = db.page();
-                var hash = "#" + page;
+                var hash = '#' + page;
 
-                if (page === "cat") {
-                    hash += "/" + db.market();
-                    hash += "/" + db.cat();
-                    hash += "/" + db.lang();
+                if (page === 'cat') {
+                    hash += '/' + db.market();
+                    hash += '/' + db.cat();
+                    hash += '/' + db.lang();
                 }
 
                 window.location.hash = hash;
@@ -298,7 +293,7 @@ Kdown = function () {
         table : {
             populate : function(file_list, lang_list) {
 
-                var table_html = "";
+                var table_html = '';
                 var copy = view.copy.table_row;
                 var row = copy;
                 var lang = db.lang();
@@ -310,10 +305,10 @@ Kdown = function () {
                     row = copy;
 
                     // Tempating
-                    row = row.replace("(HEART_URL)", '#');
-                    row = row.replace("(NAME)", file.name);
-                    row = row.replace("(FILE_LINK)", 'single.php?id=' + file.id);
-                    row = row.replace("(LANG)", lang_list[file.language]);
+                    row = row.replace('(HEART_URL)', '#');
+                    row = row.replace('(NAME)', file.name);
+                    row = row.replace('(FILE_LINK)', 'single.php?id=' + file.id);
+                    row = row.replace('(LANG)', lang_list[file.language]);
 
                     table_html += row;
                 }
@@ -352,7 +347,7 @@ Kdown = function () {
             populate : function () {
                 var copy_cat = view.copy.cat,
                     pages = db.pages,
-                    html = "",
+                    html = '',
                     cat_list = db.cat_list();
 
                 var make_page = function(copy, code, href, title, page) {
@@ -361,8 +356,8 @@ Kdown = function () {
 
                     li = li.replace(/\(PAGE\)/g, page);
                     li = li.replace(/\(CAT\)/g, code);
-                    li = li.replace("(HREF)", href);
-                    li = li.replace("(TITLE)", title);
+                    li = li.replace('(HREF)', href);
+                    li = li.replace('(TITLE)', title);
 
                     return li;
                 };
@@ -371,7 +366,7 @@ Kdown = function () {
                 for (var code in cat_list) {
                     if(cat_list.hasOwnProperty(code)) {
                         var cat_name = cat_list[code];
-                        html += make_page(copy_cat, code, "#", cat_name, "cat");
+                        html += make_page(copy_cat, code, '#', cat_name, 'cat');
                     }
                  }
 
@@ -379,7 +374,7 @@ Kdown = function () {
                  for (var page_code in pages) {
                      if(pages.hasOwnProperty(page_code)) {
                          var page_name = pages[page_code];
-                        html += make_page(copy_cat, page_code, "#", page_name, "page");
+                        html += make_page(copy_cat, page_code, '#', page_name, 'page');
                      }
                  }
 
@@ -394,7 +389,7 @@ Kdown = function () {
                     removeClass($ui.sidebar.current_class.slice(1));
 
                 //change to the new one
-                sidebar.ul.find( "#" + db.page() + "_" + db.cat() ).
+                sidebar.ul.find( '#' + db.page() + '_' + db.cat() ).
                     addClass(sidebar.current_class.slice(1));
             }
         },
@@ -405,8 +400,8 @@ Kdown = function () {
                 var temp = '<option value="(CODE)">(NAME)</option>';
                 for (var item in list) {
                     if(list.hasOwnProperty(item)) {
-                        var option = temp.replace("(NAME)", list[item]);
-                        option = option.replace("(CODE)", item);
+                        var option = temp.replace('(NAME)', list[item]);
+                        option = option.replace('(CODE)', item);
                         html += option;
                     }
                 }
@@ -427,7 +422,7 @@ Kdown = function () {
                 var option = temp.replace("(VAL)", 'all');
 
                 //add the all option at the top
-                option = option.replace("(NAME)", "All" );
+                option = option.replace("(NAME)", 'All' );
                 html += option;
 
                 // add each lang to the drop down HTML
@@ -451,13 +446,13 @@ Kdown = function () {
             spaces_align : function (col1, col2) {
                 var padding = 4,
                     spaces = [];
-                col1 = col1 + "";
-                col2 = col2 + "";
+                col1 = col1 + '';
+                col2 = col2 + '';
 
                 for (var ii = 0, l = padding - col1.length; ii< l; ii++) {
-                    spaces.push("\u00A0");  //this is the char for a non-breaking space
+                    spaces.push('\u00A0');  //this is the char for a non-breaking space
                 }
-                return  col1 + spaces.join(" ") + col2;
+                return  col1 + spaces.join(' ') + col2;
             }
         },
         error: {
@@ -508,13 +503,13 @@ Kdown = function () {
 
             // If either Error out: 
             lists_promise.fail(function (code) {
-                console.log("FAIL", code);
-                bubpub.say("ajax/fail");
+                console.log('FAIL', code);
+                bubpub.say('ajax/fail');
             });
 
             promise.fail(function (code) {
-                console.log("FAIL", code);
-                bubpub.say("ajax/fail");
+                console.log('FAIL', code);
+                bubpub.say('ajax/fail');
             });
 
         },
@@ -524,7 +519,7 @@ Kdown = function () {
          */
         save_json : function (json) {
 
-            console.group("save_json");
+            console.group('save_json');
 
             var file_list  = json.files,
                 market_list = {},
@@ -562,7 +557,7 @@ Kdown = function () {
                 // stick it all in the local storage
                 db.file_list(file_list);
                 db.cat_list(cat_list);
-                db.file_tree(file_tree);  // publishes ("ajax/load")
+                db.file_tree(file_tree);  // publishes ('ajax/load')
 
                 // set default cat
                 for (var def_cat in cat_list) break;
@@ -570,19 +565,19 @@ Kdown = function () {
 
                 db.set_defaults();
 
-                console.groupEnd("save_json");
+                console.groupEnd('save_json');
 
         },
         /***
          * Save all list from market_lang.json
          */
         save_lists_json : function (json) {
-            console.group("save_lists_json");
+            console.group('save_lists_json');
 
             db.market_list(json.markets);
             db.lang_list(json.langs);
 
-            console.groupEnd("save_lists_json");
+            console.groupEnd('save_lists_json');
         }
     };
 
@@ -591,28 +586,28 @@ Kdown = function () {
      */
     var start = function () {
 
-        bubpub.listen("cat", function cat_change() {
-            console.log("Page Change: ", db.cat(), db.market());
+        bubpub.listen('cat', function cat_change() {
+            console.log('cat page change: ', db.cat(), db.market(), db.lang());
             var file_list = db.current_file_tree(); 
             var lang_list = db.current_lang_list(); 
 
                 view.lang_DD.populate();
             // check if file list exists
             if (file_list.length !== 0) { //yes files
-                bubpub.say("error/clear");
+                bubpub.say('error/clear');
                 view.table.populate(file_list, lang_list);
 
             } else { //no files
-                bubpub.say("error/none_found");
+                bubpub.say('error/none_found');
             }
 
         });
 
-        bubpub.listen("sidebar/populate", function sidebar_populate() {
+        bubpub.listen('sidebar/populate', function sidebar_populate() {
             view.sidebar.populate();
         });
 
-        bubpub.listen("cat/market", function market_change() {
+        bubpub.listen('cat/market', function market_change() {
             var lang = db.lang();
 
             // check if new market has current lang
@@ -622,41 +617,41 @@ Kdown = function () {
             view.market_DD.update();
         });
 
-        bubpub.listen("page", function page_change() {
+        bubpub.listen('page', function page_change() {
             var page = db.page();
-            if (page === "cat") {
+            if (page === 'cat') {
                 view.page.cat();
-            } else if (page === "all") {
+            } else if (page === 'all') {
                 view.page.all();
             }
               
         });
 
-        bubpub.listen("cat/cat", function cat_change() {
+        bubpub.listen('cat/cat', function cat_change() {
             view.sidebar.set_current();
         });
 
-        bubpub.listen("list/markets", function market_list_change() {
+        bubpub.listen('list/markets', function market_list_change() {
             view.market_DD.populate();
         });
 
-        bubpub.listen("list/cats", function cat_list_change() {
-            bubpub.say("sidebar/populate");
+        bubpub.listen('list/cats', function cat_list_change() {
+            bubpub.say('sidebar/populate');
         });
 
-        bubpub.listen("error/clear", function error_clear() {
+        bubpub.listen('error/clear', function error_clear() {
             view.error.clear();
         });
 
-        bubpub.listen("error/none_found", function none_found() {
+        bubpub.listen('error/none_found', function none_found() {
             view.error.none_found();
         });
 
-        bubpub.listen("hash/export", function hash_export() {
+        bubpub.listen('hash/export', function hash_export() {
             view.hash.url_export();
         });
 
-        bubpub.listen("hash/import", function hash_import() {
+        bubpub.listen('hash/import', function hash_import() {
             view.hash.url_import();
 
             if ( db.market() === null ) {
@@ -679,32 +674,40 @@ Kdown = function () {
          */
         $ui.DD.market.change(function market_DD_change() {
             db.market( $(this).val() );
-            bubpub.say("hash/export");
+            bubpub.say('hash/export');
         });
 
         $ui.DD.lang.change(function lang_DD_change() {
             db.lang( $(this).val() );
-            bubpub.say("hash/export");
+            bubpub.say('hash/export');
         });
 
-        // NOTE: hash only should work. 
         $ui.sidebar.ul.on('click', 'a', function (e) {
+            e.preventDefault(); // stop hash change
+
             var $this = $(this).parent();
             var current = $ui.sidebar.current_class;
-            var page = $this.data("page");
+            var page = $this.data('page');
 
-            if (page === "cat") {
-                db.cat( $this.data("cat") );
+            db.page(page);
+
+            if (page === 'cat') {
+                db.cat( $this.data('cat') );
             }
 
-            console.log("click", page);
+            if (page === 'page') {
+                db.page( $this.data('cat') );
+            }
+
+
+            console.log('click', page);
 
             // change current visually
             $(current).removeClass(current.slice(1));
             $(this).parent().addClass(current.slice(1));
 
-            e.preventDefault(); // stop hash change
-            bubpub.say("hash/export");
+
+            bubpub.say('hash/export');
 
         });
 
@@ -717,11 +720,11 @@ Kdown = function () {
     };
 
     return {
-        "start" : start,
-        "view" : view,
-        "db" : db,
-        "$ui" : $ui,
-        "server" : server
+        'start' : start,
+        'view' : view,
+        'db' : db,
+        '$ui' : $ui,
+        'server' : server
     };
 };
 

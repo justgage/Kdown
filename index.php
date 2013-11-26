@@ -35,49 +35,71 @@
             <h1>Downloads</h1>
 
             <div id="dl_controls">
-
                 <span>Market</span>
                 <select name="market" id="market_select"> </select>
 
-                <span>Translations</span>
+                <span>Languages</span>
                 <select name="market" id="lang_select"> </select>
-
             </div>
 
             <div id="ajax_error" style="display:none;" >
-                Sorry there was an error loading the page! click a category to your left or refresh the page. 
-<a href="#reload" id="reload_img"> <img src="files/reload.png" alt="Reload" /> </a>
-
+                Sorry there was an error loading the page! Click a category to your left or refresh the page. 
+                <a href="#reload" id="reload_img"> <img src="files/reload.png" alt="Reload" /> </a>
             </div>
+
             <div id="dl_loading" style="display:none;" >
                 <img alt="" src="files/AjaxLoader.gif" />
                 <!-- this can contain text for clarity -->
             </div>
             <h3 style="display:none; text-align:center;" id="none_found">Sorry, no files where found.</h3>
-            <div id="dl_table_first" class="dl_table" >
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Fav</th>
-                            <th>File name</th>
-                            <th>Languages</th>
-                            <th>Download</th>
+            <div id="dl_table_all">
+                <div id="dl_table_first" class="dl_table" >
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fav</th>
+                                <th>File name</th>
+                                <th>Languages</th>
+                                <th>Download</th>
+                            </tr>
+                        </thead>
+                        <!-- this is a template for the table, it will be changed on execution -->
+                        <tbody>
+                        <tr style="display:none;" id="table_copy">
+                            <td class="table_fav"><a href="(HEART_URL)"></a></td>
+                            <td class="table_name"><a href="(FILE_LINK)">(NAME)</a></td>
+                            <td class="table_lang">(LANG)</td>
+                            <td class="table_dl_link"><a href="(DL_LINK)">Download</a></td>
                         </tr>
-                    </thead>
-                    <!-- this is a template for the table, it will be changed on execution -->
-                    <tbody>
-                    <tr style="display:none;" id="table_copy">
-                        <td class="table_fav"><a href="(HEART_URL)"></a></td>
-                        <td class="table_name"><a href="(FILE_LINK)">(NAME)</a></td>
-                        <td class="table_lang">(LANG)</td>
-                        <td class="table_dl_link"><a href="(DL_LINK)">Download</a></td>
-                    </tr>
-                    </tbody>
-                </table>
-                <h3><a id="to_top">Back to top</a></h3>
+                        </tbody>
+                    </table>
+                </div>
+    
+                <div id="dl_table_second" class="dl_table" style="display:none;">
+                <h3>Other Markets and Languages</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fav</th>
+                                <th>File name</th>
+                                <th>Languages</th>
+                                <th>Market</th>
+                                <th>Download</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <tr style="display:none;" id="table_copy">
+                            <td class="table_fav"><a href="(HEART_URL)"></a></td>
+                            <td class="table_name"><a href="(FILE_LINK)">(NAME)</a></td>
+                            <td class="table_lang">(LANG)</td>
+                            <td class="table_market">(MARKET)</td>
+                            <td class="table_dl_link"><a href="(DL_LINK)">Download</a></td>
+                        </tr>
+                        </tbody>
+                    </table>
             </div>
-
-
+            </div>
+                <h3><a id="to_top">Back to top</a></h3>
         </div>
     </div>
     <br style="clear:both;" />
