@@ -123,10 +123,11 @@ Kdown = function () {
         lang_count : new Kobj('lang_count'),              // each language's count [lang] => count
         file_tree : new Kobj('ajax/load'),                // hold the current table's JSON
 
+        search : new Kobj('search'),
+
         pages : {
             all : 'All Downloads'
         },
-
         /***
          * current_file_tree
          *
@@ -304,7 +305,7 @@ Kdown = function () {
 
                     row = copy;
 
-                    // Tempating
+                    // Tempting
                     row = row.replace('(HEART_URL)', '#');
                     row = row.replace('(NAME)', file.name);
                     row = row.replace('(FILE_LINK)', 'single.php?id=' + file.id);
@@ -341,6 +342,33 @@ Kdown = function () {
                 }
 
                 return num_found > 0;
+            },
+            /***
+             * Search all the file in the data base
+             */
+            search : function (search_str) {
+                search_str = search_str || db.search();
+
+                var json = db.file_list(),
+                    main_list = [],
+                    other_list = [],
+                    market = db.market(),
+                    lang = db.lang();
+
+                if (search_str === "") {
+                    table.populate(json);
+                } else {
+                    for (var i=0, l = json.length; i < l; i++) {
+                        var file = json[i];
+
+                        if (file.title.indexOf(search_str) > 0) {
+                            if (file.market === market && file.lang === lang) {
+                                main_list.push(f);
+                            }
+                        }
+
+                    }
+                }
             }
         },
         sidebar : {
@@ -623,6 +651,7 @@ Kdown = function () {
                 view.page.cat();
             } else if (page === 'all') {
                 view.page.all();
+                view.table.search();
             }
               
         });
