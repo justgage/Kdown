@@ -21,11 +21,11 @@
     </div>
     <div id="main_content">
         <div id="dl_search">
-            <form action="search.html" method="get" accept-charset="utf-8">
+            <form id="dl_search_form" action="search.html" method="get" accept-charset="utf-8">
 
                 <!-- <a href="search.html">Search</a> -->
                 <div class="search_round">
-                    <input type="text" name="dl_search" id="dl_search_box" value="" />
+                    <input type="text" placeholder="Search" name="dl_search" id="dl_search_box" value="" />
                     <!-- Translate the "SEARCH" below -->
                     <input id="search_go" type="submit" value="GO" />
                 </div>
@@ -88,7 +88,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                        <tr style="display:none;" id="table_copy">
+                        <tr style="display:none;" id="table_copy_second">
                             <td class="table_fav"><a href="(HEART_URL)"></a></td>
                             <td class="table_name"><a href="(FILE_LINK)">(NAME)</a></td>
                             <td class="table_lang">(LANG)</td>
