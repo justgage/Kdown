@@ -79,6 +79,14 @@
                         </tbody>
                     </table>
                 </div>
+                <div style="display:none; text-align:center;" id="none_found_first">
+                    <h3>
+                        Sorry, no files where found in this market or language.
+                    </h3>
+                    <em>
+                        see below for more options.
+                    </em>
+                </div> 
                 <br />
 
                 <div id="dl_table_second" class="dl_table" style="display:none;">
@@ -102,8 +110,18 @@
                         </tbody>
                     </table>
                 </div>
+                <div style="display:none; text-align:center;" id="none_found_second">
+                    <h3>
+                        Sorry, no files where found in all other markets and languages
+                    </h3>
+                    <em>
+                        Please try a different search.
+                    </em>
+                </div> 
 
             </div>
+
+
 
             <h3><a id="to_top">Back to top</a></h3>
         </div>

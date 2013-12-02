@@ -28,7 +28,9 @@ Kdown = function () {
         error : {
             loading : $('#dl_loading'),
             ajax : $('#ajax_error'),
-            none_found : $('#none_found')
+            none_found : $('#none_found'),
+            none_found_first : $('#none_found_first'),
+            none_found_second : $('#none_found_second')
         },
         DD : {
             market : $('#market_select'),
@@ -363,7 +365,7 @@ Kdown = function () {
                 return num_found > 0;
             },
             /***
-             * Search all the file in the data base
+             * Search all the file in the database
              */
             search : function (search_str) {
                 search_str = search_str || db.search();
@@ -382,7 +384,8 @@ Kdown = function () {
                 for (var i=0, l = json.length; i < l; i++) {
                     var file = json[i];
 
-                    if (search_str === "" || file.name.toLowerCase().indexOf(search_str) !== -1) {
+                    if (search_str === "" ||
+                        file.name.toLowerCase().indexOf(search_str) !== -1) {
 
                         if (file.market === market && ('all' === lang || file.language === lang)) {
                             console.log("main_list", file);
@@ -394,7 +397,6 @@ Kdown = function () {
                         }
 
                         lang_count[file.language] = ++lang_count[file.language] || 1;
-                        console.log(lang_count);
                     }
 
                 }
@@ -402,9 +404,24 @@ Kdown = function () {
                 console.log(lang_count);
                 console.groupEnd("Search");
 
+                if (main_list.length > 0) {
+                    console.log('main list found');
+                    view.table.populate(main_list);
+                    view.error.found_first();
+                } else {
+                    console.log('main list NONE found');
+                    view.error.none_found_first();
+                }
 
-                view.table.populate(main_list);
-                view.table.populate(other_list, null, 2);
+                if (other_list.length > 0) {
+                    console.log('other list found');
+                    view.table.populate(other_list, null, 2);
+                    view.error.found_second();
+                } else {
+                    console.log('other list NONE found');
+                    view.error.none_found_second();
+                }
+
                 view.lang_DD.populate(lang_count);
 
             }
@@ -544,6 +561,22 @@ Kdown = function () {
             none_found : function () {
                 this.hide_all();
                 $ui.error.none_found.show();
+            },
+            found_first : function () {
+                $ui.table.first.show();
+                $ui.error.none_found_first.hide();
+            },
+            found_second : function () {
+                $ui.table.second.show();
+                $ui.error.none_found_second.hide();
+            },
+            none_found_first : function () {
+                $ui.table.first.hide();
+                $ui.error.none_found_first.show();
+            },
+            none_found_second : function () {
+                $ui.table.second.hide();
+                $ui.error.none_found_second.show();
             },
             clear : function () {
                 this.hide_all();
