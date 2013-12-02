@@ -5,7 +5,7 @@
 Kdown = function () {
     "use strict";
     /***
-     * config
+     * config constants
      */
     var LOGGING = false,
         MY_LANG = 'en',
@@ -236,12 +236,12 @@ Kdown = function () {
         page : {
             all : function () {
                 view.error.clear();
-                $ui.table.first.show();
-                $ui.table.second.show();
+                $ui.table.first.fadeIn();
+                $ui.table.second.fadeIn();
             },
             cat : function () {
                 view.error.clear();
-                $ui.table.first.show();
+                $ui.table.first.fadeIn();
                 $ui.table.second.hide();
             }
         },
@@ -368,32 +368,42 @@ Kdown = function () {
                 search_str = search_str.toLowerCase();
 
                 var json = db.file_list(),
-                main_list = [],
-                other_list = [],
-                market = db.market(),
-                lang = db.lang();
+                    main_list = [],
+                    other_list = [],
+                    market = db.market(),
+                    lang = db.lang(),
+                    lang_count = {};
+
+                console.groupCollapsed("Search");
 
 
                 for (var i=0, l = json.length; i < l; i++) {
                     var file = json[i];
 
                     if (search_str === "" || file.name.toLowerCase().indexOf(search_str) !== -1) {
-                        console.log(file.market, market);
-                        console.log(file.language, lang);
 
                         if (file.market === market && ('all' === lang || file.language === lang)) {
                             console.log("main_list", file);
                             main_list.push(file);
+
                         } else {
                             console.log("other_list", file);
                             other_list.push(file);
                         }
+
+                        lang_count[file.language] = ++lang_count[file.language] || 1;
+                        console.log(lang_count);
                     }
 
                 }
 
+                console.log(lang_count);
+                console.groupEnd("Search");
+
+
                 view.table.populate(main_list);
                 view.table.populate(other_list, null, 2);
+                view.lang_DD.populate(lang_count);
 
             }
         },
@@ -529,7 +539,7 @@ Kdown = function () {
             },
             clear : function () {
                 this.hide_all();
-                $ui.table.all.show();
+                $ui.table.all.fadeIn();
             },
             loading : function () {
                 this.hide_all();
@@ -642,12 +652,13 @@ Kdown = function () {
 
         bubpub.listen('cat search', function cat_change() {
             console.log('cat page change: ', db.cat(), db.market(), db.lang());
-            var file_list = db.current_file_tree();
-            var lang_list = db.current_lang_list();
 
-            view.lang_DD.populate();
             // check if file list exists
             if (db.page() === 'cat') {
+                var file_list = db.current_file_tree();
+                var lang_list = db.current_lang_list();
+                view.lang_DD.populate();
+
                 if (file_list.length !== 0) { //yes files
                     bubpub.say('error/clear');
                     view.table.populate(file_list, lang_list);
@@ -655,7 +666,8 @@ Kdown = function () {
                 } else { //no files
                     bubpub.say('error/none_found');
                 }
-            } else {
+
+            } else {  // search
                 view.table.search();
             }
 
@@ -676,6 +688,7 @@ Kdown = function () {
         });
 
         bubpub.listen('page', function page_change() {
+
             var page = db.page();
             if (page === 'cat') {
                 view.page.cat();
@@ -736,6 +749,7 @@ Kdown = function () {
             var search_str = $('#dl_search_box').val();
             console.log("searching for...", search_str);
             db.search(search_str);
+            db.page("all");
 
         });
 
@@ -760,12 +774,13 @@ Kdown = function () {
 
             if (page === 'cat') {
                 db.cat( $this.data('cat') );
+                // make sure to fire even if it doesn't change
+                bubpub.say('cat'); 
             }
 
             if (page === 'page') {
                 db.page( $this.data('cat') );
             }
-
 
             console.log('click', page);
 

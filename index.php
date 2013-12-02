@@ -51,36 +51,39 @@
                 <img alt="" src="files/AjaxLoader.gif" />
                 <!-- this can contain text for clarity -->
             </div>
-            <h3 style="display:none; text-align:center;" id="none_found">Sorry, no files where found.</h3>
+            <div style="display:none; text-align:center;" id="none_found">
+                <h3>
+                    Sorry, no files where found in this category, language and market.
+                </h3>
+                Please try a different category or expanding your options.
+            </div> 
+
             <div id="dl_table_all">
                 <div id="dl_table_first" class="dl_table" >
                     <table>
                         <thead>
                             <tr>
-                                <th>Fav</th>
                                 <th>File name</th>
                                 <th>Languages</th>
                                 <th>Download</th>
                             </tr>
                         </thead>
-                        <!-- this is a template for the table, it will be changed on execution -->
                         <tbody>
-                        <tr style="display:none;" id="table_copy">
-                            <td class="table_fav"><a href="(HEART_URL)"></a></td>
-                            <td class="table_name"><a href="(FILE_LINK)">(NAME)</a></td>
-                            <td class="table_lang">(LANG)</td>
-                            <td class="table_dl_link"><a href="(DL_LINK)">Download</a></td>
-                        </tr>
+                            <tr style="display:none;" id="table_copy">
+                                <td class="table_name"><a href="(FILE_LINK)">(NAME)</a></td>
+                                <td class="table_lang">(LANG)</td>
+                                <td class="table_dl_link"><a href="(DL_LINK)">Download</a></td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
-    
+                <br />
+
                 <div id="dl_table_second" class="dl_table" style="display:none;">
-                <h3>Other Markets and Languages</h3>
+                    <h3>Other Markets and Languages</h3>
                     <table>
                         <thead>
                             <tr>
-                                <th>Fav</th>
                                 <th>File name</th>
                                 <th>Languages</th>
                                 <th>Market</th>
@@ -88,34 +91,35 @@
                             </tr>
                         </thead>
                         <tbody>
-                        <tr style="display:none;" id="table_copy_second">
-                            <td class="table_fav"><a href="(HEART_URL)"></a></td>
-                            <td class="table_name"><a href="(FILE_LINK)">(NAME)</a></td>
-                            <td class="table_lang">(LANG)</td>
-                            <td class="table_market">(MARKET)</td>
-                            <td class="table_dl_link"><a href="(DL_LINK)">Download</a></td>
-                        </tr>
+                            <tr style="display:none;" id="table_copy_second">
+                                <td class="table_name"><a href="(FILE_LINK)">(NAME)</a></td>
+                                <td class="table_lang">(LANG)</td>
+                                <td class="table_market">(MARKET)</td>
+                                <td class="table_dl_link"><a href="(DL_LINK)">Download</a></td>
+                            </tr>
                         </tbody>
                     </table>
+                </div>
+
             </div>
-            </div>
-                <h3><a id="to_top">Back to top</a></h3>
+
+            <h3><a id="to_top">Back to top</a></h3>
         </div>
     </div>
     <br style="clear:both;" />
 </div>
 
 <script type="text/javascript" charset="utf-8">
-<?php 
+    <?php 
     //combine all the js files;
-   include 'files/jquery.min.js';
-   include 'console_fix.js';
-?>
+    include 'files/jquery.min.js';
+    include 'console_fix.js';
+    ?>
 </script>
 
 <script src="bubpub/bubpub.js" type="text/javascript" charset="utf-8"> </script>
 <script src="kdown.js" type="text/javascript" charset="utf-8"> </script>
-   
+
 
 </body>
 </html>
