@@ -1,7 +1,6 @@
 /***
  * Kdown ~ Kyani download interface
  */
-
 Kdown = function () {
     "use strict";
     /***
@@ -286,7 +285,6 @@ Kdown = function () {
                     db.market(hash[1]);
                     db.cat(hash[2]);
                     db.lang(hash[3]);
-                    db.search("");
 
                     bubpub.say('cat'); // publish using bubpub
                 }
@@ -773,6 +771,10 @@ Kdown = function () {
             view.hash.url_export();
         });
 
+        bubpub.listen('search', function search_update() {
+            $ui.search.form.find('#dl_search_box').val( db.search() );
+        });
+
         bubpub.listen('hash/import', function hash_import() {
             view.hash.url_import();
 
@@ -863,5 +865,4 @@ Kdown = function () {
 var Kdown = new Kdown();
 
 Kdown.start();
-
 
