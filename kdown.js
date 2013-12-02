@@ -246,12 +246,12 @@ Kdown = function () {
         page : {
             all : function () {
                 view.error.clear();
-                $ui.table.first.fadeIn();
-                $ui.table.second.fadeIn();
+                $ui.table.first.show();
+                $ui.table.second.show();
             },
             cat : function () {
                 view.error.clear();
-                $ui.table.first.fadeIn();
+                $ui.table.first.show();
                 $ui.table.second.hide();
             }
         },
@@ -589,7 +589,7 @@ Kdown = function () {
             },
             clear : function () {
                 this.hide_all();
-                $ui.table.all.fadeIn();
+                $ui.table.all.show();
             },
             loading : function () {
                 this.hide_all();
