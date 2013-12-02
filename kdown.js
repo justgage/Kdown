@@ -15,7 +15,7 @@ Kdown = function () {
         NAMES_URL = 'files/market_lang.json';
 
     /***
-     * UI handlers
+     * commonly used jquery objects. 
      */
     var $ui = {
         table: {
@@ -45,24 +45,28 @@ Kdown = function () {
         search : {
             form : $('#dl_search_form')
         }
-
     };
 
     /***
-     * an object that publishes events when it changes
+     * Kobj
+     *
+     * An object that publishes events when it changes
      *
      * also has ability to have a validator function passed
      * in to test if the input is valid or not.
      *
-     * @arg  {string} publish_name
-     * a string of a publishing name, which can be name spaced like so
+     * @arg {string} publish_name   a string of a publishing name that is pushed to bubpub.
+     * @arg {any} preset            a value to set the object to when created.
+     * @arg {funciton} validator    a function that will return TRUE if the value is valid.
      *
+     * @return {function}           returns function for getting and setting the value.
      */
     var Kobj = function (publish_name, preset, validator) {
 
         if (typeof preset === 'undefined') {
             preset = null;
         }
+
         if (typeof validator === 'undefined') {
             validator = null;
         }
@@ -71,7 +75,8 @@ Kdown = function () {
         var value = preset;
 
         /***
-         * Will change value to new_val if the values are different
+         * Will change value to new_val IF the values are different AND
+         * it passes the validator funciton
          */
         var change = function (new_val) {
 
@@ -132,15 +137,18 @@ Kdown = function () {
         pages : {
             all : 'All Downloads'
         },
+
         /***
          * current_file_tree
+         *
+         * will get the current file tree based on the current db.market and db.cat
          *
          * @arg {string} lang pass in a language to filter by 'all' get's all.
          * @returns {array} list of files in the current market, cat, and lang
          */
         current_file_tree : function (lang) {
 
-            var tree = db.file_tree(); // all files
+            var tree = db.file_tree(); // get all files
             var market = db.market();
             var cat = db.cat();
             lang = lang || db.lang();
@@ -166,7 +174,7 @@ Kdown = function () {
         /***
          * Returns a list of langs in the current market and the amount in the current cateogry
          *
-         * eg: { 'en' : 6, 'hk' 0 }
+         * @return {object} returns language counts in this structure -> { 'en' : 6, 'hk' : 0 ...}
          */
         current_lang_count : function (tree) {
 
@@ -278,8 +286,9 @@ Kdown = function () {
                     db.market(hash[1]);
                     db.cat(hash[2]);
                     db.lang(hash[3]);
+                    db.search("");
 
-                    bubpub.say('cat');
+                    bubpub.say('cat'); // publish using bubpub
                 }
             },
             /***
