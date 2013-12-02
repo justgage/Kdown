@@ -1,0 +1,73 @@
+{
+   "markets":{
+      "usa-can":"USA / Canada",
+      "au":"Australia",
+      "cn":"China (中国)",
+      "eu":"Europe",
+      "hk":"Hong Kong (香港)",
+      "jp":"Japan",
+      "ko":"Korea",
+      "sg":"Singapore",
+      "my":"Malaysia",
+      "mx":"Mexico",
+      "tw":"Taiwan (台灣)"
+   },
+   "langs":{
+      "usa-can":{
+         "en":"English",
+         "es":"Español"
+      },
+      "au":{
+         "cn":"中国-简体",
+         "hk":"台灣-繁體",
+         "en":"English"
+      },
+      "cn":{
+         "cn":"中国-简体",
+         "en":"English"
+      },
+      "eu":{
+         "da":"Dansk",
+         "de":"Deutsch",
+         "et":"Eesti",
+         "en":"English",
+         "hr":"Hrvatski",
+         "hu":"Magyar",
+         "no":"Norsk",
+         "pl":"Polski",
+         "ru":"Pусский",
+         "ro":"Română",
+         "sk":"Slovenský",
+         "sn":"Slovensko",
+         "sr":"Srpski",
+         "fi":"Suomi",
+         "sv":"Svenska",
+         "tr":"Türkçe",
+         "ua":"Українська"
+      },
+      "hk":{
+         "hk":"香港-繁體",
+         "en":"English"
+      },
+      "jp":{
+         "ja":"日本人"
+      },
+      "ko":{
+         "ko":"한국어"
+      },
+      "sg":{
+         "en":"English"
+      },
+      "my":{
+         "my":"Bahasa Melayu",
+         "en":"English"
+      },
+      "mx":{
+         "es":"Español"
+      },
+      "tw":{
+         "tw":"台灣-繁體",
+         "en":"English"
+      }
+   }
+}

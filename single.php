@@ -39,7 +39,7 @@ foreach ($markets as $market => $inside) {
     </div>
     <div id="main_content">
         <h4>
-           <a class="grey_callout" href="index.html<?php echo "#" . $myCat . "@" . $myMarket; ?>">&larr; Back </a>
+           <a class="grey_callout" href="/<?php echo "#" . $myCat . "@" . $myMarket; ?>">&larr; Back </a>
         </h4>
         <h1><?php echo $found['filename'] ?></h1>
         <table>
