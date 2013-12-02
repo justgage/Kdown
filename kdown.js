@@ -276,6 +276,8 @@ Kdown = function () {
                     db.market(hash[1]);
                     db.cat(hash[2]);
                     db.lang(hash[3]);
+
+                    bubpub.say('cat');
                 }
             },
             /***
@@ -453,12 +455,18 @@ Kdown = function () {
                     removeClass($ui.sidebar.current_class.slice(1));
 
                 //change to the new one
-                sidebar.ul.find( '#' + db.page() + '_' + db.cat() ).
-                    addClass(sidebar.current_class.slice(1));
+                if (db.page() === 'cat') {
+                    sidebar.ul.find( '#cat_' + db.cat() ).
+                        addClass(sidebar.current_class.slice(1));
+                } else {
+                    sidebar.ul.find( '#page_' + db.page() ).
+                        addClass(sidebar.current_class.slice(1));
+                }
             }
         },
         market_DD : {
             populate : function () {
+            
                 var list = db.market_list();
                 var html;
                 var temp = '<option value="(CODE)">(NAME)</option>';
@@ -699,7 +707,7 @@ Kdown = function () {
 
         });
 
-        bubpub.listen('cat/cat', function cat_change() {
+        bubpub.listen('cat/cat page', function cat_change() {
             view.sidebar.set_current();
         });
 

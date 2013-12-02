@@ -55,7 +55,9 @@
                 <h3>
                     Sorry, no files where found in this category, language and market.
                 </h3>
-                Please try a different category or expanding your options.
+                <em>
+                    Please try a different category, changing your options in the drop-downs, or doing a search above.
+                </em>
             </div> 
 
             <div id="dl_table_all">
