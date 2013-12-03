@@ -157,8 +157,7 @@ Kdown = function () {
         },
 
         /***
-         * current_file_list
-         *
+         * @name db.current_file_list
          * will get the current file list based on the current db.market and db.cat
          *
          * @arg {string} lang pass in a language to filter by 'all' get's all.
@@ -190,6 +189,7 @@ Kdown = function () {
         },
 
         /***
+         * @name db.current_lang_count
          * count how many times a language is found in a file list to update the language dropdown count. 
          *
          * @arg {arr} file_list a array of files that contain the language attribute. 
@@ -212,6 +212,7 @@ Kdown = function () {
         },
 
         /***
+         * @name current_lang_list
          * Return the langs in the current market
          *
          * @arg {string} market URL safe (see function) version of the market to look in
@@ -235,6 +236,7 @@ Kdown = function () {
         },
 
         /***
+         * @name db.set_defaults
          * will set the market, category, language to a default one if they are null.
          */
         set_defaults : function () {
@@ -253,8 +255,9 @@ Kdown = function () {
             console.groupEnd('DEFAULTS');
         }
     };
+
     /***
-     * url_safe
+     * @name url_safe
      *
      * escape strings for the URL
      *
@@ -508,6 +511,7 @@ Kdown = function () {
 
             }
         },
+
         /***
          * @name view.sidebar
          * helper object with the links in the sidebar
@@ -686,6 +690,7 @@ Kdown = function () {
                 return  col1 + spaces.join(' ') + col2;
             }
         },
+
         /***
          * @name view.error
          * helper with hiding and showing error messages
@@ -771,6 +776,7 @@ Kdown = function () {
     };
 
     /***
+     * @name server
      * Handles all the AJAX requests.
      */
     var server = {
@@ -878,6 +884,7 @@ Kdown = function () {
     };
 
     /***
+     * @name start
      * first function to run
      *
      * contains all the bubpub listeners
