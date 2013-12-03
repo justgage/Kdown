@@ -154,7 +154,7 @@ Kdown = function () {
         search : new Kobj('search', ""),
 
         pages : {
-            all : 'All Downloads'
+            all : 'All'
         },
 
         /***
@@ -723,6 +723,7 @@ Kdown = function () {
          */
         error: {
             /***
+             * @name error.hide_all
              * hide all tables and error messages
              */
             hide_all : function () {
@@ -736,6 +737,7 @@ Kdown = function () {
             },
 
             /***
+             * @name error.ajax
              * show ajax error
              */
             ajax : function () {
@@ -744,6 +746,8 @@ Kdown = function () {
             },
 
             /***
+             * @name error.none_found
+             * 
              * show 'no files found message'
              */
             none_found : function () {
@@ -752,6 +756,7 @@ Kdown = function () {
             },
 
             /***
+             * @name error.found_first
              * Show first table (used in the search)
              */
             found_first : function () {
@@ -760,6 +765,7 @@ Kdown = function () {
             },
 
             /***
+             * @name error.found_second
              * Show second table (used in the search)
              */
             found_second : function () {
@@ -768,6 +774,7 @@ Kdown = function () {
             },
 
             /***
+             * @name error.none_found_first
              * show message that none where found in the first table
              */
             none_found_first : function () {
@@ -776,6 +783,7 @@ Kdown = function () {
             },
 
             /***
+             * @name error.none_found_second 
              * show message that none where found in the second table
              */
             none_found_second : function () {
@@ -784,6 +792,7 @@ Kdown = function () {
             },
 
             /***
+             * @name error.clear 
              * clear all error messages and show table (used in normal category view)
              */
             clear : function () {
@@ -792,7 +801,8 @@ Kdown = function () {
             },
 
             /***
-             * Show loading throbbed for ajax
+             * @name error.loading 
+             * Show loading throbber for ajax
              */
             loading : function () {
                 this.hide_all();
@@ -832,6 +842,7 @@ Kdown = function () {
                 bubpub.say('ajax/fail');
             });
 
+            view.error.loading();
         },
 
         /***
@@ -1025,6 +1036,10 @@ Kdown = function () {
             }
         });
 
+        bubpub.listen('ajax/fail', function () {
+            view.error.ajax();
+        });
+
         /***
          * Bind events to the DOM
          */
@@ -1084,6 +1099,11 @@ Kdown = function () {
         $('#search_mess a').click(function (e) {
             e.preventDefault(); // stop hash change
             db.search("");
+        });
+
+        $('#reload_img').click(function (e) {
+            e.preventDefault(); // stop hash change
+            server.ajax_load_json();
         });
 
         $('#to_top').click(function () {

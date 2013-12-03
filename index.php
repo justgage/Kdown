@@ -43,7 +43,7 @@
             </div>
 
             <div id="ajax_error" style="display:none;" >
-                Sorry there was an error loading the page! Click a category to your left or refresh the page. 
+                Sorry there was an error loading the page! 
                 <a href="#reload" id="reload_img"> <img src="files/reload.png" alt="Reload" /> </a>
             </div>
 
