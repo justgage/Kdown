@@ -281,6 +281,7 @@ Kdown = function () {
 
                 db.page(page);
 
+                // if the page is on a category import from the hash.
                 if (page === 'cat') {
                     db.market(hash[1]);
                     db.cat(hash[2]);
