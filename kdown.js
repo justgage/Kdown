@@ -1,5 +1,7 @@
 /***
- * Kdown ~ Kyani download interface
+ * @name Kdown ~ Kyani download interface
+ *
+ * @constructor
  */
 Kdown = function () {
     "use strict";
@@ -14,7 +16,7 @@ Kdown = function () {
         NAMES_URL = 'files/market_lang.json';
 
     /***
-     * commonly used jquery objects. 
+     * commonly used jQuery objects. 
      */
     var $ui = {
         table: {
@@ -59,15 +61,15 @@ Kdown = function () {
      * @arg {funciton} validator    a function that will return TRUE if the value is valid.
      *
      * @return {function}           returns function for getting and setting the value.
+     *
+     * @constructor
      */
     var Kobj = function (publish_name, preset, validator) {
 
         if (typeof preset === 'undefined') {
             preset = null;
         }
-
         if (typeof validator === 'undefined') {
-
             validator = null;
         }
 
@@ -75,8 +77,11 @@ Kdown = function () {
         var value = preset;
 
         /***
-         * Will change value to new_val IF the values are different AND
-         * it passes the validator funciton
+         * Will change value to new_val 
+         *  IF the values are different 
+         *  AND it passes the validator function (if there is one)
+         *
+         * @arg {any} new_val value to try to change 'value' to.
          */
         var change = function (new_val) {
 
@@ -93,6 +98,16 @@ Kdown = function () {
             }
         };
 
+        /***
+         * function that will get/set the value.
+         *      IF new_val is passed it SETS value.
+         *      IF NOT it GETS value.
+         *
+         * @arg {any} new_val value to change 'value' to. 
+         *
+         * @return {any / bool} returns if the value was changed if it SETS
+         *                           returns value if not set. 
+         */
         return function kobj_get_set(new_val) {
             // GET
             if (typeof new_val === 'undefined') {
