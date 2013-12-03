@@ -67,6 +67,7 @@ Kdown = function () {
         }
 
         if (typeof validator === 'undefined') {
+
             validator = null;
         }
 
@@ -108,7 +109,10 @@ Kdown = function () {
     };
 
     /***
-     * holds all the information in kobjs (see above)
+     * db 
+     *
+     * holds all the information about the state of the page
+     * in kobjs (see above)
      */
     var db = {
         page : new Kobj('page', 'cat'),                   // current page
@@ -138,14 +142,14 @@ Kdown = function () {
         },
 
         /***
-         * current_file_tree
+         * current_file_list
          *
-         * will get the current file tree based on the current db.market and db.cat
+         * will get the current file list based on the current db.market and db.cat
          *
          * @arg {string} lang pass in a language to filter by 'all' get's all.
          * @returns {array} list of files in the current market, cat, and lang
          */
-        current_file_tree : function (lang) {
+        current_file_list : function (lang) {
 
             var tree = db.file_tree(); // get all files
             var market = db.market();
@@ -161,29 +165,31 @@ Kdown = function () {
             }
 
             // filter out all files in other languages
-            var result = $.map(tree[market][cat], function (file) {
+            var list = $.map(tree[market][cat], function (file) {
                 if (lang === 'all' || file.language === lang) {
                     return file;
                 }
             });
 
-            return  result;
+            return list;
         },
 
         /***
-         * Returns a list of langs in the current market and the amount in the current cateogry
+         * count how many times a language is found in a file list to update the language dropdown count. 
+         *
+         * @arg {arr} file_list a array of files that contain the language attribute. 
          *
          * @return {object} returns language counts in this structure -> { 'en' : 6, 'hk' : 0 ...}
          */
-        current_lang_count : function (tree) {
+        current_lang_count : function (file_list) {
 
-            tree = tree || this.current_file_tree('all');
+            file_list = file_list || this.current_file_list('all');
 
             var lang_count = {},
-                i = tree.length;
+                i = file_list.length;
 
             while(i--) {
-                var lang = tree[i].language;
+                var lang = file_list[i].language;
                 lang_count[lang] = ++lang_count[lang] || 1;
             }
 
@@ -192,6 +198,11 @@ Kdown = function () {
 
         /***
          * Return the langs in the current market
+         *
+         * @arg {string} market URL safe (see function) version of the market to look in
+         * @arg {string} category URL safe (see function) version of the category to look in
+         *
+         * @returns {array} list of languages in the specified market and category. 
          */
         current_lang_list : function (market, cat) {
             market = market || db.market();
@@ -205,9 +216,12 @@ Kdown = function () {
                 current = {};
             }
 
-
             return current;
         },
+
+        /***
+         * will set the market, category, language to a default one if they are null.
+         */
         set_defaults : function () {
             console.groupCollapsed('DEFAULTS');
             if (this.market() === null) {
@@ -225,7 +239,9 @@ Kdown = function () {
         }
     };
     /***
-     * url_safe - escape strings for the URL
+     * url_safe
+     *
+     * escape strings for the URL
      *
      * @arg {string} unsafe string to make URL safe
      * @return {string} string with all spaces and non
@@ -236,11 +252,14 @@ Kdown = function () {
     };
 
     /***
-     * helpers with handling the DOM
+     * view 
+     *
+     * helper functions/objects with handling the DOM.
      */
     var view = {
         /***
-         * the html of the copy objects used for tempesting
+         * @name view.page 
+         * helpers to do page changes.
          */
         page : {
             all : function () {
@@ -254,15 +273,27 @@ Kdown = function () {
                 $ui.table.second.hide();
             }
         },
+
+        /***
+         * @name view.copy 
+         * the html of the copy objects used for tempesting
+         */
         copy : {
             table_row : '<tr>' + $('#table_copy').html() + '</tr>',
             table_row_second : '<tr>' + $('#table_copy_second').html() + '</tr>',
             cat : $('#copy-cat').html(),
             page : $('#copy-page').html()
         },
+
+        /***
+         * @name view.hash 
+         * helper object to deal with the hash in the URL.
+         */
         hash : {
+
             /***
-             * get out of the hash
+             * @name hash.url_import 
+             * import the information into the hash to the db.
              */
             url_import : function () {
                 var hash_str = window.location.hash;
@@ -290,8 +321,10 @@ Kdown = function () {
                     bubpub.say('cat'); // publish using bubpub
                 }
             },
+
             /***
-             * export data to the hash
+             * @name hash.url_export 
+             * export the db information to the hash for the current page
              */
             url_export : function () {
                 var page = db.page();
@@ -306,7 +339,23 @@ Kdown = function () {
                 window.location.hash = hash;
             }
         },
+
+        /***
+         * @name view.table
+         * helper functions for manipulating the table.
+         */
         table : {
+
+            /***
+             * @name table.populate
+             *
+             * fill a table with a list of files. 
+             *
+             * @arg {array} file_list (optional) a array of files to fill the table with. 
+             * @arg {object} lang_list (optional) a mapping of the language code to the language name.
+             *                         eg: {"en" : "English", "es" : "Spanish", ... } 
+             * @arg {number} table_num (optional) which table to fill, 1 or 2? (second only used for search)
+             */     
             populate : function(file_list, lang_list, table_num) {
 
                 var copy = "";
@@ -344,9 +393,16 @@ Kdown = function () {
                     table_html += row;
                 }
                 $table.html(table_html);
-
-                return true;
             },
+
+            /***
+             * @name table.lang_filter
+             * Filter all the files that don't contain a lang
+             *
+             * @arg {string} lang language code for the language which we want to find in the file list.
+             *
+             * @return
+             */
             lang_filter : function(lang) {
                 var json = db.table_json(), // TODO: table_json is invalid
                     filtered_json = [],
@@ -373,7 +429,10 @@ Kdown = function () {
                 return num_found > 0;
             },
             /***
-             * Search all the file in the database
+             * @name table.search
+             * search all files name in the database for the search string. 
+             *
+             * @arg {string} search_str string to search for in file.name.
              */
             search : function (search_str) {
                 search_str = search_str || db.search();
@@ -434,13 +493,25 @@ Kdown = function () {
 
             }
         },
+        /***
+         * @name view.sidebar
+         * helper object with the links in the sidebar
+         */
         sidebar : {
+            /***
+             * @name sidebar.populate
+             *
+             * fill the sidebar with categories and pages 
+             */
             populate : function () {
                 var copy_cat = view.copy.cat,
                     pages = db.pages,
                     html = '',
                     cat_list = db.cat_list();
 
+                /***
+                 * will replace the appropriate fields.
+                 */
                 var make_page = function(copy, code, href, title, page) {
 
                     var li = copy;
@@ -473,6 +544,11 @@ Kdown = function () {
                 $ui.sidebar.ul.html(html).show();
                 this.set_current();
             },
+
+            /***
+             * @name sidebar.set_current
+             * Change with page is selected in the sidebar.
+             */
             set_current : function () {
                 var sidebar = $ui.sidebar;
                 //remove current one
@@ -489,7 +565,16 @@ Kdown = function () {
                 }
             }
         },
+
+        /***
+         * @name view.market_DD
+         * helps with interaction with the market drop down. 
+         */
         market_DD : {
+            /***
+             * @name market_DD.populate
+             * fill the market drop down with markets in db.market_list
+             */
             populate : function () {
             
                 var list = db.market_list();
@@ -504,12 +589,28 @@ Kdown = function () {
                 }
                 $ui.DD.market.html(html);
             },
+
+            /***
+             * @name market_DD.update
+             *
+             * change which one is selected in the DOM based on db.market 
+             */
             update : function () {
                 $ui.DD.market.val( db.market() );
             }
 
         },
+        /***
+         * @name view.lang_DD
+         * helps with interaction with the language drop down. 
+         */
         lang_DD : {
+            /***
+             * @name lang_DD.populate
+             *
+             * @arg {object} count a object assosiating the language code with the amount in the table
+             *                     eg {"en" : 2, "es" : 4...}
+             */
             populate : function (count) {
 
                 count = count || db.current_lang_count();
@@ -540,6 +641,24 @@ Kdown = function () {
                 }
                 $ui.DD.lang.html(html).val(db.lang());
             },
+
+            /***
+             * @name lang_DD.spaces_align 
+             * creates a table using spaces based on padding. 
+             * Used for making the lang count in the lang drop down
+             *
+             *                eg:"1   English"
+             *                   "4   Spanish"
+             *                   "12  Japanese"
+             *                        ^- notice how this row is lined up
+             *
+             * @arg {string} col1 the thing in the first row.
+             * @arg {string} col2 the thing in the second row.
+             *
+             * @var padding how many characters wide to have col1 be.
+             *
+             * @return string a row in the table that has col2 lined up. 
+             */
             spaces_align : function (col1, col2) {
                 var padding = 4,
                     spaces = [];
@@ -552,7 +671,14 @@ Kdown = function () {
                 return  col1 + spaces.join(' ') + col2;
             }
         },
+        /***
+         * @name view.error
+         * helper with hiding and showing error messages
+         */
         error: {
+            /***
+             * hide all tables and error messages
+             */
             hide_all : function () {
                 $ui.table.all.hide();
                 for (var single in $ui.error) {
@@ -562,45 +688,79 @@ Kdown = function () {
                 }
                 return true;
             },
+
+            /***
+             * show ajax error
+             */
             ajax : function () {
                 this.hide_all();
                 $ui.error.ajax.show();
             },
+
+            /***
+             * show 'no files found message'
+             */
             none_found : function () {
                 this.hide_all();
                 $ui.error.none_found.show();
             },
+
+            /***
+             * Show first table (used in the search)
+             */
             found_first : function () {
                 $ui.table.first.show();
                 $ui.error.none_found_first.hide();
             },
+
+            /***
+             * Show second table (used in the search)
+             */
             found_second : function () {
                 $ui.table.second.show();
                 $ui.error.none_found_second.hide();
             },
+
+            /***
+             * show message that none where found in the first table
+             */
             none_found_first : function () {
                 $ui.table.first.hide();
                 $ui.error.none_found_first.show();
             },
+
+            /***
+             * show message that none where found in the second table
+             */
             none_found_second : function () {
                 $ui.table.second.hide();
                 $ui.error.none_found_second.show();
             },
+
+            /***
+             * clear all error messages and show table (used in normal category view)
+             */
             clear : function () {
                 this.hide_all();
                 $ui.table.all.show();
             },
+
+            /***
+             * Show loading throbbed for ajax
+             */
             loading : function () {
                 this.hide_all();
                 $ui.error.loading.show();
             }
         }
     };
+
     /***
      * Handles all the AJAX requests.
      */
     var server = {
         /***
+         * @name server.ajax_load_json 
          * save the json in the proper formats
          */
         ajax_load_json : function () {
@@ -626,9 +786,13 @@ Kdown = function () {
             });
 
         },
+
         /***
+         * @name server.save_json
          * Save all the ajax information from API
          * in proper format
+         *
+         * @arg {array} json json from api to save in db.
          */
         save_json : function (json) {
 
@@ -681,8 +845,12 @@ Kdown = function () {
                 console.groupEnd('save_json');
 
         },
+
         /***
+         * @name server.save_lists_json
          * Save all list from market_lang.json
+         *
+         * @arg {obj} json an object with two market and lang lists
          */
         save_lists_json : function (json) {
             console.group('save_lists_json');
@@ -696,6 +864,8 @@ Kdown = function () {
 
     /***
      * first function to run
+     *
+     * contains all the bubpub listeners
      */
     var start = function () {
 
