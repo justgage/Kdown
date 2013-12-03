@@ -44,7 +44,8 @@ Kdown = function () {
             cat_links : $('.cat_link a')
         },
         search : {
-            form : $('#dl_search_form')
+            form : $('#dl_search_form'),
+            mess : $('#search_mess')
         }
     };
 
@@ -280,11 +281,20 @@ Kdown = function () {
          * helpers to do page changes.
          */
         page : {
+            /***
+             * @name page.all
+             * show all downloads page
+             */
             all : function () {
                 view.error.clear();
                 $ui.table.first.show();
                 $ui.table.second.show();
             },
+
+            /***
+             * @name page.cat
+             * show category page
+             */
             cat : function () {
                 view.error.clear();
                 $ui.table.first.show();
@@ -891,12 +901,14 @@ Kdown = function () {
      */
     var start = function () {
 
-        bubpub.listen('cat search', function cat_change() {
+        bubpub.listen('cat page search', function cat_change() {
             console.log('cat page change: ', db.cat(), db.market(), db.lang());
 
+            var page = db.page();
+
             // check if file list exists
-            if (db.page() === 'cat') {
-                var file_list = db.current_file_tree();
+            if (page === 'cat') {
+                var file_list = db.current_file_list();
                 var lang_list = db.current_lang_list();
                 view.lang_DD.populate();
 
@@ -908,10 +920,19 @@ Kdown = function () {
                     bubpub.say('error/none_found');
                 }
 
-            } else {  // search
-                view.table.search();
-            }
+                $ui.search.mess.hide();
 
+            } else if (page === 'all') {  // search
+                view.table.search();
+
+                var search = db.search();
+
+                if (search === "") {
+                    $ui.search.mess.hide();
+                } else {
+                    $ui.search.mess.show().find('span').text( db.search() );
+                }
+            }
         });
 
         bubpub.listen('sidebar/populate', function sidebar_populate() {
@@ -965,7 +986,8 @@ Kdown = function () {
         });
 
         bubpub.listen('search', function search_update() {
-            $ui.search.form.find('#dl_search_box').val( db.search() );
+            var search = db.search();
+            $ui.search.form.find('#dl_search_box').val(search);
         });
 
         bubpub.listen('hash/import', function hash_import() {
@@ -1040,6 +1062,15 @@ Kdown = function () {
 
         $(window).bind('hashchange', function () {
             bubpub.say('hash/import');
+        });
+
+        $('#search_mess a').click(function (e) {
+            e.preventDefault(); // stop hash change
+            db.search("");
+        });
+
+        $('#to_top').click(function () {
+            $('html,body').animate({scrollTop:0},0);
         });
 
         server.ajax_load_json();

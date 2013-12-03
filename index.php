@@ -60,6 +60,14 @@
                 </em>
             </div> 
 
+            <div id="search_mess" style="display:none;">
+                <h3>
+                    Searching for 
+                    "<span>...</span>" 
+                        <a href="#">clear search</a> 
+                </h3>
+            </div>
+
             <div id="dl_table_all">
                 <div id="dl_table_first" class="dl_table" >
                     <table>
@@ -123,7 +131,7 @@
 
 
 
-            <h3><a id="to_top">Back to top</a></h3>
+            <h3 id="to_top">Back to top</h3>
         </div>
     </div>
     <br style="clear:both;" />
