@@ -348,6 +348,14 @@ Kdown = function () {
 
                     bubpub.say('cat'); // publish using bubpub
                 }
+
+                if (page === 'all') {
+                    if (hash.length > 1) {
+                        db.market(hash[1]);
+                        db.lang(hash[2]);
+                        db.search( decodeURI(hash[3]) );
+                    }
+                }
             },
 
             /***
@@ -362,6 +370,14 @@ Kdown = function () {
                     hash += '/' + db.market();
                     hash += '/' + db.cat();
                     hash += '/' + db.lang();
+                }
+
+                if (page === 'all') {
+                    if (db.search() !== "") {
+                        hash += '/' + db.market();
+                        hash += '/' + db.lang();
+                        hash += '/' + encodeURI(db.search());
+                    }
                 }
 
                 window.location.hash = hash;
@@ -901,7 +917,7 @@ Kdown = function () {
      */
     var start = function () {
 
-        bubpub.listen('cat page search', function cat_change() {
+        bubpub.listen('cat page search', function page_change() {
             console.log('cat page change: ', db.cat(), db.market(), db.lang());
 
             var page = db.page();
@@ -988,6 +1004,7 @@ Kdown = function () {
         bubpub.listen('search', function search_update() {
             var search = db.search();
             $ui.search.form.find('#dl_search_box').val(search);
+            bubpub.say('hash/export');
         });
 
         bubpub.listen('hash/import', function hash_import() {
