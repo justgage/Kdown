@@ -49,109 +49,37 @@ Kdown = function () {
         }
     };
 
-    /***
-     * Kobj
-     *
-     * An object that publishes events when it changes
-     *
-     * also has ability to have a validator function passed
-     * in to test if the input is valid or not.
-     *
-     * @arg {string} publish_name   a string of a publishing name that is pushed to bubpub.
-     * @arg {any} preset            a value to set the object to when created.
-     * @arg {funciton} validator    a function that will return TRUE if the value is valid.
-     *
-     * @return {function}           returns function for getting and setting the value.
-     *
-     * @constructor
-     */
-    var Kobj = function (publish_name, preset, validator) {
-
-        if (typeof preset === 'undefined') {
-            preset = null;
-        }
-        if (typeof validator === 'undefined') {
-            validator = null;
-        }
-
-        // save as a local var
-        var value = preset;
-
-        /***
-         * Will change value to new_val 
-         *  IF the values are different 
-         *  AND it passes the validator function (if there is one)
-         *
-         * @arg {any} new_val value to try to change 'value' to.
-         */
-        var change = function (new_val) {
-
-            // and is valid
-            if (validator === null || validator(new_val) === true) {
-                // make sure we're changing it
-                if (value !== new_val) {
-                    console.log('SET' ,value, '-> ' + publish_name + ' ->', new_val);
-                    value = new_val;
-                    bubpub.say(publish_name);
-                }
-            } else {
-                console.error(publish_name, ' trying to set to ', new_val);
-            }
-        };
-
-        /***
-         * function that will get/set the value.
-         *      IF new_val is passed it SETS value.
-         *      IF NOT it GETS value.
-         *
-         * @arg {any} new_val value to change 'value' to. 
-         *
-         * @return {any / bool} returns if the value was changed if it SETS
-         *                           returns value if not set. 
-         */
-        return function kobj_get_set(new_val) {
-            // GET
-            if (typeof new_val === 'undefined') {
-                if (value === null) {
-                    console.error(publish_name + ' returning NULL');
-                }
-                return value; // get
-            } else {
-                // SET
-                return change(new_val);
-            }
-
-        };
-    };
 
     /***
      * db 
      *
      * holds all the information about the state of the page
-     * in kobjs (see above)
+     *
+     * see bubpub.obj in the bubpub README for more info.
      */
     var db = {
-        page : new Kobj('page', 'cat'),                   // current page
+        page : new bubpub.obj('page/page', 'cat'),                         // current page
 
-        market_list : new Kobj('list/markets'),           // list of valid markets
-        cat_list : new Kobj('list/cats'),                 // list of valid categories
-        lang_list : new Kobj('list/langs', {}),           // list of valid languages
-        file_list : new Kobj('list/files'),               // list of valid categories
+        market_list : new bubpub.obj('list/markets'),                      // list of valid markets
+        cat_list : new bubpub.obj('list/cats'),                            // list of valid categories
+        lang_list : new bubpub.obj('list/langs', {}),                      // list of valid languages
+        file_list : new bubpub.obj('list/files'),                          // list of valid categories
 
-        market : new Kobj('cat/market', null, function (test) {
+        market : new bubpub.obj('page/cat/market', null, function (test) {
             return test in db.market_list();
-        }),                                               // current market
-        cat : new Kobj('cat/cat', null, function (test) {
+        }),                                                                // current market
+        cat : new bubpub.obj('page/cat/cat', null, function (test) {
             return test in db.cat_list();
-        }),                                               // current category
-        lang : new Kobj('cat/lang', null, function (test) {
+        }),                                                                // current category
+        lang : new bubpub.obj('page/cat/lang', null, function (test) {
             return test === 'all' || test in db.current_lang_list();
-        }),                                               // current translation selected (can be 'ALL')
+        }),                                                                // current translation selected (can be 'ALL')
 
-        lang_count : new Kobj('lang_count'),              // each language's count [lang] => count
-        file_tree : new Kobj('ajax/load'),                // hold the current table's JSON
+        search : new bubpub.obj('page/search', ""),                        // search string
 
-        search : new Kobj('search', ""),
+        lang_count : new bubpub.obj('lang_count'),                         // each language's count [lang] => count
+        file_tree : new bubpub.obj('ajax/load'),                           // hold the current table's JSON
+
 
         pages : {
             all : 'All'
@@ -350,9 +278,9 @@ Kdown = function () {
                 }
 
                 if (page === 'all') {
-                    if (hash.length > 1) {
-                        db.market(hash[1]);
-                        db.lang(hash[2]);
+                    db.market(hash[1]);
+                    db.lang(hash[2]);
+                    if (hash.length > 3) {
                         db.search( decodeURI(hash[3]) );
                     }
                 }
@@ -373,9 +301,9 @@ Kdown = function () {
                 }
 
                 if (page === 'all') {
+                    hash += '/' + db.market();
+                    hash += '/' + db.lang();
                     if (db.search() !== "") {
-                        hash += '/' + db.market();
-                        hash += '/' + db.lang();
                         hash += '/' + encodeURI(db.search());
                     }
                 }
@@ -431,8 +359,19 @@ Kdown = function () {
                     row = row.replace('(HEART_URL)', '#');
                     row = row.replace('(NAME)', file.name);
                     row = row.replace('(FILE_LINK)', 'single.php?id=' + file.id);
-                    row = row.replace('(LANG)', lang_list[file.language]);
-                    row = row.replace('(MARKET)', market_list[file.market]);
+
+                    if (typeof lang_list[file.language] !== 'undefined') {
+                        row = row.replace('(LANG)', lang_list[file.language]);
+                    } else {
+                        row = row.replace('(LANG)', file.language);
+                    }
+
+                    if (typeof market_list[file.market] !== 'undefined') {
+                        row = row.replace('(MARKET)', market_list[file.market]);
+                    } else {
+                        row = row.replace('(MARKET)', file.market);
+                    }
+
 
                     table_html += row;
                 }
@@ -633,6 +572,8 @@ Kdown = function () {
                     }
                 }
                 $ui.DD.market.html(html);
+
+                this.update();
             },
 
             /***
@@ -865,9 +806,21 @@ Kdown = function () {
                 // go through every file (backwards!)
                 while (i--) {
                     var f = file_list[i]; // single file
+                    var safe_market, safe_cat;
 
-                    var safe_market = url_safe(f.market);
-                    var safe_cat = url_safe(f.category);
+                    if (typeof f.market !== 'undefined') {
+                        safe_market = url_safe(f.market);
+                    } else {
+                        console.log("BAD FILE: (no market)" ,f);
+                        continue;
+                    }
+
+                    if (typeof f.category !== 'undefined') {
+                        safe_cat = url_safe(f.category);
+                    } else {
+                        console.log("BAD FILE: (no category)" ,f);
+                        continue;
+                    }
 
                     /***
                      * add the categories to the list
@@ -928,7 +881,15 @@ Kdown = function () {
      */
     var start = function () {
 
-        bubpub.listen('cat page search', function page_change() {
+
+        bubpub.listen('sidebar/populate', function sidebar_populate() {
+            view.sidebar.populate();
+        });
+
+        /****************************************************
+         * BUBPUB: page changes
+         ****************************************************/
+        bubpub.listen('page', function page_change() {
             console.log('cat page change: ', db.cat(), db.market(), db.lang());
 
             var page = db.page();
@@ -962,21 +923,7 @@ Kdown = function () {
             }
         });
 
-        bubpub.listen('sidebar/populate', function sidebar_populate() {
-            view.sidebar.populate();
-        });
-
-        bubpub.listen('cat/market', function market_change() {
-            var lang = db.lang();
-
-            // check if new market has current lang
-            if ( (lang === 'all' || lang in db.current_lang_list()) === false) {
-                db.lang('all');
-            }
-            view.market_DD.update();
-        });
-
-        bubpub.listen('page', function page_change() {
+        bubpub.listen('page/page', function page_change() {
 
             var page = db.page();
             if (page === 'cat') {
@@ -988,9 +935,31 @@ Kdown = function () {
 
         });
 
-        bubpub.listen('cat/cat page', function cat_change() {
+
+        bubpub.listen('page/cat/market', function market_change() {
+            var lang = db.lang();
+
+            // check if new market has current lang
+            if ( (lang === 'all' || lang in db.current_lang_list()) === false) {
+                db.lang('all');
+            }
+
+            view.market_DD.update();
+        });
+
+        bubpub.listen('page/cat/cat page', function cat_change() {
             view.sidebar.set_current();
         });
+
+        bubpub.listen('page/search', function search_update() {
+            var search = db.search();
+            $ui.search.form.find('#dl_search_box').val(search);
+            bubpub.say('hash/export');
+        });
+
+        /****************************************************
+         * BUBPUB: lists
+         ****************************************************/
 
         bubpub.listen('list/markets', function market_list_change() {
             view.market_DD.populate();
@@ -1000,6 +969,10 @@ Kdown = function () {
             bubpub.say('sidebar/populate');
         });
 
+        /****************************************************
+         * BUBPUB: error
+         ****************************************************/
+
         bubpub.listen('error/clear', function error_clear() {
             view.error.clear();
         });
@@ -1008,15 +981,13 @@ Kdown = function () {
             view.error.none_found();
         });
 
+        /****************************************************
+         * BUBPUB: hash
+         ****************************************************/
         bubpub.listen('hash/export', function hash_export() {
             view.hash.url_export();
         });
 
-        bubpub.listen('search', function search_update() {
-            var search = db.search();
-            $ui.search.form.find('#dl_search_box').val(search);
-            bubpub.say('hash/export');
-        });
 
         bubpub.listen('hash/import', function hash_import() {
             view.hash.url_import();
