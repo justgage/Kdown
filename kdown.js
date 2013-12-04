@@ -1057,7 +1057,7 @@ Kdown = function () {
             // change current visually
             $(current).removeClass(current.slice(1));
             $(this).parent().addClass(current.slice(1));
-
+            view.error.loading();
 
             bubpub.say('hash/export');
 
