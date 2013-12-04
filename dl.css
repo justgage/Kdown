@@ -63,6 +63,11 @@
     padding: 4px;
 }
 
+.table_num {
+    text-align:center;
+    width: 50px;
+}
+
 .table_name {
     width: 300px;
     overflow: hidden;

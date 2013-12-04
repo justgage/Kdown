@@ -73,6 +73,7 @@
                     <table>
                         <thead>
                             <tr>
+                                <th>#</th>
                                 <th>File name</th>
                                 <th>Languages</th>
                                 <th>Download</th>
@@ -80,6 +81,7 @@
                         </thead>
                         <tbody>
                             <tr style="display:none;" id="table_copy">
+                                <td class="table_num">(NUM)</td>
                                 <td class="table_name"><a href="(FILE_LINK)">(NAME)</a></td>
                                 <td class="table_lang">(LANG)</td>
                                 <td class="table_dl_link"><a href="(DL_LINK)">Download</a></td>
@@ -102,6 +104,7 @@
                     <table>
                         <thead>
                             <tr>
+                                <th>#</th>
                                 <th>File name</th>
                                 <th>Languages</th>
                                 <th>Market</th>
@@ -110,6 +113,7 @@
                         </thead>
                         <tbody>
                             <tr style="display:none;" id="table_copy_second">
+                                <td class="table_num">(NUM)</td>
                                 <td class="table_name"><a href="(FILE_LINK)">(NAME)</a></td>
                                 <td class="table_lang">(LANG)</td>
                                 <td class="table_market">(MARKET)</td>

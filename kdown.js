@@ -82,7 +82,24 @@ Kdown = function () {
 
 
         pages : {
-            all : 'All'
+            all : 'All Documents'
+        },
+
+        /***
+         * @name db.sort_file_list
+         * @arg {arr} file_list a array of files
+         * @return {arr} sorted file list
+         */
+        sort_file_list : function (file_list) {
+            var compare = function (a, b) {
+
+                a = a.name.toLocaleLowerCase();
+                b = b.name.toLocaleLowerCase();
+
+                return a.localeCompare(b);
+            };
+
+            return file_list.sort(compare);
         },
 
         /***
@@ -121,7 +138,7 @@ Kdown = function () {
          * @name db.current_lang_count
          * count how many times a language is found in a file list to update the language dropdown count. 
          *
-         * @arg {arr} file_list a array of files that contain the language attribute. 
+         * @arg {arr} file_list a array of file objects
          *
          * @return {object} returns language counts in this structure -> { 'en' : 6, 'hk' : 0 ...}
          */
@@ -195,7 +212,7 @@ Kdown = function () {
      *                  alpha-numeric characters turned to a '-'
      */
     var url_safe = function (unsafe) {
-        return unsafe.toLowerCase().replace(/[^a-zA-Z0-9]+/g,'-');
+        return unsafe.toLocaleLowerCase().replace(/[^a-zA-Z0-9]+/g,'-');
     };
 
     /***
@@ -336,6 +353,8 @@ Kdown = function () {
                 var lang = db.lang();
                 var market_list = db.market_list();
                 var row;
+                var i;
+                var l;
 
                 lang_list = lang_list || db.current_lang_list();
                 table_num = table_num || 1;
@@ -349,14 +368,19 @@ Kdown = function () {
                 }
 
                 row = copy;
-                // backwards
-                for (var i = file_list.length - 1; i >= 0; i--) {
+
+                // Sort it by name
+                file_list = db.sort_file_list(file_list);
+
+                for (i=0, l = file_list.length; i < l; i++) {
+
+                    var item = file_list[i];
                     var file = file_list[i];
 
                     row = copy;
 
-                    // Tempting
                     row = row.replace('(HEART_URL)', '#');
+                    row = row.replace('(NUM)', 1 + i);
                     row = row.replace('(NAME)', file.name);
                     row = row.replace('(FILE_LINK)', 'single.php?id=' + file.id);
 
@@ -419,7 +443,7 @@ Kdown = function () {
              */
             search : function (search_str) {
                 search_str = search_str || db.search();
-                search_str = search_str.toLowerCase();
+                search_str = search_str.toLocaleLowerCase();
 
                 var json = db.file_list(),
                     main_list = [],
@@ -435,7 +459,7 @@ Kdown = function () {
                     var file = json[i];
 
                     if (search_str === "" ||
-                        file.name.toLowerCase().indexOf(search_str) !== -1) {
+                        file.name.toLocaleLowerCase().indexOf(search_str) !== -1) {
 
                         if (file.market === market && ('all' === lang || file.language === lang)) {
                             console.log("main_list", file);
@@ -474,7 +498,7 @@ Kdown = function () {
 
                 view.lang_DD.populate(lang_count);
 
-            }
+            },
         },
 
         /***
@@ -1043,13 +1067,19 @@ Kdown = function () {
             db.page(page);
 
             if (page === 'cat') {
-                db.cat( $this.data('cat') );
+                
+                //if it did change
+                if (db.cat( $this.data('cat') ) === true) {
+                    view.error.loading();
+                }
                 // make sure to fire even if it doesn't change
                 bubpub.say('cat'); 
             }
 
             if (page === 'page') {
-                db.page( $this.data('cat') );
+                if (db.page( $this.data('cat') ) === true) {
+                    view.error.loading();
+                }
             }
 
             console.log('click', page);
@@ -1057,7 +1087,6 @@ Kdown = function () {
             // change current visually
             $(current).removeClass(current.slice(1));
             $(this).parent().addClass(current.slice(1));
-            view.error.loading();
 
             bubpub.say('hash/export');
 
