@@ -1,5 +1,5 @@
 {
-    "files":[
+    "files": [
         {
             "id":1,
             "name":"First Document",
@@ -7,8 +7,7 @@
             "language":"en",
             "category":"Applications & Forms",
             "market":"usa-can",
-            "url":"#",
-            "note":""
+            "url":"#"
         },
         {
             "id":1,

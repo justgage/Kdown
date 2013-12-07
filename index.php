@@ -140,6 +140,42 @@
     </div>
     <br style="clear:both;" />
 </div>
+<div class="file_pane file_pane_hide">
+    <h2>Becky_Bursell's_Kyani_Overview</h2>
+    <h3>Description</h3>
+    <p class="grey_callout">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+    </p>
+    <p>
+        <button class="fancy light-blue medium submit-information" tabindex="12" id="ext-gen77">Download File</button>
+    </p>
+    <h3>Other Translations</h3>
+    <div class="grey_callout">
+        <strong>USA / CANADA</strong>
+        <ul>
+            <li><a href="#">English</a></li>
+            <li><a href="#">Japanese</a></li>
+            <li><a href="#">Sweedish</a></li>
+        </ul>
+        <br />
+        <strong>USA / CANADA</strong>
+        <ul>
+            <li><a href="#">English</a></li>
+            <li><a href="#">Japanese</a></li>
+            <li><a href="#">Sweedish</a></li>
+        </ul>
+        <strong>USA / CANADA</strong>
+        <ul>
+            <li><a href="#">English</a></li>
+            <li><a href="#">Japanese</a></li>
+            <li><a href="#">Sweedish</a></li>
+        </ul>
+        <strong>Japan</strong>
+        <ul>
+            <li><a href="#">Japanese</a></li>
+        </ul>
+    </div>
+</div>
 
 <script type="text/javascript" charset="utf-8">
     <?php 

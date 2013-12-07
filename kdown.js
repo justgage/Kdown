@@ -21,6 +21,7 @@ Kdown = function () {
     var $ui = {
         table: {
             all : $('#dl_table_all'),
+            each : $('.dl_table'),
             first : $('#dl_table_first'),
             first_body : $('#dl_table_first').find('tbody'),
             second : $('#dl_table_second'),
@@ -46,6 +47,15 @@ Kdown = function () {
         search : {
             form : $('#dl_search_form'),
             mess : $('#search_mess')
+        },
+        file_pane : {
+            pane : $('.file_pane'),
+            open : function () {
+                this.pane.removeClass("file_pane_hide").addClass("file_pane_show");
+            },
+            close : function () {
+                this.pane.removeClass("file_pane_show").addClass("file_pane_hide");
+            }
         }
     };
 
@@ -301,6 +311,7 @@ Kdown = function () {
                         db.search( decodeURI(hash[3]) );
                     }
                 }
+
             },
 
             /***
@@ -935,7 +946,8 @@ Kdown = function () {
                 $ui.search.mess.hide();
 
             } else if (page === 'all') {  // search
-                view.table.search();
+                view.error.loading();
+                bubpub.say('table/search');
 
                 var search = db.search();
 
@@ -945,6 +957,11 @@ Kdown = function () {
                     $ui.search.mess.show().find('span').text( db.search() );
                 }
             }
+        });
+
+        bubpub.listen('table/search', function page_change() {
+            view.error.clear();
+            view.table.search();
         });
 
         bubpub.listen('page/page', function page_change() {
@@ -1055,6 +1072,20 @@ Kdown = function () {
         $ui.DD.lang.change(function lang_DD_change() {
             db.lang( $(this).val() );
             bubpub.say('hash/export');
+        });
+
+
+        $ui.table.each.delegate("a", "click", function (e) {
+            e.preventDefault();
+            console.log("file_pane_open");
+            $ui.file_pane.open();
+            return false;
+        });
+
+        $(".center").click(function () {
+            console.log("file_pane_close");
+            console.log($ui.file_pane);
+            $ui.file_pane.close();
         });
 
         $ui.sidebar.ul.on('click', 'a', function (e) {
