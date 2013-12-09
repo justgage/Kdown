@@ -3,8 +3,10 @@
  *
  * @constructor
  */
+
 Kdown = function () {
     "use strict";
+
     /***
      * config constants
      */
@@ -76,7 +78,7 @@ Kdown = function () {
         market_list : new bubpub.obj('list/markets'),                      // list of valid markets
         cat_list : new bubpub.obj('list/cats'),                            // list of valid categories
         lang_list : new bubpub.obj('list/langs', {}),                      // list of valid languages
-        file_list : new bubpub.obj('list/files'),                          // list of valid categories
+        file_list : new bubpub.obj('list/files'),                          // flat array list of files
 
         market : new bubpub.obj('page/cat/market', null, function (test) {
             return test in db.market_list();
@@ -247,7 +249,7 @@ Kdown = function () {
             all : function () {
                 view.error.clear();
                 $ui.table.first.show();
-                $ui.table.second.show();
+                $ui.table.second.show(); // TODO: CHECK THIS OUT
             },
 
             /***
@@ -398,7 +400,6 @@ Kdown = function () {
                 //generate each file's HTML
                 for (i=0, l = file_list.length; i < l; i++) {
 
-                    var item = file_list[i];
                     var file = file_list[i];
 
                     row = copy;
@@ -429,33 +430,33 @@ Kdown = function () {
 
             /***
              * @name table.lang_filter
-             * Filter all the files that don't contain a lang
+             * Filter all the files that don't contain the lang specified 
              *
              * @arg {string} lang language code for the language which we want to find in the file list.
              *
              * @return
              */
             lang_filter : function(lang) {
-                var json = db.table_json(), // TODO: table_json is invalid
-                filtered_json = [],
+                var file_list = db.table_json(), // TODO: table_json is invalid
+                filtered_list = [],
                 num_found = 0,
                 i = 0, l;
 
                 lang = lang || db.lang();
 
                 if (lang === 'all') {
-                    num_found = json.length;
+                    num_found = file_list.length;
                     this.populate();
                     i = 1;
                 } else {
-                    for (i = 0, l = json.length; i < l; i++) {
-                        var file = json[i];
+                    for (i = 0, l = file_list.length; i < l; i++) {
+                        var file = file_list[i];
                         if (file.langs[lang]) {
                             num_found += 1;
-                            filtered_json.push(file);
+                            filtered_list.push(file);
                         }
                     }
-                    this.populate(filtered_json);
+                    this.populate(filtered_list);
                 }
 
                 return num_found > 0;
@@ -483,6 +484,7 @@ Kdown = function () {
                 for (var i=0, l = json.length; i < l; i++) {
                     var file = json[i];
 
+                    // If file name contains search string
                     if (search_str === "" ||
                         file.name.toLocaleLowerCase().indexOf(search_str) !== -1) {
 
