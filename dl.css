@@ -222,4 +222,10 @@ a.favd {
     right:-600px;
 }
 
+.center_text {
+    text-align: center;
+}
 
+button span {
+    color: white;
+}

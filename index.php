@@ -51,14 +51,6 @@
                 <img alt="" src="files/AjaxLoader.gif" />
                 <!-- this can contain text for clarity -->
             </div>
-            <div style="display:none; text-align:center;" id="none_found">
-                <h3>
-                    Sorry, no files where found in this category, language and market.
-                </h3>
-                <em>
-                    Please try a different category, changing your options in the drop-downs, or doing a search above.
-                </em>
-            </div> 
 
             <div id="search_mess" style="display:none;">
                 <h3>
@@ -67,6 +59,18 @@
                         <a href="#">clear search</a> 
                 </h3>
             </div>
+
+            <div class="center_text" style="display:none;" id="none_found">
+                <br /><br />
+                <h3>
+                    No files where found!
+                </h3>
+                <em>
+                    Please try a different category, changing your options in the drop-downs, or doing a search above.
+                </em>
+                <br /><br />
+            </div> 
+
 
             <div id="dl_table_all">
                 <div id="dl_table_first" class="dl_table" >
@@ -82,63 +86,90 @@
                         <tbody>
                             <tr style="display:none;" id="table_copy">
                                 <td class="table_num">(NUM)</td>
-                                <td class="table_name"><a href="(FILE_LINK)">(NAME)</a></td>
+                                <td class="table_name"><a href="#file_info">(NAME)</a></td>
                                 <td class="table_lang">(LANG)</td>
                                 <td class="table_dl_link"><a href="(DL_LINK)">Download</a></td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <div style="display:none; text-align:center;" id="none_found_first">
+                <div class="center_text" id="none_found_first" style="display:none;">
+                    <br /><br />
                     <h3>
-                        Sorry, no files where found in this market or language.
+                        <em>
+                            No files found in this search!
+                        </em>
                     </h3>
-                    <em>
-                        see below for more options.
-                    </em>
-                </div> 
-                <br />
-
-                <div id="dl_table_second" class="dl_table" style="display:none;">
-                    <h3>Other Markets and Languages</h3>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>File name</th>
-                                <th>Languages</th>
-                                <th>Market</th>
-                                <th>Download</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr style="display:none;" id="table_copy_second">
-                                <td class="table_num">(NUM)</td>
-                                <td class="table_name"><a href="(FILE_LINK)">(NAME)</a></td>
-                                <td class="table_lang">(LANG)</td>
-                                <td class="table_market">(MARKET)</td>
-                                <td class="table_dl_link"><a href="(DL_LINK)">Download</a></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div style="display:none; text-align:center;" id="none_found_second">
-                    <h3>
-                        Sorry, no files where found in all other markets and languages
-                    </h3>
-                    <em>
-                        Please try a different search.
-                    </em>
+                    <br />
+                    <hr />
                 </div> 
 
+
+                <div id="other_options" class="center_text">
+                    <h3>Didn't find it?</h3>
+                    <p>Here's some more options...</p>
+
+                    <p id="all_langs_link">
+                        Change language to <a  href="#">ALL
+                    </a> 
+                </p>
+                <p id="second_link">
+                    <a href="#" id="second_link">
+                        See <span>...</span> more results.
+                    </a>
+                </p>
+                <hr />
             </div>
+            <br />
 
+            <div id="dl_table_second" class="dl_table" style="display:none;">
+                <h3>Other Markets and Languages</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>File name</th>
+                            <th>Languages</th>
+                            <th>Market</th>
+                            <th>Download</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="display:none;" id="table_copy_second">
+                            <td class="table_num">(NUM)</td>
+                            <td class="table_name"><a href="(FILE_LINK)">(NAME)</a></td>
+                            <td class="table_lang">(LANG)</td>
+                            <td class="table_market">(MARKET)</td>
+                            <td class="table_dl_link"><a href="(DL_LINK)">Download</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="center_text" style="display:none;" id="none_found_second">
+                <br /><br />
+                <h3>
+                    <em>
+                        No files found in this search!
+                    </em>
+                </h3>
+                <br />
+                <hr />
+                <h3>
+                    Sorry, no files where found in all other markets and languages
+                </h3>
+                <em>
+                    Please try a different search.
+                </em>
+            </div> 
 
-
-            <h3 id="to_top">Back to top</h3>
         </div>
+
+
+
+        <h3 id="to_top">Back to top</h3>
     </div>
-    <br style="clear:both;" />
+</div>
+<br style="clear:both;" />
 </div>
 <div class="file_pane file_pane_hide">
     <h2>Becky_Bursell's_Kyani_Overview</h2>
@@ -149,6 +180,8 @@
     <p>
         <button class="fancy light-blue medium submit-information" tabindex="12" id="ext-gen77">Download File</button>
     </p>
+    <br />
+    <hr />
     <h3>Other Translations</h3>
     <div class="grey_callout">
         <strong>USA / CANADA</strong>

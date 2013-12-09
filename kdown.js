@@ -9,11 +9,11 @@ Kdown = function () {
      * config constants
      */
     var LOGGING = false,
-        MY_LANG = 'en',
-        MY_MARKET = 'usa-can',
-        MY_CAT = null,
-        API_URL = 'files/dream_api.php',
-        NAMES_URL = 'files/market_lang.json';
+    MY_LANG = 'en',
+    MY_MARKET = 'usa-can',
+    MY_CAT = null,
+    API_URL = 'files/dream_api.php',
+    NAMES_URL = 'files/market_lang.json';
 
     /***
      * commonly used jQuery objects. 
@@ -46,12 +46,15 @@ Kdown = function () {
         },
         search : {
             form : $('#dl_search_form'),
-            mess : $('#search_mess')
+            mess : $('#search_mess'),
+            other_options : $('#other_options'),
+            second_link : $('#second_link'),
+            all_langs_link : $('#all_langs_link')
         },
         file_pane : {
             pane : $('.file_pane'),
-            open : function () {
-                this.pane.removeClass("file_pane_hide").addClass("file_pane_show");
+            open : function (id) {
+                this.pane.scrollTop(0).removeClass("file_pane_hide").addClass("file_pane_show");
             },
             close : function () {
                 this.pane.removeClass("file_pane_show").addClass("file_pane_hide");
@@ -90,6 +93,7 @@ Kdown = function () {
         lang_count : new bubpub.obj('lang_count'),                         // each language's count [lang] => count
         file_tree : new bubpub.obj('ajax/load'),                           // hold the current table's JSON
 
+        hash : new bubpub.obj('hash'),                                     // hold the hash in the URL
 
         pages : {
             all : 'All Documents'
@@ -157,7 +161,7 @@ Kdown = function () {
             file_list = file_list || this.current_file_list('all');
 
             var lang_count = {},
-                i = file_list.length;
+            i = file_list.length;
 
             while(i--) {
                 var lang = file_list[i].language;
@@ -281,7 +285,7 @@ Kdown = function () {
             url_import : function () {
                 var hash_str = window.location.hash;
 
-                if (hash_str === '') {
+                if (hash_str === '' || db.file_tree() === null) {
                     return null;
                 }
 
@@ -309,6 +313,8 @@ Kdown = function () {
                     db.lang(hash[2]);
                     if (hash.length > 3) {
                         db.search( decodeURI(hash[3]) );
+                    } else {
+                        db.search("");
                     }
                 }
 
@@ -335,8 +341,8 @@ Kdown = function () {
                         hash += '/' + encodeURI(db.search());
                     }
                 }
-
                 window.location.hash = hash;
+                db.hash("hash");
             }
         },
 
@@ -345,6 +351,12 @@ Kdown = function () {
          * helper functions for manipulating the table.
          */
         table : {
+
+            /***
+             * used to store the other markets and languages table 
+             * html till needed.
+             */
+            other_table_list : null,
 
             /***
              * @name table.populate
@@ -383,6 +395,7 @@ Kdown = function () {
                 // Sort it by name
                 file_list = db.sort_file_list(file_list);
 
+                //generate each file's HTML
                 for (i=0, l = file_list.length; i < l; i++) {
 
                     var item = file_list[i];
@@ -390,10 +403,9 @@ Kdown = function () {
 
                     row = copy;
 
-                    row = row.replace('(HEART_URL)', '#');
                     row = row.replace('(NUM)', 1 + i);
                     row = row.replace('(NAME)', file.name);
-                    row = row.replace('(FILE_LINK)', 'single.php?id=' + file.id);
+                    row = row.replace('(DL_LINK)', file.url);
 
                     if (typeof lang_list[file.language] !== 'undefined') {
                         row = row.replace('(LANG)', lang_list[file.language]);
@@ -410,6 +422,8 @@ Kdown = function () {
 
                     table_html += row;
                 }
+
+                // dump into the table 
                 $table.html(table_html);
             },
 
@@ -423,9 +437,9 @@ Kdown = function () {
              */
             lang_filter : function(lang) {
                 var json = db.table_json(), // TODO: table_json is invalid
-                    filtered_json = [],
-                    num_found = 0,
-                    i = 0, l;
+                filtered_json = [],
+                num_found = 0,
+                i = 0, l;
 
                 lang = lang || db.lang();
 
@@ -457,11 +471,11 @@ Kdown = function () {
                 search_str = search_str.toLocaleLowerCase();
 
                 var json = db.file_list(),
-                    main_list = [],
-                    other_list = [],
-                    market = db.market(),
-                    lang = db.lang(),
-                    lang_count = {};
+                main_list = [],
+                other_list = [],
+                market = db.market(),
+                lang = db.lang(),
+                lang_count = {};
 
                 console.groupCollapsed("Search");
 
@@ -481,35 +495,69 @@ Kdown = function () {
                             other_list.push(file);
                         }
 
-                        lang_count[file.language] = ++lang_count[file.language] || 1;
+                        if (file.market === market) {
+                            lang_count[file.language] = ++lang_count[file.language] || 1;
+                        }
                     }
 
                 }
 
+                // fill languages
+                view.lang_DD.populate(lang_count);
+
                 console.log(lang_count);
                 console.groupEnd("Search");
+                
+                this.search_view(main_list, other_list);
+
+            },
+            /***
+             * @name table.search_view
+             *
+             * this will decide how the search results are displayed
+             *
+             * @arg {obj} main_list a list of files found in search in 
+             *                      current market / lang
+             * @arg {obj} other_list a list of files found in search 
+             *                      NOT in current market / lang
+             */     
+            search_view : function (main_list, other_list) {
 
                 if (main_list.length > 0) {
-                    console.log('main list found');
                     view.table.populate(main_list);
                     view.error.found_first();
                 } else {
-                    console.log('main list NONE found');
                     view.error.none_found_first();
                 }
 
                 if (other_list.length > 0) {
-                    console.log('other list found');
-                    view.table.populate(other_list, null, 2);
-                    view.error.found_second();
+                    $ui.search.second_link.
+                        find("span").
+                        text(other_list.length);
                 } else {
-                    console.log('other list NONE found');
-                    view.error.none_found_second();
+                    view.error.none_found();
                 }
 
-                view.lang_DD.populate(lang_count);
+                $ui.search.other_options.show();
 
-            },
+                if (db.lang() !== "all") {
+                    $ui.search.all_langs_link.show();
+                } else {
+                    $ui.search.all_langs_link.hide();
+                }
+
+                this.other_table_list = other_list;
+
+                $ui.table.second.hide();
+
+            }, 
+            /***
+             * @name table.show_other_table
+             */
+            show_other_table : function () {
+                view.table.populate(this.other_table_list, null, 2);
+                $ui.table.second.fadeIn();
+            }
         },
 
         /***
@@ -524,9 +572,9 @@ Kdown = function () {
              */
             populate : function () {
                 var copy_cat = view.copy.cat,
-                    pages = db.pages,
-                    html = '',
-                    cat_list = db.cat_list();
+                pages = db.pages,
+                html = '',
+                cat_list = db.cat_list();
 
                 /***
                  * will replace the appropriate fields.
@@ -549,15 +597,15 @@ Kdown = function () {
                         var cat_name = cat_list[code];
                         html += make_page(copy_cat, code, '#', cat_name, 'cat');
                     }
-                 }
+                }
 
-                 // add all other pages
-                 for (var page_code in pages) {
-                     if(pages.hasOwnProperty(page_code)) {
-                         var page_name = pages[page_code];
+                // add all other pages
+                for (var page_code in pages) {
+                    if(pages.hasOwnProperty(page_code)) {
+                        var page_name = pages[page_code];
                         html += make_page(copy_cat, page_code, '#', page_name, 'page');
-                     }
-                 }
+                    }
+                }
 
                 //set the sidebar
                 $ui.sidebar.ul.html(html).show();
@@ -595,7 +643,7 @@ Kdown = function () {
              * fill the market drop down with markets in db.market_list
              */
             populate : function () {
-            
+
                 var list = db.market_list();
                 var html;
                 var temp = '<option value="(CODE)">(NAME)</option>';
@@ -648,7 +696,7 @@ Kdown = function () {
                 for (var code in langs) {
                     if(langs.hasOwnProperty(code)) {
                         var name = langs[code],
-                            num = count[code] || 0;
+                        num = count[code] || 0;
 
                         option = temp; // clear option html
 
@@ -682,7 +730,7 @@ Kdown = function () {
              */
             spaces_align : function (col1, col2) {
                 var padding = 4,
-                    spaces = [];
+                spaces = [];
                 col1 = col1 + '';
                 col2 = col2 + '';
 
@@ -745,8 +793,8 @@ Kdown = function () {
              * Show second table (used in the search)
              */
             found_second : function () {
-                $ui.table.second.show();
-                $ui.error.none_found_second.hide();
+                //$ui.table.second.show();
+                // $ui.error.none_found_second.hide();
             },
 
             /***
@@ -763,8 +811,8 @@ Kdown = function () {
              * show message that none where found in the second table
              */
             none_found_second : function () {
-                $ui.table.second.hide();
-                $ui.error.none_found_second.show();
+                //$ui.table.second.hide();
+                // $ui.error.none_found_second.show();
             },
 
             /***
@@ -832,329 +880,371 @@ Kdown = function () {
 
             console.group('save_json');
 
+            if (json === null) {
+                bubpub.say("ajax/fail");
+                return;
+            }
+
             var file_list  = json.files,
-                market_list = {},
-                cat_list    = {},
-                file_tree   = {},
-                i           = file_list.length;
+            market_list = {},
+            cat_list    = {},
+            file_tree   = {},
+            i           = file_list.length;
 
-                // go through every file (backwards!)
-                while (i--) {
-                    var f = file_list[i]; // single file
-                    var safe_market, safe_cat;
+            // go through every file (backwards!)
+            while (i--) {
+                var f = file_list[i]; // single file
+                var safe_market, safe_cat;
 
-                    if (typeof f.market !== 'undefined') {
-                        safe_market = url_safe(f.market);
-                    } else {
-                        console.log("BAD FILE: (no market)" ,f);
-                        continue;
-                    }
+                if (typeof f.market !== 'undefined') {
+                    safe_market = url_safe(f.market);
+                } else {
+                    console.log("BAD FILE: (no market)" ,f);
+                    continue;
+                }
 
-                    if (typeof f.category !== 'undefined') {
-                        safe_cat = url_safe(f.category);
-                    } else {
-                        console.log("BAD FILE: (no category)" ,f);
-                        continue;
-                    }
+                if (typeof f.category !== 'undefined') {
+                    safe_cat = url_safe(f.category);
+                } else {
+                    console.log("BAD FILE: (no category)" ,f);
+                    continue;
+                }
 
-                    /***
-                     * add the categories to the list
-                     */
-                    cat_list[ safe_cat ] = f.category;
+                /***
+                 * add the categories to the list
+                 */
+                cat_list[ safe_cat ] = f.category;
 
-                    /***
-                     * create entries if needed
-                     */
-                    file_tree[ safe_market ] = file_tree[ safe_market ] || {};
-                    file_tree[ safe_market ][ safe_cat ] =
-                        file_tree[ safe_market ][ safe_cat ] || [];
+                /***
+                 * create entries if needed
+                 */
+                file_tree[ safe_market ] = file_tree[ safe_market ] || {};
+                file_tree[ safe_market ][ safe_cat ] =
+                    file_tree[ safe_market ][ safe_cat ] || [];
 
-                    /***
-                     * add file to the tree
-                     * tree -> market -> category -> file
-                     */
-                    file_tree[ safe_market ][ safe_cat ].push(f);
+                /***
+                 * add file to the tree
+                 * tree -> market -> category -> file
+                 */
+                file_tree[ safe_market ][ safe_cat ].push(f);
 
-                } // while()
+            } // while()
 
-                // stick it all in the local storage
-                db.file_list(file_list);
-                db.cat_list(cat_list);
-                db.file_tree(file_tree);  // publishes ('ajax/load')
+            // stick it all in the local storage
+            db.file_list(file_list);
+            db.cat_list(cat_list);
+            db.file_tree(file_tree);  // publishes ('ajax/load')
 
-                // set default cat
-                for (var def_cat in cat_list) break;
-                MY_CAT = def_cat;
+            // set default cat
+            for (var def_cat in cat_list) break;
+            MY_CAT = def_cat;
 
                 db.set_defaults();
 
                 console.groupEnd('save_json');
 
-        },
+            },
+
+            /***
+             * @name server.save_lists_json
+             * Save all list from market_lang.json
+             *
+             * @arg {obj} json an object with two market and lang lists
+             */
+            save_lists_json : function (json) {
+                console.group('save_lists_json');
+
+                db.market_list(json.markets);
+                db.lang_list(json.langs);
+
+                console.groupEnd('save_lists_json');
+            }
+        };
 
         /***
-         * @name server.save_lists_json
-         * Save all list from market_lang.json
+         * @name start
+         * first function to run
          *
-         * @arg {obj} json an object with two market and lang lists
+         * contains all the bubpub listeners
          */
-        save_lists_json : function (json) {
-            console.group('save_lists_json');
-
-            db.market_list(json.markets);
-            db.lang_list(json.langs);
-
-            console.groupEnd('save_lists_json');
-        }
-    };
-
-    /***
-     * @name start
-     * first function to run
-     *
-     * contains all the bubpub listeners
-     */
-    var start = function () {
+        var start = function () {
 
 
-        bubpub.listen('sidebar/populate', function sidebar_populate() {
-            view.sidebar.populate();
-        });
+            bubpub.listen('sidebar/populate', function sidebar_populate() {
+                view.sidebar.populate();
+            });
 
-        /****************************************************
-         * BUBPUB: page changes
-         ****************************************************/
-        bubpub.listen('page', function page_change() {
-            console.log('cat page change: ', db.cat(), db.market(), db.lang());
+            /****************************************************
+             * BUBPUB: page changes
+             ****************************************************/
+            bubpub.listen('page', function page_change() {
+                console.log('cat page change: ', db.cat(), db.market(), db.lang());
 
-            var page = db.page();
+                var page = db.page();
 
-            // check if file list exists
-            if (page === 'cat') {
-                var file_list = db.current_file_list();
-                var lang_list = db.current_lang_list();
-                view.lang_DD.populate();
+                // check if file list exists
+                if (page === 'cat') {
+                    var file_list = db.current_file_list();
+                    var lang_list = db.current_lang_list();
+                    view.lang_DD.populate();
 
-                if (file_list.length !== 0) { //yes files
-                    bubpub.say('error/clear');
-                    view.table.populate(file_list, lang_list);
+                    if (file_list.length !== 0) { //yes files
+                        bubpub.say('error/clear');
+                        view.table.populate(file_list, lang_list);
 
-                } else { //no files
-                    bubpub.say('error/none_found');
-                }
+                    } else { //no files
+                        bubpub.say('error/none_found');
+                    }
 
-                $ui.search.mess.hide();
-
-            } else if (page === 'all') {  // search
-                view.error.loading();
-                bubpub.say('table/search');
-
-                var search = db.search();
-
-                if (search === "") {
                     $ui.search.mess.hide();
-                } else {
-                    $ui.search.mess.show().find('span').text( db.search() );
+                    $ui.search.other_options.hide();
+
+                } else if (page === 'all') {  // search
+                    view.error.loading();
+                    bubpub.say('table/search');
+
+                    var search = db.search();
+
+                    if (search === "") {
+                        $ui.search.mess.hide();
+                    } else {
+                        $ui.search.mess.show().find('span').text( db.search() );
+                    }
                 }
-            }
-        });
+            });
 
-        bubpub.listen('table/search', function page_change() {
-            view.error.clear();
-            view.table.search();
-        });
-
-        bubpub.listen('page/page', function page_change() {
-
-            var page = db.page();
-            if (page === 'cat') {
-                view.page.cat();
-            } else if (page === 'all') {
-                view.page.all();
+            bubpub.listen('table/search', function page_change() {
+                view.error.clear();
                 view.table.search();
-            }
+            });
 
-        });
+            bubpub.listen('page/page', function page_change() {
 
-
-        bubpub.listen('page/cat/market', function market_change() {
-            var lang = db.lang();
-
-            // check if new market has current lang
-            if ( (lang === 'all' || lang in db.current_lang_list()) === false) {
-                db.lang('all');
-            }
-
-            view.market_DD.update();
-        });
-
-        bubpub.listen('page/cat/cat page', function cat_change() {
-            view.sidebar.set_current();
-        });
-
-        bubpub.listen('page/search', function search_update() {
-            var search = db.search();
-            $ui.search.form.find('#dl_search_box').val(search);
-            bubpub.say('hash/export');
-        });
-
-        /****************************************************
-         * BUBPUB: lists
-         ****************************************************/
-
-        bubpub.listen('list/markets', function market_list_change() {
-            view.market_DD.populate();
-        });
-
-        bubpub.listen('list/cats', function cat_list_change() {
-            bubpub.say('sidebar/populate');
-        });
-
-        /****************************************************
-         * BUBPUB: error
-         ****************************************************/
-
-        bubpub.listen('error/clear', function error_clear() {
-            view.error.clear();
-        });
-
-        bubpub.listen('error/none_found', function none_found() {
-            view.error.none_found();
-        });
-
-        /****************************************************
-         * BUBPUB: hash
-         ****************************************************/
-        bubpub.listen('hash/export', function hash_export() {
-            view.hash.url_export();
-        });
-
-
-        bubpub.listen('hash/import', function hash_import() {
-            view.hash.url_import();
-
-            if ( db.market() === null ) {
-                for(var def_market in db.market_list() ) break;
-                db.market(def_market);
-            }
-
-            if ( db.cat() === null ) {
-                for(var def_cat in db.cat_list() ) break;
-                db.cat(def_cat);
-            }
-
-            if ( db.lang() === null ) {
-                db.cat(MY_LANG);
-            }
-        });
-
-        bubpub.listen('ajax/fail', function () {
-            view.error.ajax();
-        });
-
-        /***
-         * Bind events to the DOM
-         */
-        $ui.search.form.submit(function search_submit(e) {
-            e.preventDefault();
-            var search_str = $('#dl_search_box').val();
-            console.log("searching for...", search_str);
-            db.search(search_str);
-            db.page("all");
-
-        });
-
-        $ui.DD.market.change(function market_DD_change() {
-            db.market( $(this).val() );
-            bubpub.say('hash/export');
-        });
-
-        $ui.DD.lang.change(function lang_DD_change() {
-            db.lang( $(this).val() );
-            bubpub.say('hash/export');
-        });
-
-
-        $ui.table.each.delegate("a", "click", function (e) {
-            e.preventDefault();
-            console.log("file_pane_open");
-            $ui.file_pane.open();
-            return false;
-        });
-
-        $(".center").click(function () {
-            console.log("file_pane_close");
-            console.log($ui.file_pane);
-            $ui.file_pane.close();
-        });
-
-        $ui.sidebar.ul.on('click', 'a', function (e) {
-            e.preventDefault(); // stop hash change
-
-            var $this = $(this).parent();
-            var current = $ui.sidebar.current_class;
-            var page = $this.data('page');
-
-            db.page(page);
-
-            if (page === 'cat') {
-                
-                //if it did change
-                if (db.cat( $this.data('cat') ) === true) {
-                    view.error.loading();
+                var page = db.page();
+                if (page === 'cat') {
+                    view.page.cat();
+                } else if (page === 'all') {
+                    view.page.all();
+                    view.table.search();
                 }
-                // make sure to fire even if it doesn't change
-                bubpub.say('cat'); 
-            }
 
-            if (page === 'page') {
-                if (db.page( $this.data('cat') ) === true) {
-                    view.error.loading();
+            });
+
+
+            bubpub.listen('page/cat/market', function market_change() {
+                var lang = db.lang();
+
+                // check if new market has current lang
+                if ( (lang === 'all' || lang in db.current_lang_list()) === false) {
+                    db.lang('all');
                 }
-            }
 
-            console.log('click', page);
+                view.market_DD.update();
+            });
 
-            // change current visually
-            $(current).removeClass(current.slice(1));
-            $(this).parent().addClass(current.slice(1));
+            bubpub.listen('page/cat/cat page', function cat_change() {
+                view.sidebar.set_current();
+            });
 
-            bubpub.say('hash/export');
+            bubpub.listen('page/search', function search_update() {
+                var search = db.search();
+                $ui.search.form.find('#dl_search_box').val(search);
+                view.hash.url_export();
+            });
 
-        });
+            /****************************************************
+             * BUBPUB: lists
+             ****************************************************/
 
-        $(window).bind('hashchange', function () {
-            bubpub.say('hash/import');
-        });
+            bubpub.listen('list/markets', function market_list_change() {
+                view.market_DD.populate();
+            });
 
-        $('#search_mess a').click(function (e) {
-            e.preventDefault(); // stop hash change
-            db.search("");
-        });
+            bubpub.listen('list/cats', function cat_list_change() {
+                bubpub.say('sidebar/populate');
+            });
 
-        $('#reload_img').click(function (e) {
-            e.preventDefault(); // stop hash change
+            /****************************************************
+             * BUBPUB: error
+             ****************************************************/
+
+            /***
+             * Clear all the errors and show the table
+             */
+            bubpub.listen('error/clear', function error_clear() {
+                view.error.clear();
+            });
+
+            /***
+             * No files where found in a category
+             */
+            bubpub.listen('error/none_found', function none_found() {
+                view.error.none_found();
+            });
+
+            /***
+             * Hash changed in the browser window (usually from clicking
+             * the back or forward buttons)
+             */
+            bubpub.listen('hash', function hash_change() {
+                view.hash.url_import();
+
+                if ( db.market() === null ) {
+                    for(var def_market in db.market_list() ) break;
+                    db.market(def_market);
+                }
+
+                if ( db.cat() === null ) {
+                    for(var def_cat in db.cat_list() ) break;
+                    db.cat(def_cat);
+                }
+
+                if ( db.lang() === null ) {
+                    db.cat(MY_LANG);
+                }
+            });
+
+            /***
+             * there was an AJAX error
+             */
+            bubpub.listen('ajax/fail', function () {
+                view.error.ajax();
+            });
+
+            /***
+             * Bind submitting the search form
+             */
+            $ui.search.form.submit(function search_submit(e) {
+                e.preventDefault();
+                var search_str = $('#dl_search_box').val();
+                console.log("searching for...", search_str);
+                db.search(search_str);
+                db.page("all");
+
+            });
+
+            /***
+             * change the market drop down
+             */
+            $ui.DD.market.change(function market_DD_change() {
+                db.market( $(this).val() );
+                view.hash.url_export();
+            });
+
+            /***
+             * change the language drop down
+             */
+            $ui.DD.lang.change(function lang_DD_change() {
+                db.lang( $(this).val() );
+                view.hash.url_export();
+            });
+
+            /***
+             * Click on the name of a file opens up the side pane
+             */
+            $ui.table.each.delegate(".table_name > a", "click", function (e) {
+                e.preventDefault();
+                var id = $(this).data("id");
+                $ui.file_pane.open(id);
+                return false; // don't propagate!
+            });
+
+            /***
+             * anywhere on the page outside of the .file_pane
+             * will close it
+             */
+            $(".center").click(function () {
+                $ui.file_pane.close();
+            });
+
+            /***
+             * click on link that allows you to see more market / languages
+             * in the search.
+             */
+            $ui.search.second_link.click(function (e) {
+                e.preventDefault();
+                $ui.search.other_options.hide();
+                view.table.show_other_table();
+            });
+
+            /***
+             * click the "can't find it?" link that sets language to all that sets language to all.
+             */
+            $ui.search.all_langs_link.find('a').click(function (e) {
+                e.preventDefault();
+                db.lang("all");
+            });
+
+            /***
+             * click the sidebar tab
+             */
+            $ui.sidebar.ul.on('click', 'a', function (e) {
+                e.preventDefault(); // stop hash change
+
+                var $this = $(this).parent();
+                var current = $ui.sidebar.current_class;
+                var page = $this.data('page');
+
+                db.page(page);
+
+                if (page === 'cat') {
+
+                    //if it did change
+                    if (db.cat( $this.data('cat') ) === true) {
+                        view.error.loading();
+                    }
+                    // make sure to fire even if it doesn't change
+                    bubpub.say('cat'); 
+                }
+
+                if (page === 'page') {
+                    if (db.page( $this.data('cat') ) === true) {
+                        view.error.loading();
+                    }
+                }
+
+                console.log('click', page);
+
+                // change current visually
+                $(current).removeClass(current.slice(1));
+                $(this).parent().addClass(current.slice(1));
+
+                view.hash.url_export();
+
+            });
+
+            $(window).bind('hashchange', function () {
+                db.hash( window.location.hash );
+            });
+
+            $('#search_mess a').click(function (e) {
+                e.preventDefault(); // stop hash change
+                db.search("");
+            });
+
+            $('#reload_img').click(function (e) {
+                e.preventDefault(); // stop hash change
+                server.ajax_load_json();
+            });
+
+            $('#to_top').click(function () {
+                $('html,body').animate({scrollTop:0},0);
+            });
+
             server.ajax_load_json();
-        });
 
-        $('#to_top').click(function () {
-            $('html,body').animate({scrollTop:0},0);
-        });
+        };
 
-        server.ajax_load_json();
-
+        return {
+            'start' : start,
+            'view' : view,
+            'db' : db,
+            '$ui' : $ui,
+            'server' : server
+        };
     };
 
-    return {
-        'start' : start,
-        'view' : view,
-        'db' : db,
-        '$ui' : $ui,
-        'server' : server
-    };
-};
+    var Kdown = new Kdown();
 
-var Kdown = new Kdown();
-
-Kdown.start();
+    Kdown.start();
 
