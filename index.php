@@ -213,12 +213,12 @@
 <script type="text/javascript" charset="utf-8">
     <?php 
     //combine all the js files;
-    include 'files/jquery.min.js';
-    include 'console_fix.js';
+    include 'libs/jquery.min.js';
+    include 'libs/console_fix.js';
     ?>
 </script>
 
-<script src="bubpub/bubpub.js" type="text/javascript" charset="utf-8"> </script>
+<script src="libs/bubpub/bubpub.js" type="text/javascript" charset="utf-8"> </script>
 <script src="kdown.js" type="text/javascript" charset="utf-8"> </script>
 
 

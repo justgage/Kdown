@@ -14,7 +14,7 @@ Kdown = function () {
     MY_LANG = 'en',
     MY_MARKET = 'usa-can',
     MY_CAT = null,
-    API_URL = 'files/dream_api.php',
+    API_URL = 'api.php',
     NAMES_URL = 'files/market_lang.json';
 
     /***
@@ -47,6 +47,7 @@ Kdown = function () {
             cat_links : $('.cat_link a')
         },
         search : {
+            box : $('#dl_search_box'),
             form : $('#dl_search_form'),
             mess : $('#search_mess'),
             other_options : $('#other_options'),
@@ -975,9 +976,15 @@ Kdown = function () {
                     $ui.search.mess.hide();
                     $ui.search.other_options.hide();
 
+                    //make search box small
+                    $ui.search.box.
+                        removeClass('dl_search_big').
+                        addClass('dl_search_small');
+
                 } else if (page === 'search') {  // search
                     view.error.loading();
                     bubpub.say('table/search');
+
 
                     var search = db.search();
 
@@ -992,6 +999,13 @@ Kdown = function () {
             bubpub.listen('table/search', function page_change() {
                 view.error.clear();
                 view.table.search();
+                
+                //make search box big
+                $ui.search.box.
+                    addClass('dl_search_big').
+                    removeClass('dl_search_small').
+                    select(),
+                    focus();
             });
 
             bubpub.listen('page/page', function page_change() {
