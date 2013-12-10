@@ -375,7 +375,7 @@ Kdown = function () {
 
                     row = row.replace('(NUM)', 1 + i);
                     row = row.replace('(NAME)', file.doc_name);
-                    row = row.replace('(ID)', file.id);
+                    row = row.replace('(ID)', file.doc_id);
                     row = row.replace('(DL_LINK)', file.doc_url);
 
                     if (typeof lang_list[file.doc_language] !== 'undefined') {
@@ -462,23 +462,26 @@ Kdown = function () {
              */
             search_view : function table_search_view(main_list, other_list) {
 
+                // IS files in main list
                 if (main_list.length > 0) {
+                    console.log("main_list > 0");
                     view.table.populate(main_list);
                     view.error.found_first();
                 } else {
+                    console.log("main_list NONE");
                     view.error.none_found_first();
                 }
 
                 if (other_list.length > 0) {
+                    console.log("other_list > 0");
+                    $ui.search.other_options.show();
                     $ui.search.second_link.
                         find("span").
                         text(other_list.length);
                 } else {
-                    view.error.none_found();
+                    console.log("other_list NONE");
+                    $ui.search.other_options.hide();
                 }
-
-                $ui.search.other_options.show();
-
                 if (db.lang() !== "all") {
                     $ui.search.all_langs_link.show();
                 } else {
@@ -723,8 +726,8 @@ Kdown = function () {
              * Show first table (used in the search)
              */
             found_first : function () {
-                $ui.table.first.stop().fadeIn();
-                $ui.error.none_found_first.hide();
+                $ui.table.first.show();
+                this.clear();
             },
 
             /***
