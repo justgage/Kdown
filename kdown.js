@@ -18,7 +18,7 @@ Kdown = function () {
     NAMES_URL = 'files/market_lang.json';
 
     /***
-     * commonly used jQuery objects. 
+     * commonly used jQuery objects.
      */
     var $ui = {
         table: {
@@ -67,7 +67,7 @@ Kdown = function () {
 
 
     /***
-     * db 
+     * db
      *
      * holds all the information about the state of the page
      *
@@ -153,7 +153,7 @@ Kdown = function () {
 
         /***
          * @name db.current_lang_count
-         * count how many times a language is found in a file list to update the language dropdown count. 
+         * count how many times a language is found in a file list to update the language dropdown count.
          *
          * @arg {arr} file_list a array of file objects
          *
@@ -181,7 +181,7 @@ Kdown = function () {
          * @arg {string} market URL safe (see function) version of the market to look in
          * @arg {string} category URL safe (see function) version of the category to look in
          *
-         * @returns {array} list of languages in the specified market and category. 
+         * @returns {array} list of languages in the specified market and category.
          */
         current_lang_list : function (market, cat) {
             market = market || db.market();
@@ -233,13 +233,13 @@ Kdown = function () {
     };
 
     /***
-     * view 
+     * view
      *
      * helper functions/objects with handling the DOM.
      */
     var view = {
         /***
-         * @name view.copy 
+         * @name view.copy
          * the html of the copy objects used for tempesting
          */
         copy : {
@@ -250,13 +250,13 @@ Kdown = function () {
         },
 
         /***
-         * @name view.hash 
+         * @name view.hash
          * helper object to deal with the hash in the URL.
          */
         hash : {
 
             /***
-             * @name hash.url_import 
+             * @name hash.url_import
              * import the information into the hash to the db.
              */
             url_import : function () {
@@ -298,7 +298,7 @@ Kdown = function () {
             },
 
             /***
-             * @name hash.url_export 
+             * @name hash.url_export
              * export the db information to the hash for the current page
              */
             url_export : function () {
@@ -330,7 +330,7 @@ Kdown = function () {
         table : {
 
             /***
-             * used to store the other markets and languages table 
+             * used to store the other markets and languages table
              * html till needed.
              */
             other_table_list : null,
@@ -338,13 +338,13 @@ Kdown = function () {
             /***
              * @name table.populate
              *
-             * fill a table with a list of files. 
+             * fill a table with a list of files.
              *
-             * @arg {array} file_list (optional) a array of files to fill the table with. 
+             * @arg {array} file_list (optional) a array of files to fill the table with.
              * @arg {object} lang_list (optional) a mapping of the language code to the language name.
-             *                         eg: {"en" : "English", "es" : "Spanish", ... } 
+             *                         eg: {"en" : "English", "es" : "Spanish", ... }
              * @arg {number} table_num (optional) which table to fill, 1 or 2? (second only used for search)
-             */     
+             */
             populate : function(file_list, lang_list, table_num) {
 
                 var copy = "";
@@ -399,13 +399,13 @@ Kdown = function () {
                     table_html += row;
                 }
 
-                // dump into the table 
+                // dump into the table
                 $table.html(table_html);
             },
 
             /***
              * @name table.lang_filter
-             * Filter all the files that don't contain the lang specified 
+             * Filter all the files that don't contain the lang specified
              *
              * @arg {string} lang language code for the language which we want to find in the file list.
              *
@@ -438,7 +438,7 @@ Kdown = function () {
             },
             /***
              * @name table.search
-             * search all files name in the database for the search string. 
+             * search all files name in the database for the search string.
              *
              * @arg {string} search_str string to search for in file.name.
              */
@@ -484,7 +484,7 @@ Kdown = function () {
 
                 console.log(lang_count);
                 console.groupEnd("Search");
-                
+
                 this.search_view(main_list, other_list);
 
             },
@@ -493,11 +493,11 @@ Kdown = function () {
              *
              * this will decide how the search results are displayed
              *
-             * @arg {obj} main_list a list of files found in search in 
+             * @arg {obj} main_list a list of files found in search in
              *                      current market / lang
-             * @arg {obj} other_list a list of files found in search 
+             * @arg {obj} other_list a list of files found in search
              *                      NOT in current market / lang
-             */     
+             */
             search_view : function (main_list, other_list) {
 
                 if (main_list.length > 0) {
@@ -527,7 +527,7 @@ Kdown = function () {
 
                 $ui.table.second.hide();
 
-            }, 
+            },
             /***
              * @name table.show_other_table
              */
@@ -545,7 +545,7 @@ Kdown = function () {
             /***
              * @name sidebar.populate
              *
-             * fill the sidebar with categories and pages 
+             * fill the sidebar with categories and pages
              */
             populate : function () {
                 var copy_cat = view.copy.cat,
@@ -612,7 +612,7 @@ Kdown = function () {
 
         /***
          * @name view.market_DD
-         * helps with interaction with the market drop down. 
+         * helps with interaction with the market drop down.
          */
         market_DD : {
             /***
@@ -639,7 +639,7 @@ Kdown = function () {
             /***
              * @name market_DD.update
              *
-             * change which one is selected in the DOM based on db.market 
+             * change which one is selected in the DOM based on db.market
              */
             update : function () {
                 $ui.DD.market.val( db.market() );
@@ -648,7 +648,7 @@ Kdown = function () {
         },
         /***
          * @name view.lang_DD
-         * helps with interaction with the language drop down. 
+         * helps with interaction with the language drop down.
          */
         lang_DD : {
             /***
@@ -689,8 +689,8 @@ Kdown = function () {
             },
 
             /***
-             * @name lang_DD.spaces_align 
-             * creates a table using spaces based on padding. 
+             * @name lang_DD.spaces_align
+             * creates a table using spaces based on padding.
              * Used for making the lang count in the lang drop down
              *
              *                eg:"1   English"
@@ -703,7 +703,7 @@ Kdown = function () {
              *
              * @var padding how many characters wide to have col1 be.
              *
-             * @return string a row in the table that has col2 lined up. 
+             * @return string a row in the table that has col2 lined up.
              */
             spaces_align : function (col1, col2) {
                 var padding = 4,
@@ -748,7 +748,7 @@ Kdown = function () {
 
             /***
              * @name error.none_found
-             * 
+             *
              * show 'no files found message'
              */
             none_found : function () {
@@ -761,17 +761,8 @@ Kdown = function () {
              * Show first table (used in the search)
              */
             found_first : function () {
-                $ui.table.first.show();
+                $ui.table.first.stop().fadeIn();
                 $ui.error.none_found_first.hide();
-            },
-
-            /***
-             * @name error.found_second
-             * Show second table (used in the search)
-             */
-            found_second : function () {
-                //$ui.table.second.show();
-                // $ui.error.none_found_second.hide();
             },
 
             /***
@@ -784,7 +775,7 @@ Kdown = function () {
             },
 
             /***
-             * @name error.none_found_second 
+             * @name error.none_found_second
              * show message that none where found in the second table
              */
             none_found_second : function () {
@@ -793,16 +784,16 @@ Kdown = function () {
             },
 
             /***
-             * @name error.clear 
+             * @name error.clear
              * clear all error messages and show table (used in normal category view)
              */
             clear : function () {
                 this.hide_all();
-                $ui.table.all.show();
+                $ui.table.all.stop().fadeIn();
             },
 
             /***
-             * @name error.loading 
+             * @name error.loading
              * Show loading throbber for ajax
              */
             loading : function () {
@@ -818,7 +809,7 @@ Kdown = function () {
      */
     var server = {
         /***
-         * @name server.ajax_load_json 
+         * @name server.ajax_load_json
          * save the json in the proper formats
          */
         ajax_load_json : function () {
@@ -999,7 +990,7 @@ Kdown = function () {
             bubpub.listen('table/search', function page_change() {
                 view.error.clear();
                 view.table.search();
-                
+
                 //make search box big
                 $ui.search.box.
                     addClass('dl_search_big').
@@ -1105,7 +1096,6 @@ Kdown = function () {
             $ui.search.form.submit(function search_submit(e) {
                 e.preventDefault();
                 var search_str = $('#dl_search_box').val();
-                console.log("searching for...", search_str);
                 db.search(search_str);
                 db.page("search");
 
@@ -1182,7 +1172,7 @@ Kdown = function () {
                         view.error.loading();
                     }
                     // make sure to fire even if it doesn't change
-                    bubpub.say('cat'); 
+                    bubpub.say('cat');
                 }
 
                 if (page === 'page') {
@@ -1205,7 +1195,7 @@ Kdown = function () {
                 db.hash( window.location.hash );
             });
 
-            $('#search_mess a').click(function (e) {
+            $ui.search.mess.click(function (e) {
                 e.preventDefault(); // stop hash change
                 db.search("");
             });
