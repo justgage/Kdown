@@ -15,7 +15,7 @@ Kdown = function () {
     MY_MARKET = 'usa-can',
     MY_CAT = null,
     API_URL = 'api.php',
-    NAMES_URL = 'files/api_format.json';
+    NAMES_URL = 'api.php';
 
     /***
      * commonly used jQuery objects.
@@ -882,15 +882,15 @@ Kdown = function () {
                 var f = file_list[i]; // single file
                 var safe_market, safe_cat;
 
-                if (typeof f.market !== 'undefined') {
-                    safe_market = url_safe(f.market);
+                if (typeof f.doc_market !== 'undefined') {
+                    safe_market = url_safe(f.doc_market);
                 } else {
                     console.log("BAD FILE: (no market)" ,f);
                     continue;
                 }
 
-                if (typeof f.category !== 'undefined') {
-                    safe_cat = url_safe(f.category);
+                if (typeof f.doc_category !== 'undefined') {
+                    safe_cat = url_safe(f.doc_category);
                 } else {
                     console.log("BAD FILE: (no category)" ,f);
                     continue;
@@ -899,7 +899,7 @@ Kdown = function () {
                 /***
                  * add the categories to the list
                  */
-                cat_list[ safe_cat ] = f.category;
+                cat_list[ safe_cat ] = f.doc_category;
 
                 /***
                  * create entries if needed
