@@ -15,7 +15,7 @@ Kdown = function () {
     MY_MARKET = 'usa-can',
     MY_CAT = null,
     API_URL = 'api.php',
-    NAMES_URL = 'api.php';
+    NAMES_URL = 'files/market_lang.json';
 
     /***
      * commonly used jQuery objects.
@@ -104,8 +104,8 @@ Kdown = function () {
         sort_file_list : function sort_file_list(file_list) {
             var compare = function sort_compare(a, b) {
 
-                a = a.name.toLocaleLowerCase();
-                b = b.name.toLocaleLowerCase();
+                a = a.doc_name.toLocaleLowerCase();
+                b = b.doc_name.toLocaleLowerCase();
 
                 return a.localeCompare(b);
             };
@@ -137,7 +137,7 @@ Kdown = function () {
 
             // filter out all files in other languages
             var list = $.map(tree[market][cat], function map_filter_lang(file) {
-                if (lang === 'all' || file.language === lang) {
+                if (lang === 'all' || file.doc_language === lang) {
                     return file;
                 }
             });
@@ -161,7 +161,7 @@ Kdown = function () {
             i = file_list.length;
 
             while(i--) {
-                var lang = file_list[i].language;
+                var lang = file_list[i].doc_language;
                 lang_count[lang] = ++lang_count[lang] || 1;
             }
 
@@ -374,20 +374,20 @@ Kdown = function () {
                     row = copy;
 
                     row = row.replace('(NUM)', 1 + i);
-                    row = row.replace('(NAME)', file.name);
+                    row = row.replace('(NAME)', file.doc_name);
                     row = row.replace('(ID)', file.id);
-                    row = row.replace('(DL_LINK)', file.url);
+                    row = row.replace('(DL_LINK)', file.doc_url);
 
-                    if (typeof lang_list[file.language] !== 'undefined') {
-                        row = row.replace('(LANG)', lang_list[file.language]);
+                    if (typeof lang_list[file.doc_language] !== 'undefined') {
+                        row = row.replace('(LANG)', lang_list[file.doc_language]);
                     } else {
-                        row = row.replace('(LANG)', file.language);
+                        row = row.replace('(LANG)', file.doc_language);
                     }
 
-                    if (typeof market_list[file.market] !== 'undefined') {
-                        row = row.replace('(MARKET)', market_list[file.market]);
+                    if (typeof market_list[file.doc_market] !== 'undefined') {
+                        row = row.replace('(MARKET)', market_list[file.doc_market]);
                     } else {
-                        row = row.replace('(MARKET)', file.market);
+                        row = row.replace('(MARKET)', file.doc_market);
                     }
 
 
@@ -398,39 +398,6 @@ Kdown = function () {
                 $table.html(table_html);
             },
 
-            /***
-             * @name table.lang_filter
-             * Filter all the files that don't contain the lang specified
-             *
-             * @arg {string} lang language code for the language which we want to find in the file list.
-             *
-             * @return
-             */
-            lang_filter : function(lang) {
-                var file_list = db.table_json(), // TODO: table_json is invalid
-                filtered_list = [],
-                num_found = 0,
-                i = 0, l;
-
-                lang = lang || db.lang();
-
-                if (lang === 'all') {
-                    num_found = file_list.length;
-                    this.populate();
-                    i = 1;
-                } else {
-                    for (i = 0, l = file_list.length; i < l; i++) {
-                        var file = file_list[i];
-                        if (file.langs[lang]) {
-                            num_found += 1;
-                            filtered_list.push(file);
-                        }
-                    }
-                    this.populate(filtered_list);
-                }
-
-                return num_found > 0;
-            },
             /***
              * @name table.search
              * search all files name in the database for the search string.
@@ -456,19 +423,19 @@ Kdown = function () {
 
                     // If file name contains search string
                     if (search_str === "" ||
-                        file.name.toLocaleLowerCase().indexOf(search_str) !== -1) {
+                        file.doc_name.toLowerCase().indexOf(search_str) > -1) {
+                        console.log('searching' , file.doc_name.toLocaleLowerCase(), 'for', search_str, file.doc_name.toLowerCase().indexOf(search_str) );
 
-                        if (file.market === market && ('all' === lang || file.language === lang)) {
-                            console.log("main_list", file);
+                        if (file.doc_market === market && ('all' === lang || file.doc_language === lang)) {
+                            console.log("main", file.doc_name);
                             main_list.push(file);
-
                         } else {
-                            console.log("other_list", file);
+                            console.log("other", file.doc_name);
                             other_list.push(file);
                         }
 
-                        if (file.market === market) {
-                            lang_count[file.language] = ++lang_count[file.language] || 1;
+                        if (file.doc_market === market) {
+                            lang_count[file.doc_language] = ++lang_count[file.doc_language] || 1;
                         }
                     }
 
@@ -871,7 +838,7 @@ Kdown = function () {
                 return;
             }
 
-            var file_list  = json.files,
+            var file_list  = json,
             market_list = {},
             cat_list    = {},
             file_tree   = {},
