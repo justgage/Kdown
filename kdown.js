@@ -98,7 +98,7 @@ Kdown = function () {
         hash : new bubpub.obj('hash'),                                     // hold the hash in the URL
 
         pages : {
-            all : 'All Documents'
+            search : 'Search all Documents'
         },
 
         /***
@@ -238,32 +238,6 @@ Kdown = function () {
      */
     var view = {
         /***
-         * @name view.page 
-         * helpers to do page changes.
-         */
-        page : {
-            /***
-             * @name page.all
-             * show all downloads page
-             */
-            all : function () {
-                view.error.clear();
-                $ui.table.first.show();
-                $ui.table.second.show(); // TODO: CHECK THIS OUT
-            },
-
-            /***
-             * @name page.cat
-             * show category page
-             */
-            cat : function () {
-                view.error.clear();
-                $ui.table.first.show();
-                $ui.table.second.hide();
-            }
-        },
-
-        /***
          * @name view.copy 
          * the html of the copy objects used for tempesting
          */
@@ -288,7 +262,7 @@ Kdown = function () {
                 var hash_str = window.location.hash;
 
                 if (hash_str === '' || db.file_tree() === null) {
-                    return null;
+                    return false;
                 }
 
                 // if anything is null.
@@ -310,7 +284,7 @@ Kdown = function () {
                     bubpub.say('cat'); // publish using bubpub
                 }
 
-                if (page === 'all') {
+                if (page === 'search') {
                     db.market(hash[1]);
                     db.lang(hash[2]);
                     if (hash.length > 3) {
@@ -319,7 +293,7 @@ Kdown = function () {
                         db.search("");
                     }
                 }
-
+                return true;
             },
 
             /***
@@ -336,7 +310,7 @@ Kdown = function () {
                     hash += '/' + db.lang();
                 }
 
-                if (page === 'all') {
+                if (page === 'search') {
                     hash += '/' + db.market();
                     hash += '/' + db.lang();
                     if (db.search() !== "") {
@@ -471,7 +445,7 @@ Kdown = function () {
                 search_str = search_str || db.search();
                 search_str = search_str.toLocaleLowerCase();
 
-                var json = db.file_list(),
+                var file_list = db.file_list(),
                 main_list = [],
                 other_list = [],
                 market = db.market(),
@@ -481,8 +455,8 @@ Kdown = function () {
                 console.groupCollapsed("Search");
 
 
-                for (var i=0, l = json.length; i < l; i++) {
-                    var file = json[i];
+                for (var i=0, l = file_list.length; i < l; i++) {
+                    var file = file_list[i];
 
                     // If file name contains search string
                     if (search_str === "" ||
@@ -1001,7 +975,7 @@ Kdown = function () {
                     $ui.search.mess.hide();
                     $ui.search.other_options.hide();
 
-                } else if (page === 'all') {  // search
+                } else if (page === 'search') {  // search
                     view.error.loading();
                     bubpub.say('table/search');
 
@@ -1024,9 +998,7 @@ Kdown = function () {
 
                 var page = db.page();
                 if (page === 'cat') {
-                    view.page.cat();
-                } else if (page === 'all') {
-                    view.page.all();
+                } else if (page === 'search') {
                     view.table.search();
                 }
 
@@ -1121,7 +1093,7 @@ Kdown = function () {
                 var search_str = $('#dl_search_box').val();
                 console.log("searching for...", search_str);
                 db.search(search_str);
-                db.page("all");
+                db.page("search");
 
             });
 
@@ -1249,4 +1221,5 @@ Kdown = function () {
     var Kdown = new Kdown();
 
     Kdown.start();
+
 
