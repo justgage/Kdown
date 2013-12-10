@@ -86,7 +86,7 @@
                         <tbody>
                             <tr style="display:none;" id="table_copy">
                                 <td class="table_num">(NUM)</td>
-                                <td class="table_name"><a href="#file_info">(NAME)</a></td>
+                                <td class="table_name"><a data-id="(ID)" href="#file_info">(NAME)</a></td>
                                 <td class="table_lang">(LANG)</td>
                                 <td class="table_dl_link"><a href="(DL_LINK)">Download</a></td>
                             </tr>

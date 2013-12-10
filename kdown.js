@@ -15,7 +15,7 @@ Kdown = function () {
     MY_MARKET = 'usa-can',
     MY_CAT = null,
     API_URL = 'api.php',
-    NAMES_URL = 'files/market_lang.json';
+    NAMES_URL = 'files/api_format.json';
 
     /***
      * commonly used jQuery objects.
@@ -56,12 +56,6 @@ Kdown = function () {
         },
         file_pane : {
             pane : $('.file_pane'),
-            open : function (id) {
-                this.pane.scrollTop(0).removeClass("file_pane_hide").addClass("file_pane_show");
-            },
-            close : function () {
-                this.pane.removeClass("file_pane_show").addClass("file_pane_hide");
-            }
         }
     };
 
@@ -107,8 +101,8 @@ Kdown = function () {
          * @arg {arr} file_list a array of files
          * @return {arr} sorted file list
          */
-        sort_file_list : function (file_list) {
-            var compare = function (a, b) {
+        sort_file_list : function sort_file_list(file_list) {
+            var compare = function sort_compare(a, b) {
 
                 a = a.name.toLocaleLowerCase();
                 b = b.name.toLocaleLowerCase();
@@ -126,7 +120,7 @@ Kdown = function () {
          * @arg {string} lang pass in a language to filter by 'all' get's all.
          * @returns {array} list of files in the current market, cat, and lang
          */
-        current_file_list : function (lang) {
+        current_file_list : function current_file_list(lang) {
 
             var tree = db.file_tree(); // get all files
             var market = db.market();
@@ -142,7 +136,7 @@ Kdown = function () {
             }
 
             // filter out all files in other languages
-            var list = $.map(tree[market][cat], function (file) {
+            var list = $.map(tree[market][cat], function map_filter_lang(file) {
                 if (lang === 'all' || file.language === lang) {
                     return file;
                 }
@@ -159,7 +153,7 @@ Kdown = function () {
          *
          * @return {object} returns language counts in this structure -> { 'en' : 6, 'hk' : 0 ...}
          */
-        current_lang_count : function (file_list) {
+        current_lang_count : function current_lang_count(file_list) {
 
             file_list = file_list || this.current_file_list('all');
 
@@ -183,7 +177,7 @@ Kdown = function () {
          *
          * @returns {array} list of languages in the specified market and category.
          */
-        current_lang_list : function (market, cat) {
+        current_lang_list : function current_lang_list(market, cat) {
             market = market || db.market();
             cat = cat || db.cat();
             var lang_list = db.lang_list();
@@ -202,7 +196,7 @@ Kdown = function () {
          * @name db.set_defaults
          * will set the market, category, language to a default one if they are null.
          */
-        set_defaults : function () {
+        set_defaults : function set_defaults() {
             console.groupCollapsed('DEFAULTS');
             if (this.market() === null) {
                 this.market(MY_MARKET);
@@ -228,7 +222,7 @@ Kdown = function () {
      * @return {string} string with all spaces and non
      *                  alpha-numeric characters turned to a '-'
      */
-    var url_safe = function (unsafe) {
+    var url_safe = function url_safe(unsafe) {
         return unsafe.toLocaleLowerCase().replace(/[^a-zA-Z0-9]+/g,'-');
     };
 
@@ -259,7 +253,7 @@ Kdown = function () {
              * @name hash.url_import
              * import the information into the hash to the db.
              */
-            url_import : function () {
+            url_import : function url_import() {
                 var hash_str = window.location.hash;
 
                 if (hash_str === '' || db.file_tree() === null) {
@@ -301,7 +295,7 @@ Kdown = function () {
              * @name hash.url_export
              * export the db information to the hash for the current page
              */
-            url_export : function () {
+            url_export : function url_export() {
                 var page = db.page();
                 var hash = '#' + page;
 
@@ -381,6 +375,7 @@ Kdown = function () {
 
                     row = row.replace('(NUM)', 1 + i);
                     row = row.replace('(NAME)', file.name);
+                    row = row.replace('(ID)', file.id);
                     row = row.replace('(DL_LINK)', file.url);
 
                     if (typeof lang_list[file.language] !== 'undefined') {
@@ -442,7 +437,7 @@ Kdown = function () {
              *
              * @arg {string} search_str string to search for in file.name.
              */
-            search : function (search_str) {
+            search : function table_search(search_str) {
                 search_str = search_str || db.search();
                 search_str = search_str.toLocaleLowerCase();
 
@@ -498,7 +493,7 @@ Kdown = function () {
              * @arg {obj} other_list a list of files found in search
              *                      NOT in current market / lang
              */
-            search_view : function (main_list, other_list) {
+            search_view : function table_search_view(main_list, other_list) {
 
                 if (main_list.length > 0) {
                     view.table.populate(main_list);
@@ -531,7 +526,7 @@ Kdown = function () {
             /***
              * @name table.show_other_table
              */
-            show_other_table : function () {
+            show_other_table : function show_other_table() {
                 view.table.populate(this.other_table_list, null, 2);
                 $ui.table.second.fadeIn();
             }
@@ -547,7 +542,7 @@ Kdown = function () {
              *
              * fill the sidebar with categories and pages
              */
-            populate : function () {
+            populate : function sidebar_populate() {
                 var copy_cat = view.copy.cat,
                 pages = db.pages,
                 html = '',
@@ -593,7 +588,7 @@ Kdown = function () {
              * @name sidebar.set_current
              * Change with page is selected in the sidebar.
              */
-            set_current : function () {
+            set_current : function sidebar_set_current() {
                 var sidebar = $ui.sidebar;
                 //remove current one
                 $($ui.sidebar.current_class).
@@ -619,7 +614,7 @@ Kdown = function () {
              * @name market_DD.populate
              * fill the market drop down with markets in db.market_list
              */
-            populate : function () {
+            populate : function market_DD_populate() {
 
                 var list = db.market_list();
                 var html;
@@ -641,7 +636,7 @@ Kdown = function () {
              *
              * change which one is selected in the DOM based on db.market
              */
-            update : function () {
+            update : function market_DD_update() {
                 $ui.DD.market.val( db.market() );
             }
 
@@ -657,7 +652,7 @@ Kdown = function () {
              * @arg {object} count a object assosiating the language code with the amount in the table
              *                     eg {"en" : 2, "es" : 4...}
              */
-            populate : function (count) {
+            populate : function lang_DD_populate(count) {
 
                 count = count || db.current_lang_count();
                 var langs = db.current_lang_list();
@@ -705,7 +700,7 @@ Kdown = function () {
              *
              * @return string a row in the table that has col2 lined up.
              */
-            spaces_align : function (col1, col2) {
+            spaces_align : function lang_DD_spaces_align(col1, col2) {
                 var padding = 4,
                 spaces = [];
                 col1 = col1 + '';
@@ -727,7 +722,7 @@ Kdown = function () {
              * @name error.hide_all
              * hide all tables and error messages
              */
-            hide_all : function () {
+            hide_all : function error_hide_all  () {
                 $ui.table.all.hide();
                 for (var single in $ui.error) {
                     if($ui.error.hasOwnProperty(single)) {
@@ -800,6 +795,29 @@ Kdown = function () {
                 this.hide_all();
                 $ui.error.loading.show();
             }
+        },
+        file_pane : {
+            open : function (id) {
+                var $pane = $ui.file_pane.pane;
+
+                console.log(id);
+                
+                //close it
+                this.close();
+                // reopen it in a second
+                // to show that it's changed
+                window.setTimeout(function () {
+                    $pane.
+                        addClass("file_pane_show").
+                        scrollTop(0).
+                        removeClass("file_pane_hide");
+                }, 200);
+            },
+            close : function () {
+                $ui.file_pane.pane.
+                    removeClass("file_pane_show").
+                    addClass("file_pane_hide");
+            }
         }
     };
 
@@ -824,13 +842,13 @@ Kdown = function () {
             });
 
             // If either Error out:
-            lists_promise.fail(function (code) {
-                console.log('FAIL', code);
+            lists_promise.fail(function (error_obj) {
+                console.log('FAIL', error_obj);
                 bubpub.say('ajax/fail');
             });
 
-            promise.fail(function (code) {
-                console.log('FAIL', code);
+            promise.fail(function (error_obj) {
+                console.log('FAIL', error_obj);
                 bubpub.say('ajax/fail');
             });
 
@@ -1123,7 +1141,7 @@ Kdown = function () {
             $ui.table.each.delegate(".table_name > a", "click", function (e) {
                 e.preventDefault();
                 var id = $(this).data("id");
-                $ui.file_pane.open(id);
+                view.file_pane.open(id);
                 return false; // don't propagate!
             });
 
@@ -1132,7 +1150,7 @@ Kdown = function () {
              * will close it
              */
             $(".center").click(function () {
-                $ui.file_pane.close();
+                view.file_pane.close();
             });
 
             /***

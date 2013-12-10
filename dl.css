@@ -86,12 +86,18 @@
     overflow: hidden;
 }
 
+
 .table_name a {
     /* text-decoration: none;
      */
     display: block;
     padding: 10px;
     vertical-align: middle;
+}
+
+.table_name a:active {
+    padding-top: 12px;
+    padding-bottom: 8px;
 }
 
 .dl_table table td {
