@@ -1004,7 +1004,7 @@ Kdown = function () {
                 $ui.search.box.
                     addClass('dl_search_big').
                     removeClass('dl_search_small').
-                    select(),
+                    select().
                     focus();
             });
 
