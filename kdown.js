@@ -991,8 +991,10 @@ Kdown = function () {
 
                 var page = db.page();
                 if (page === 'cat') {
+                    $ui.table.first.show();
+                    $ui.table.second.hide();
                 } else if (page === 'search') {
-                    view.table.search();
+
                 }
 
             });
@@ -1213,5 +1215,4 @@ Kdown = function () {
     var Kdown = new Kdown();
 
     Kdown.start();
-
 
