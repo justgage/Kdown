@@ -1,17 +1,79 @@
-{
-    [
+{ 
+    "table": {
+        "Cateogry 1" : [
+            {
+                "id" : 1,
+                "name" : "Name in my native lang",
+                "url" : "http://..",
+                "file_ext" : "pdf"
+            },
+            {
+                "id" : 1,
+                "name" : "Name in my native lang",
+                "url" : "http://..",
+                "file_ext" : "pdf"
+            }
+            {},
+            {},
+            {}
+        ],
+        "Cateogry 2" : [
+            {
+                "id" : 3,
+                "name" : "Name in my native lang",
+                "url" : "http://..",
+                "file_ext" : "pdf",
+                "Applications & Forms"
+            },
+            {
+                "id" : 5,
+                "name" : "Name in my native lang",
+                "url" : "http://..",
+                "file_ext" : "pdf"
+            }
+        ]
+    },
+
+
+
+
+
+    "db schema" : [
         {
-            "doc_id" : 1,
-            "doc_name" : "name",
-            "doc_date" : "2013-12-31",
-            "doc_description" : "this is what the file is",
-            "doc_market" : "eu",
-            "doc_language" : "en",
-            "doc_url" : "http://google.com",
-            "docfile_ext" : "pdf",
-            "doc_revision" : "1",
-            "doc_category" : "Applications",
-            "doc_trans" : "parent_doc_name"
+            "id" : 1,
+            "name" : "Admin's name",
+            "file_ext" : "pdf",
+            "category" : "Applications",
+            "translations" : {
+                "usa-can" : {
+                    "en" : {
+                        [ 
+                            0 : {}, 
+                            1 : {},
+                            2 : {
+                                "name" : "English Name",
+                                "date" : "2013-12-31",
+                                "description" : "this is what the file is",
+                                "url" : "http://google.com",
+                                "revision" : 3
+                            }
+                                ]
+                    },
+                    "es" : {
+                        "name" : "Spanish Name",
+                        "date" : "2013-12-31",
+                        "description" : "this is what the file is",
+                        "url" : "http://google.com",
+                        "revision" : "3"
+                    }
+                }
+                "eu" : {
+                    "en" : {}
+                    "es" : {}
+                    "hk" : {}
+                }
+            }
+
         }
     ]
 }

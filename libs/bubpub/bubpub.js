@@ -51,7 +51,7 @@ var bubpub = {
         // merge the two objects together
         $.extend(this.args[topic_str], args_obj );
 
-        console.groupCollapsed("SAY" , topics);
+        console.log("SAY >> " , topics);
 
         for (var i=0, l = topics.length; i < l; i++) {
             this.bubble(topics[i]);
@@ -119,6 +119,7 @@ var bubpub = {
         var que = that.que;
         that.que = [];
         that.timeout_fired = false;
+        console.log("");
         console.group("FIRE");
 
         i = que.length;
@@ -198,9 +199,12 @@ var bubpub = {
             if (validator === null || validator(new_val) === true) {
                 // make sure we're changing it
                 if (value !== new_val) {
-                    console.log('SET' ,value, '-> ' + publish_name + ' ->', new_val);
+                    console.groupCollapsed('SET' , publish_name);
+                    console.log(value, ' >> ', new_val);
+                    console.trace();
                     value = new_val;
                     bubpub.say(publish_name);
+                    console.groupEnd();
                     return true;
                 }
             } else {
@@ -223,7 +227,7 @@ var bubpub = {
             // GET
             if (typeof new_val === 'undefined') {
                 if (value === null) {
-                    console.error(publish_name + ' returning NULL');
+                    console.warn(publish_name + ' returning NULL');
                 }
                 return value; // get
             } else {

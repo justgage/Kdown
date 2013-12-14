@@ -13,6 +13,7 @@ Kdown = function () {
     var LOGGING = false,
     MY_LANG = 'en',
     MY_MARKET = 'usa-can',
+    MY_CAT = null,
     API_URL = 'api.php',
     NAMES_URL = 'files/market_lang.json';
 
@@ -65,6 +66,8 @@ Kdown = function () {
      * see bubpub.obj in the bubpub README for more info.
      */
     var db = {
+        // current page
+        page : new bubpub.obj('page/page', 'cat'),
 
         // list of valid markets
         market_list : new bubpub.obj('list/markets'),
@@ -73,31 +76,28 @@ Kdown = function () {
         // list of valid categories
         cat_list : new bubpub.obj('list/cats'),
 
-        // current page
-        page : new bubpub.obj('document/sidebar/page', 'cat'),
-
         // current market
-        market : new bubpub.obj('document/DD/market', null, function (test) {
+        market : new bubpub.obj('page/cat/market', null, function (test) {
             return test in db.market_list();
         }),
 
         // current category
-        cat : new bubpub.obj('document/sidebar/cat', null, function (test) {
+        cat : new bubpub.obj('page/cat/cat', null, function (test) {
             return  test in db.cat_list();
         }),
 
         // current translation selected (can be 'ALL')
-        lang : new bubpub.obj('document/DD/lang', null, function (test) {
+        lang : new bubpub.obj('page/cat/lang', null, function (test) {
             return test in model.current_lang_list();
         }),
 
         // search string
-        search : new bubpub.obj('document/search', ""),
+        search : new bubpub.obj('page/search', ""),
 
         // each language's count [lang] => count
         lang_count : new bubpub.obj('lang_count'),
         // hold the current table's JSON
-        file_tree : new bubpub.obj('file_tree/load', {}),
+        file_tree : new bubpub.obj('ajax/load', {}),
         current_file_list : new bubpub.obj('file_tree/current'),
 
             // hold the hash in the URL
@@ -175,7 +175,7 @@ Kdown = function () {
             var lang = db.lang();
             var cat = db.cat();
 
-            // do we have it in file_tree?
+            // do we have it in file_tree? 
             if (typeof tree[market] === 'undefined' ||
                 typeof tree[market][lang] === 'undefined') {
                 return null;
@@ -186,32 +186,65 @@ Kdown = function () {
 
         /***
          * @name model.current_file_list_update
-         *
+         * 
          * changes model.current_file_list() to current
-         * market/lang one loading it with AJAX if
+         * market/lang one loading it with AJAX if 
          * it doesn't exist
          *
          */
         current_file_list_update : function () {
 
-           console.log("current_file_list update!!!!");
+            console.group("current_file_list_update");
 
             var market = db.market();
             var lang = db.lang();
             var tree = this.get_current_file_list();
 
-            // do we have it in file_tree?
+            // do we have it in file_tree? 
             if (tree === null) {
-                console.log("no current tree, ajax load...");
-
+                
                 // load it ajax wise
-                API.load_file_tree();
+                API.file_tree_load(function (cat_tree) {
+                    var temp_tree = {};
+
+                    temp_tree[market] = {};
+                    temp_tree[market][lang] = cat_tree;
+
+                    $.extend(tree, temp_tree);
+
+                    db.current_file_list(cat_tree[ db.cat() ]);
+                    db.file_tree(tree);
+                });
 
             } else {
-                console.log("oh we already have that tree setting it...");
+                //set it to current market / lang
                 db.current_file_list( tree );
             }
 
+            console.groupEnd("current_file_list_update");
+        },
+
+        /***
+         * @name model.current_lang_count
+         * count how many times a language is found in a file list to update the language dropdown count.
+         *
+         * @arg {arr} file_list a array of file objects
+         *
+         * @return {object} returns language counts in this structure -> { 'en' : 6, 'hk' : 0 ...}
+         */
+        current_lang_count : function current_lang_count(file_list) {
+
+            file_list = file_list || this.current_file_list();
+
+            var lang_count = {},
+            i = file_list.length;
+
+            while(i--) {
+                var lang = file_list[i].language;
+                lang_count[lang] = ++lang_count[lang] || 1;
+            }
+
+            return lang_count;
         },
 
         /***
@@ -238,7 +271,6 @@ Kdown = function () {
          */
         set_defaults : function set_defaults() {
             console.log("set_defaults");
-
             if (db.market() === null) {
                 db.market(MY_MARKET);
             }
@@ -277,6 +309,65 @@ Kdown = function () {
             page : $('#copy-page').html()
         },
 
+        page : {
+            /***
+             * @name page.update
+             *
+             * this will update the entire page including loading
+             * the sidebar / DD AND Table if needed. 
+             */
+            update : function () {
+
+                // make sure we have the lists loaded
+                if ( db.market_list() !== null ) {
+
+                    var page = db.page();
+
+                    if (page === 'cat') {
+
+                        $ui.search.mess.hide();
+                        $ui.search.other_options.hide();
+                        $ui.search.box.
+                            removeClass('dl_search_big').
+                            addClass('dl_search_small');
+
+                        var file_list = model.get_current_file_list();
+
+                        if (file_list !== null) {
+
+                            if (file_list.length !== 0) { 
+                                db.current_file_list(file_list);
+
+                            } else { //no files
+                                bubpub.say('error/none_found');
+                            }
+
+                        } else {
+
+                            API.file_tree_load();
+
+                        }
+                    } else if (page === 'search') {  // search
+                        view.error.loading();
+                        bubpub.say('table/search');
+
+
+                        var search = db.search();
+
+                        if (search === "") {
+                            $ui.search.mess.hide();
+                        } else {
+                            $ui.search.mess.show().find('span').text( db.search() );
+                        }
+                    }
+
+
+                } else { //there's no list loaded
+                    API.load_lists();
+                }
+            }
+        },
+
         /***
          * @name view.hash
          * helper object to deal with the hash in the URL.
@@ -313,6 +404,8 @@ Kdown = function () {
                         db.cat_temp = hash[2];
                     }
                     db.lang(hash[3]);
+
+                    bubpub.say('cat'); // publish using bubpub
                 }
 
                 if (page === 'search') {
@@ -324,7 +417,6 @@ Kdown = function () {
                         db.search("");
                     }
                 }
-
                 return true;
             },
 
@@ -376,7 +468,6 @@ Kdown = function () {
              *                         eg: {"en" : "English", "es" : "Spanish", ... }
              * @arg {number} table_num (optional) which table to fill, 1 or 2? (second only used for search)
              */
-
             populate : function(file_list, lang_list, table_num) {
 
                 lang_list = lang_list || model.current_lang_list();
@@ -641,7 +732,7 @@ Kdown = function () {
                 for (var code in langs) {
                     if(langs.hasOwnProperty(code)) {
                         var name = langs[code];
-                        option = temp;
+                        option = temp; 
 
                         option = option.replace("(VAL)", code);
                         option = option.replace("(NAME)", name );
@@ -796,7 +887,7 @@ Kdown = function () {
      */
     var API = {
         /***
-         * @name API.load_lists
+         * @name API.ajax_load_json
          * load enough to start off the page.
          */
         load_lists : function () {
@@ -807,8 +898,8 @@ Kdown = function () {
 
             promise.done(function promise_list_done(json) {
                 API.save_lists_json(json);
-                model.set_defaults();
 
+                view.hash.url_import();
             });
 
             promise.fail(function (error_obj) {
@@ -819,12 +910,12 @@ Kdown = function () {
         },
 
         /***
-         * @name API.load_file_tree
+         * @name API.file_tree_load
          */
-        load_file_tree : function () {
+        file_tree_load : function (callback, market, lang) {
 
-            var market = db.market();
-            var lang = db.lang();
+            market = market || db.market();
+            lang = lang || db.lang();
 
             var request = {
                 "market" : market,
@@ -864,23 +955,15 @@ Kdown = function () {
 
                     db.file_tree(tree);
 
-                    var current = model.get_current_file_list();
-
-                    if ( db.current_file_list(current)) {
-                        console.log("ajax CHANGED somthing!", current);
-                    } else {
-                        console.log("didn't change anything!", current, db.cat());
-                    }
-
-                    view.hash.url_import();
                     model.set_defaults();
+
+                    db.current_file_list(json.cats[db.cat()]);
 
                 } else {
 
                     console.log("AJAX_ERROR:", json);
 
                     db.current_file_list(null);
-                    bubpub.say('file_tree/current');
 
                 }
             });
@@ -892,7 +975,7 @@ Kdown = function () {
 
         /***
          * ~~~~~TODO remove this in place for db.update_file_tree() ~~~~~
-         *
+         * 
          * @name API.save_json
          * Save all the ajax information from API
          * in proper format
@@ -964,6 +1047,12 @@ Kdown = function () {
             db.cat_list(cat_list);
             db.file_tree(file_tree);  // publishes ('ajax/load')
 
+            // set default cat
+            for (var def_cat in cat_list) break;
+            MY_CAT = def_cat;
+
+            model.set_defaults();
+
             console.groupEnd('save_json');
 
             return true; // worked
@@ -974,15 +1063,16 @@ Kdown = function () {
              * @name API.save_lists_json
              * Save all list from market_lang.json
              *
-             * @arg {obj} json an object with two master lists, language and market.
+             * @arg {obj} json an object with two market and lang lists
              */
             save_lists_json : function (json) {
 
                 db.market_list(json.markets);
                 db.lang_list(json.langs);
 
+                model.set_defaults();
             }
-        };
+        }; 
 
         /***
          * @name start
@@ -996,6 +1086,10 @@ Kdown = function () {
             /****************************************************
              * BUBPUB: page changes
              ****************************************************/
+            bubpub.listen('page', function any_page_change() {
+                view.page.update();
+            });
+
             bubpub.listen('table/search', function page_change() {
                 view.error.clear();
                 view.table.search();
@@ -1008,53 +1102,36 @@ Kdown = function () {
                     focus();
             });
 
-            bubpub.listen('document/sidebar', function sidebar_change() {
+            bubpub.listen('page/page', function page_change() {
                 var page = db.page();
 
                 if (page === 'cat') {
-
-                    $ui.search.mess.hide();
-                    $ui.search.other_options.hide();
-                    $ui.search.box.
-                        removeClass('dl_search_big').
-                        addClass('dl_search_small');
-
-                } else if (page === 'search') {
-                    view.error.loading();
-                    bubpub.say('table/search');
-
-
-                    var search = db.search();
-
-                    if (search === "") {
-                        $ui.search.mess.hide();
-                    } else {
-                        $ui.search.mess.show().find('span').text( db.search() );
-                    }
-
+                    $ui.table.first.show();
+                    $ui.table.second.hide();
                 }
-
-                $ui.table.first.show();
-                $ui.table.second.hide();
-
             });
 
-            bubpub.listen('document/sidebar/cat', function () {
+            bubpub.listen('page/cat/market page/cat/lang', function () {
+                console.log("market or lang changed");
+                bubpub.say('current_file_list_update')
+            });
+
+            bubpub.listen('current_file_list_update', function () {
                 model.current_file_list_update();
             });
 
 
-            bubpub.listen('document/DD/market', function market_change() {
+            bubpub.listen('page/cat/market', function market_change() {
                 var lang = db.lang();
 
                 view.market_DD.update();
             });
 
-            bubpub.listen('document/sidebar', function sidebar_change() {
+            bubpub.listen('page/cat/cat page/page', function cat_change() {
                 view.sidebar.set_current();
             });
 
-            bubpub.listen('document/search', function search_update() {
+            bubpub.listen('page/search', function search_update() {
                 var search = db.search();
                 $ui.search.form.find('#dl_search_box').val(search);
                 view.hash.url_export();
@@ -1066,8 +1143,6 @@ Kdown = function () {
 
             bubpub.listen('list/markets', function market_list_change() {
                 view.market_DD.populate();
-                
-                model.current_file_list_update();
             });
 
             bubpub.listen('list/langs', function market_list_change() {
@@ -1078,19 +1153,13 @@ Kdown = function () {
                 view.sidebar.populate();
             });
 
-            bubpub.listen('file_tree/current', function file_tree_current() {
-                console.log("updating table");
-
-                var file_list = db.current_file_list();
-                console.log("file_list is", file_list);
-
+            bubpub.listen('file_tree/current', function cat_list_change() {
+                var file_list = db.current_file_list(); // set to 'all'
                 if (file_list !== null) {
-
                     view.error.clear();
                     view.table.populate(file_list);
-
                 } else {
-                    view.error.ajax();
+                    bubpub.say('error/ajax');
                 }
             });
 
@@ -1238,7 +1307,6 @@ Kdown = function () {
 
             $('#reload_img').click(function (e) {
                 e.preventDefault(); // stop hash change
-
                 API.load_lists();
             });
 
@@ -1246,21 +1314,24 @@ Kdown = function () {
                 $('html,body').animate({scrollTop:0},0);
             });
 
-            API.load_lists();
+            /***
+             * start off the whole thing
+             */
+            view.page.update();
         };
 
-        /***
-         * @name url_safe
-         *
-         * escape strings for the URL
-         *
-         * @arg {string} unsafe string to make URL safe
-         * @return {string} string with all spaces and non
-         *                  alpha-numeric characters turned to a '-'
-         */
-        var url_safe = function url_safe(unsafe) {
-            return unsafe.toLocaleLowerCase().replace(/[^a-zA-Z0-9]+/g,'-');
-        };
+    /***
+     * @name url_safe
+     *
+     * escape strings for the URL
+     *
+     * @arg {string} unsafe string to make URL safe
+     * @return {string} string with all spaces and non
+     *                  alpha-numeric characters turned to a '-'
+     */
+    var url_safe = function url_safe(unsafe) {
+        return unsafe.toLocaleLowerCase().replace(/[^a-zA-Z0-9]+/g,'-');
+    };
 
         return {
             'start' : start,
@@ -1269,9 +1340,9 @@ Kdown = function () {
             '$ui' : $ui,
             'API' : API
         };
-};
+    };
 
-var Kdown = new Kdown();
+    var Kdown = new Kdown();
 
-Kdown.start();
+    Kdown.start();
 

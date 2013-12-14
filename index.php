@@ -79,7 +79,7 @@
                             <tr>
                                 <th>#</th>
                                 <th>File name</th>
-                                <th>Languages</th>
+                                <th>Language &mdash; Market</th>
                                 <th>Download</th>
                             </tr>
                         </thead>
@@ -87,8 +87,8 @@
                             <tr style="display:none;" id="table_copy">
                                 <td class="table_num">(NUM)</td>
                                 <td class="table_name"><a data-id="(ID)" href="#file_info">(NAME)</a></td>
-                                <td class="table_lang">(LANG)</td>
-                                <td class="table_dl_link"><a href="(DL_LINK)">Download</a></td>
+                                <td class="table_lang">(LANG) &mdash; (MARKET)</td>
+                                <td class="table_dl_link"> <a href="(DL_LINK)">Download</a>&nbsp;&nbsp;&nbsp;<span>(FILETYPE)</span></td>
                             </tr>
                         </tbody>
                     </table>
@@ -108,10 +108,6 @@
                 <div id="other_options" class="center_text">
                     <h3>Didn't find it?</h3>
                     <p>Here's some more options...</p>
-
-                    <p id="all_langs_link">
-                        Change language to <a  href="#">ALL
-                    </a> 
                 </p>
                 <p id="second_link">
                     <a href="#" id="second_link">
