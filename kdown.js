@@ -75,17 +75,16 @@ Kdown = function () {
 
         // current page
         page : new bubpub.obj('document/sidebar/page', 'cat'),
-
-        // current market
-        market : new bubpub.obj('document/DD/market', null, function (test) {
-            return test in db.market_list();
-        }),
-
+        
         // current category
         cat : new bubpub.obj('document/sidebar/cat', null, function (test) {
             return  test in db.cat_list();
         }),
 
+        // current market
+        market : new bubpub.obj('document/DD/market', null, function (test) {
+            return test in db.market_list();
+        }),
         // current translation selected (can be 'ALL')
         lang : new bubpub.obj('document/DD/lang', null, function (test) {
             return test in model.current_lang_list();
@@ -98,7 +97,6 @@ Kdown = function () {
         lang_count : new bubpub.obj('lang_count'),
         // hold the current table's JSON
         file_tree : new bubpub.obj('file_tree/load', {}),
-        current_file_list : new bubpub.obj('file_tree/current'),
 
             // hold the hash in the URL
         hash : new bubpub.obj('hash', "", function (test) {
@@ -356,159 +354,205 @@ Kdown = function () {
 
         /***
          * @name view.table
-         * helper functions for manipulating the table.
+         * the table object. 
          */
-        table : {
+        table : (function () {
+            // the file_list that the table is currently populated with. 
+            var file_list = new bubpub.obj('table/file_list');
 
-            /***
-             * used to store the other markets and languages table
-             * html till needed.
-             */
-            other_table_list : null,
 
-            /***
-             * @name table.populate
-             *
-             * fill a table with a list of files.
-             *
-             * @arg {array} file_list (optional) a array of files to fill the table with.
-             * @arg {object} lang_list (optional) a mapping of the language code to the language name.
-             *                         eg: {"en" : "English", "es" : "Spanish", ... }
-             * @arg {number} table_num (optional) which table to fill, 1 or 2? (second only used for search)
-             */
+            // message codes for the above
+            var NORMAL = 0,
+                AJAX_ERROR = 1,
+                NONE_FOUND = 2,
+                LOADING = 3;
 
-            populate : function(file_list, lang_list, table_num) {
+            var message = bubpub.obj('table/mess', NORMAL, function (test) {
+                return test <= 4 && test >= 0; 
+            }); 
 
-                lang_list = lang_list || model.current_lang_list();
-                table_num = table_num || 1;
+            var other_table_list = null;
 
-                var copy = "";
-                var $table = "";
-                var table_html = '';
-                var market_list = db.market_list();
-                var lang = lang_list[ db.lang() ];
-                var market = market_list[ db.market() ];
-                var row;
-                var i;
-                var l;
+            var update_message = function update_message() {
 
-                if (table_num === 1) {
-                    $table = $ui.table.first_body;
-                    copy = view.copy.table_row;
-                } else {
-                    $table = $ui.table.second_body;
-                    copy = view.copy.table_row_second;
+                switch ( message() ) {
+                    // just display normal table
+                    case NORMAL:
+                        view.error.clear();
+                        break;
+
+                    // just display normal table
+                    case NONE_FOUND:
+                        view.error.none_found();
+                        break;
+
+                    // just display normal table
+                    case AJAX_ERROR:
+                        view.error.ajax();
+                        break;
+
+                    case LOADING:
+                        view.error.loading();
+                        break;
+
+                    default:
+                        console.log("~ defaulting to  NORMAL ~");
+                        view.table.message(NORMAL);
+                        break;
                 }
+            };
 
-                row = copy;
+            bubpub.listen('table/mess', update_message);
 
-                // Sort it by name
-                file_list = model.sort_file_list(file_list);
+            // return table helper object
+            return {
+                message : message,
+                file_list : file_list,
 
-                //generate each file's HTML
-                for (i=0, l = file_list.length; i < l; i++) {
+                /***
+                 * @name table.populate
+                 *
+                 * fill a table with a list of files.
+                 *
+                 * @arg {array} file_list (optional) a array of files to fill the table with.
+                 * @arg {object} lang_list (optional) a mapping of the language code to the language name.
+                 *                         eg: {"en" : "English", "es" : "Spanish", ... }
+                 * @arg {number} table_num (optional) which table to fill, 1 or 2? (second only used for search)
+                 */
 
-                    var file = file_list[i];
+                populate : function(file_list, lang_list, table_num) {
+
+                    lang_list = lang_list || model.current_lang_list();
+                    table_num = table_num || 1;
+
+                    var copy = "";
+                    var $table = "";
+                    var table_html = '';
+                    var market_list = db.market_list();
+                    var lang = lang_list[ db.lang() ];
+                    var market = market_list[ db.market() ];
+                    var row;
+                    var i;
+                    var l;
+
+                    if (table_num === 1) {
+                        $table = $ui.table.first_body;
+                        copy = view.copy.table_row;
+                    } else {
+                        $table = $ui.table.second_body;
+                        copy = view.copy.table_row_second;
+                    }
 
                     row = copy;
 
-                    row = row.replace('(NUM)', 1 + i);
-                    row = row.replace('(NAME)', file.name);
-                    row = row.replace('(ID)', file.id);
-                    row = row.replace('(DL_LINK)', file.url);
-                    row = row.replace('(LANG)', lang);
-                    row = row.replace('(MARKET)', market);
-                    row = row.replace('(FILETYPE)', file.file_ext);
+                    // Sort it by name
+                    file_list = model.sort_file_list(file_list);
+
+                    //generate each file's HTML
+                    for (i=0, l = file_list.length; i < l; i++) {
+
+                        var file = file_list[i];
+
+                        row = copy;
+
+                        row = row.replace('(NUM)', 1 + i);
+                        row = row.replace('(NAME)', file.name);
+                        row = row.replace('(ID)', file.id);
+                        row = row.replace('(DL_LINK)', file.url);
+                        row = row.replace('(LANG)', lang);
+                        row = row.replace('(MARKET)', market);
+                        row = row.replace('(FILETYPE)', file.file_ext);
 
 
-                    table_html += row;
-                }
-
-                // dump into the table
-                $table.html(table_html);
-            },
-
-            /***
-             * @name table.search
-             * search all files name in the database for the search string.
-             *
-             * @arg {string} search_str string to search for in file.name.
-             */
-            search : function table_search(search_str) {
-                search_str = search_str || db.search();
-                search_str = search_str.toLocaleLowerCase();
-
-                var file_list = model.get_current_file_list(),
-                main_list = [],
-                other_list = [],
-                market = db.market(),
-                lang = db.lang(),
-                lang_count = {};
-
-                console.groupCollapsed("Search");
-
-
-                for (var i=0, l = file_list.length; i < l; i++) {
-                    var file = file_list[i];
-
-                    // If file name contains search string
-                    if (search_str === "" || file.name.toLowerCase().indexOf(search_str) > -1) {
-                        main_list.push(file);
+                        table_html += row;
                     }
 
+                    // dump into the table
+                    $table.html(table_html);
+                },
+
+                /***
+                 * @name table.search
+                 * search all files name in the database for the search string.
+                 *
+                 * @arg {string} search_str string to search for in file.name.
+                 */
+                search : function table_search(search_str) {
+                    search_str = search_str || db.search();
+                    search_str = search_str.toLocaleLowerCase();
+
+                    var file_list = model.get_current_file_list(),
+                    main_list = [],
+                    other_list = [],
+                    market = db.market(),
+                    lang = db.lang(),
+                    lang_count = {};
+
+                    console.groupCollapsed("Search");
+
+
+                    for (var i=0, l = file_list.length; i < l; i++) {
+                        var file = file_list[i];
+
+                        // If file name contains search string
+                        if (search_str === "" || file.name.toLowerCase().indexOf(search_str) > -1) {
+                            main_list.push(file);
+                        }
+
+                    }
+
+                    console.groupEnd("Search");
+
+                    this.search_view(main_list, other_list);
+
+                },
+                /***
+                 * @name table.search_view
+                 *
+                 * this will decide how the search results are displayed
+                 *
+                 * @arg {obj} main_list a list of files found in search in
+                 *                      current market / lang
+                 * @arg {obj} other_list a list of files found in search
+                 *                      NOT in current market / lang
+                 */
+                search_view : function table_search_view(main_list, other_list) {
+
+                    // IS files in main list
+                    if (main_list.length > 0) {
+                        console.log("main_list > 0");
+                        view.table.populate(main_list);
+                        view.error.found_first();
+                    } else {
+                        console.log("main_list NONE");
+                        view.error.none_found_first();
+                    }
+
+                    if (other_list.length > 0) {
+                        console.log("other_list > 0");
+                        $ui.search.other_options.show();
+                        $ui.search.second_link.
+                            find("span").
+                            text(other_list.length);
+                    } else {
+                        console.log("other_list NONE");
+                        $ui.search.other_options.hide();
+                    }
+
+                    this.other_table_list = other_list;
+
+                    $ui.table.second.hide();
+
+                },
+                /***
+                 * @name table.show_other_table
+                 */
+                show_other_table : function show_other_table() {
+                    view.table.populate(this.other_table_list, null, 2);
+                    $ui.table.second.fadeIn();
                 }
-
-                console.groupEnd("Search");
-
-                this.search_view(main_list, other_list);
-
-            },
-            /***
-             * @name table.search_view
-             *
-             * this will decide how the search results are displayed
-             *
-             * @arg {obj} main_list a list of files found in search in
-             *                      current market / lang
-             * @arg {obj} other_list a list of files found in search
-             *                      NOT in current market / lang
-             */
-            search_view : function table_search_view(main_list, other_list) {
-
-                // IS files in main list
-                if (main_list.length > 0) {
-                    console.log("main_list > 0");
-                    view.table.populate(main_list);
-                    view.error.found_first();
-                } else {
-                    console.log("main_list NONE");
-                    view.error.none_found_first();
-                }
-
-                if (other_list.length > 0) {
-                    console.log("other_list > 0");
-                    $ui.search.other_options.show();
-                    $ui.search.second_link.
-                        find("span").
-                        text(other_list.length);
-                } else {
-                    console.log("other_list NONE");
-                    $ui.search.other_options.hide();
-                }
-
-                this.other_table_list = other_list;
-
-                $ui.table.second.hide();
-
-            },
-            /***
-             * @name table.show_other_table
-             */
-            show_other_table : function show_other_table() {
-                view.table.populate(this.other_table_list, null, 2);
-                $ui.table.second.fadeIn();
-            }
-        },
+            };
+        })(), // <-- SELF EVALUATING FUNCTION
 
         /***
          * @name view.sidebar
