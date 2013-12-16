@@ -227,7 +227,7 @@ var bubpub = {
             // GET
             if (typeof new_val === 'undefined') {
                 if (value === null) {
-                    console.warn(publish_name + ' returning NULL');
+                    // console.warn(publish_name + ' returning NULL');
                 }
                 return value; // get
             } else {

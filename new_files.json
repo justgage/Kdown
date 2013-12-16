@@ -1,5 +1,29 @@
 {
     "usa-can": {
+        "es" : {
+            "Cateogry 1" : [
+                {
+                    "id" : 1,
+                    "name" : "SPANISH FILE",
+                    "url" : "http://..",
+                    "file_ext" : "pdf"
+                }
+            ],
+            "Cateogry 2" : [
+                {
+                    "id" : 3,
+                    "name" : "Another Cool SPANISH Document",
+                    "url" : "http://..",
+                    "file_ext" : "pdf"
+                },
+                {
+                    "id" : 5,
+                    "name" : "also spansish",
+                    "url" : "http://..",
+                    "file_ext" : "pdf"
+                }
+            ]
+        },
         "en" : {
             "Cateogry 1" : [
                 {
@@ -54,6 +78,18 @@
                 }
             ],
             "Cateogry 2" : [
+                {
+                    "id" : 3,
+                    "name" : "Another Cool Document",
+                    "url" : "http://..",
+                    "file_ext" : "pdf"
+                },
+                {
+                    "id" : 3,
+                    "name" : "Another Cool Document",
+                    "url" : "http://..",
+                    "file_ext" : "pdf"
+                },
                 {
                     "id" : 3,
                     "name" : "Another Cool Document",
