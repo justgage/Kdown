@@ -7,14 +7,12 @@
 
 Kdown = (function ($, window, undefined) {
     "use strict";
-    var kdown = {};
 
     var api = function () {
         var self = {};
     };
 
-    var page = function () {
-        var page_self = {};
+    var page = (function () {
 
         /***
          * @name page.main
@@ -25,11 +23,11 @@ Kdown = (function ($, window, undefined) {
          * it also includes methods to create new "display objects" (New_obj)
          * and create object that inherit from other objects (Inherit)
          */
-        page_self.main = function () {
+        var main = (function () {
             var self = {};
 
             var current = bubpub.obj("page/main/current", null, function (test) {
-                return test in display_objs;
+                return test.tag in display_objs;
             });
 
             // a list of display_objects that will.
@@ -39,33 +37,36 @@ Kdown = (function ($, window, undefined) {
              * @name main.New_obj
              * a constructor for new display objects.
              *
-             * @arg {string} tag the name by which it will be referred to with main.display() 
+             * @arg {string} tag the name by which it will be referred to with main.show() 
              *                   and stored with in display_objs.
              * @arg {function} Construct the function that creates the new object.
              *
              * @returns {object} the new object created. 
              */
-            self.New_obj = function (tag, Construct) {
+            self.Display_obj = function (tag, Construct) {
 
                 // the object that all display objects will be derived.
-                var def_obj = {
+                var new_obj = {
                     tag : tag,
-                    display : function () {
-                        console.log(".hide for " + tag + " not written!");
+                    parent_tag : "DEFAULT",
+                    show : function () {
+                        console.error(this.tag + ".show for not written!");
                     },
                     hide : function () {
-                        console.log(".hide for " + tag + " not written!");
+                        console.error(this.tag + ".hide for not written!");
                     }
                 };
 
-                var new_obj = new Construct();
 
-                display_objs[tag] = obj;
+                // add the constructor to the new object
+                $.extend(true, new_obj, new Construct() );
 
-                console.log("NEW " + tag + " >>  was added to display objects");
+                // add the newly merged object to the display_objects
+                display_objs[tag] = new_obj;
 
-                //combine the two overwriting the first one with second
-                return $.extend(true, def, extra);
+                console.log("[ main.Display_obj ] NEW: " + tag);
+
+                return new_obj; // return it
             };
 
             /***
@@ -75,15 +76,21 @@ Kdown = (function ($, window, undefined) {
              * @arg {string} tag_to_clone the tag from which to clone.
              * @arg {string} new_tag the new tag it will be known by.
              * @arg {function} Construct the function that creates the new object.
+             *                  @arg {object} self to edit
              */
             self.Inherit = function (tag_to_clone, new_tag, Construct) {
 
                 if (tag_to_clone in display_objs) {
                     var new_obj = $.extend( true, {}, display_objs[tag_to_clone] );
 
-                    $.extend(true, new_obj, new Construct());
+                    $.extend(true, new_obj, new Construct(new_obj));
+
+                    new_obj.parent_tag = new_obj.tag;
+                    new_obj.tag = new_tag;
 
                     display_objs[new_tag] = new_obj;
+
+                    console.log("[ main.Inherit ] INHERIT: " + tag_to_clone  + " ++> " + new_tag);
 
                     return new_obj;
                 } else {
@@ -97,23 +104,27 @@ Kdown = (function ($, window, undefined) {
              */
             self.change = function (tag) {
 
-                //call hide object
-                current().hide();
+                if (current() !== null) {
+                    console.log("[ main.change ]: " + current().tag + " >> " + tag);
+                    //call hide object
+                    current().hide();
+                }
 
                 // change current
                 current( display_objs[tag] );
 
                 // run display new one
-                current().display();
+                current().show();
+
             };
 
             self.log = function () {
 
-                console.log("display_objects");
+                console.log("[ main.display_objects ]");
 
                 for (var tag in display_objs) {
                     if(display_objs.hasOwnProperty(tag)) {
-                        console.log(" - " + tag);
+                        console.log(" - " + tag, display_objs[tag]);
                     }
                 }
 
@@ -121,14 +132,36 @@ Kdown = (function ($, window, undefined) {
 
             return self;
 
-        };// end of page.main
+        })();// end of page.main
 
-        var table_normal = main.new_obj("table_normal", function () {
+        /***
+         * @name page.table_normal
+         * the display_obj for the normal category view of the table.
+         */
+        var table_normal = main.Display_obj("table_normal", function () {
+
             var self = {};
             var file_list = new bubpub.obj('table/file_list');
+             
+            self.$ui = {
+                all : $('#dl_table_all'),
+                each : $('.dl_table'),
+                first : $('#dl_table_first'),
+                first_body : $('#dl_table_first').find('tbody'),
+                second : $('#dl_table_second'),
+                second_body : $('#dl_table_second').find('tbody')
+            };
 
+            self.show = function () {
+                self.$ui.all.show();
+                self.$ui.first.show();
+            };
 
-            self.populate = function(file_list, lang_list, table_num) {
+            self.hide = function () {
+                self.$ui.all.hide();
+            };
+
+            self.populate = function(file_list, lang_list) {
 
                 lang_list = lang_list || model.current_lang_list();
                 table_num = table_num || 1;
@@ -144,10 +177,10 @@ Kdown = (function ($, window, undefined) {
                 var l;
 
                 if (table_num === 1) {
-                    $table = $ui.table.first_body;
+                    $table = self.$ui.first_body;
                     copy = table_row;
                 } else {
-                    $table = $ui.table.second_body;
+                    $table = self.$ui.second_body;
                     copy = table_row_second;
                 }
 
@@ -171,7 +204,6 @@ Kdown = (function ($, window, undefined) {
                     row = row.replace('(MARKET)', market);
                     row = row.replace('(FILETYPE)', file.file_ext);
 
-
                     table_html += row;
                 }
 
@@ -182,11 +214,54 @@ Kdown = (function ($, window, undefined) {
             return self;
         }); // table_normal end
 
-        var table_search = main.Inherit("table_normal", "table_search", function () {
-            self = {};
+        var table_search = main.Inherit("table_normal", "table_search", function (self) {
+
+            self.show = function () {
+                self.$ui.all.show();
+                self.$ui.first.show();
+                self.$ui.second.show();
+            };
+
+            self.hide = function () {
+                self.$ui.all.hide();
+                self.$ui.second.hide();
+            };
 
             return self;
         });
+
+        //********************
+        //  Messages
+        //********************
+        main.Display_obj("message", function () {
+
+            return {
+                show : function () {
+                    $ui.show();
+                },
+                hide : function () {
+                    $ui.hide();
+                }
+            };
+        });
+
+        main.Inherit("message", "loading", function (self) {
+            self.$ui = $('#dl_loading');
+        });
+        
+        main.Inherit("message", "ajax", function (self) {
+            self.$ui = $('#ajax_error');
+        });
+
+        main.Inherit("message", "none_found", function (self) {
+            self.$ui = $('#none_found');
+        });
+
+        //////////////////////
+        //
+        // end of Display_obj
+        //
+        //////////////////////
 
         var sidebar = function () {
             var self = {};
@@ -208,7 +283,24 @@ Kdown = (function ($, window, undefined) {
             return self;
         };
 
-        return page_self;
+        return {
+            main : main,
+            sidebar : sidebar,
+            market_DD : market_DD,
+            lang_DD : lang_DD,
+            hash : hash,
+        };
+
+    })(); // <--- end of page object
+
+    return {
+        api : api,
+        page : page
     };
 
 })($, window);
+
+Kdown.page.main.log();
+
+Kdown.page.main.change("table_normal");
+Kdown.page.main.change("table_search");
