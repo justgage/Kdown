@@ -25,6 +25,7 @@ var bubpub = {
             }
 
             if (typeof callback === "function" ) {
+                console.log("bubpub.listen >> ", topic);
                 this.listeners[topic].push(callback);
             } else {
                 console.error("no callback function!");
