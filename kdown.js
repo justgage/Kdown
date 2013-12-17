@@ -16,7 +16,9 @@ Kdown = function (new_config) {
     };
 
     // override default config with new_config
-    $.extend(true, config, new_config); 
+    $.extend(true, config, new_config);
+
+
 
     /***
      * @name api
@@ -27,6 +29,13 @@ Kdown = function (new_config) {
         var LISTS_URL = 'files/market_lang.json';
         var API_URL = 'api.php';
 
+        var file_tree = new bubpub.obj('file_tree/load', {});
+
+        /***
+         * @name api.load_lists
+         * this will load the list of valid markets / languages
+         * see flat market_lang.json
+         */
         var load_lists = function () {
 
             var promise = $.get(LISTS_URL, {}, null, 'json');
@@ -43,10 +52,87 @@ Kdown = function (new_config) {
             });
         };
 
-        return {
-            load_lists : load_lists
+        /***
+         * @name API.load_file_tree
+         */
+        var load_file_tree = function () {
+
+            var market = page.market_DD.current();
+            var lang = page.lang_DD.current();
+
+            var request = {
+                "market" : market,
+                "lang" : lang
+            };
+
+            var promise = $.post(API_URL, request, null, 'json');
+
+            promise.done(function (json) {
+                if (json.error === false) {
+
+                    var temp_tree = {};
+                    var tree = file_tree();
+                    var cat_list = db.cat_list();
+                    var code = "";
+
+                    temp_tree[market] = {};
+                    temp_tree[market][lang] = json.cats;
+
+                    $.extend(tree, temp_tree);
+
+                    // make cat_list if needed
+                    if (cat_list === null) {
+                        cat_list = [];
+
+                        for (var cat in json.cats) {
+                            if(json.cats.hasOwnProperty(cat)) {
+                                code = url_safe(cat);
+
+                                cat_list[code] = cat;
+                            }
+                        }
+
+                        db.cat_list(cat_list);
+                    }
+
+                    db.file_tree(tree);
+
+                    var current = model.get_current_file_list();
+
+                    if ( table.file_list(current)) {
+                        console.log("ajax CHANGED somthing!", current);
+                    } else {
+                        console.log("didn't change anything!", current, db.cat());
+                    }
+
+                    view.hash.url_import();
+                    model.set_defaults();
+
+                } else {
+
+                    console.log("AJAX_ERROR:", json);
+
+                    table.file_list(null);
+                    bubpub.say('file_tree/current');
+
+                }
+            });
+
+            promise.fail(function () {
+                console.log(API_URL, "failed");
+            });
         };
+
+        return {
+            file_tree : file_tree,
+            load_lists : load_lists,
+            load_file_tree : load_file_tree
+        };
+
     })(); // end of api
+
+
+
 
     /***
      * @name page
@@ -78,11 +164,11 @@ Kdown = function (new_config) {
              * @name main.New_obj
              * a constructor for new display objects.
              *
-             * @arg {string} tag the name by which it will be referred to with main.show() 
+             * @arg {string} tag the name by which it will be referred to with main.show()
              *                   and stored with in display_objs.
              * @arg {function} Construct the function that creates the new object.
              *
-             * @returns {object} the new object created. 
+             * @returns {object} the new object created.
              */
             main_self.Display_obj = function (tag, Construct) {
 
@@ -185,7 +271,7 @@ Kdown = function (new_config) {
 
             var self = {};
             var file_list = new bubpub.obj('table/file_list');
-             
+
             self.$ui = {
                 all : $('#dl_table_all'),
                 each : $('.dl_table'),
@@ -253,7 +339,7 @@ Kdown = function (new_config) {
                 // dump into the table
                 $table.html(table_html);
             };
-             
+
             return self;
         }); // table_normal end
 
@@ -291,7 +377,7 @@ Kdown = function (new_config) {
 
             self.$ui = $();
 
-            self.show = function (_this) { 
+            self.show = function (_this) {
                 _this.$ui.show();
             };
 
@@ -310,7 +396,7 @@ Kdown = function (new_config) {
                 e.preventDefault(); // stop hash change
             });
         });
-        
+
         main.Inherit("message", "ajax", function (self) {
             self.$ui = $('#ajax_error');
         });
@@ -325,10 +411,19 @@ Kdown = function (new_config) {
         //
         //////////////////////
 
-        var sidebar = function () {
+        /***
+         * @name page.sidebar
+         */
+        var sidebar = (function () {
             var self = {};
+
+            self.cat_list = bubpub.obj("page/sidebar/cat_list");
+            self.current = bubpub.obj("page/sidebar/current");
+            self.page_list = bubpub.obj("page/sidebar/page_list");
+
+
             return self;
-        };
+        })();
 
         /***
          * @name page.market_DD
@@ -392,6 +487,7 @@ Kdown = function (new_config) {
         /***
          * @name page.lang_DD
          * is the abstraction of the language drop down
+         * also houses the lang_list given from the API
          */
         var lang_DD = (function () {
             var self = {};
