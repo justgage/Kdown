@@ -1,10 +1,23 @@
-
 /***
  * @name Kdown ~ Kyani download interface
  *
  * @constructor
  *
  */
+
+
+/***
+ * TODO:
+ *      add sidebar loading
+ *      add the cat loading to api
+ *      make table load categorys
+ *      change category on click
+ *      import / export from the hash
+ *      search page
+ *      global option
+ *      file pane
+ *      bug fixes. 
+ */ 
 
 Kdown = function (new_config) {
     "use strict";
@@ -420,7 +433,6 @@ Kdown = function (new_config) {
             self.cat_list = bubpub.obj("page/sidebar/cat_list");
             self.current = bubpub.obj("page/sidebar/current");
             self.page_list = bubpub.obj("page/sidebar/page_list");
-
 
             return self;
         })();
