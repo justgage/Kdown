@@ -257,6 +257,10 @@ Kdown = function (new_config) {
             return self;
         }); // table_normal end
 
+        /***
+         * @name table_search
+         * this is the display_obj for table searching
+         */
         var table_search = main.Inherit("table_normal", "table_search", function (self) {
 
             self.show = function () {
@@ -398,7 +402,7 @@ Kdown = function (new_config) {
             self.current = bubpub.obj(
                 "page/DD/lang/current", config.DEF_LANG,
                 function (test) {
-                    return test in self.list();
+                    return test in self.current_list();
             });
 
             self.list = bubpub.obj("page/DD/lang/list");
