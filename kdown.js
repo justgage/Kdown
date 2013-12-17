@@ -3,15 +3,56 @@
  * @name Kdown ~ Kyani download interface
  *
  * @constructor
+ *
  */
 
-Kdown = (function ($, window, undefined) {
+Kdown = function (new_config) {
     "use strict";
 
-    var api = function () {
-        var self = {};
+    // default config
+    var config = {
+        DEF_MARKET : "usa-can",
+        DEF_LANG : "en"
     };
 
+    // override default config with new_config
+    $.extend(true, config, new_config); 
+
+    /***
+     * @name api
+     * this handles all the server requests
+     */
+    var api = (function () {
+
+        var LISTS_URL = 'files/market_lang.json';
+        var API_URL = 'api.php';
+
+        var load_lists = function () {
+
+            var promise = $.get(LISTS_URL, {}, null, 'json');
+
+            promise.done(function (json) {
+                console.log(json);
+                console.log(page.market_DD);
+                page.market_DD.list(json.markets);
+                page.lang_DD.list(json.langs);
+            });
+
+            promise.fail(function (error_obj) {
+                page.main.change("ajax");
+            });
+        };
+
+        return {
+            load_lists : load_lists
+        };
+    })(); // end of api
+
+    /***
+     * @name page
+     *
+     * this handles all the VIEW parts of the application.
+     */
     var page = (function () {
 
         /***
@@ -24,7 +65,7 @@ Kdown = (function ($, window, undefined) {
          * and create object that inherit from other objects (Inherit)
          */
         var main = (function () {
-            var self = {};
+            var main_self = {};
 
             var current = bubpub.obj("page/main/current", null, function (test) {
                 return test.tag in display_objs;
@@ -43,7 +84,7 @@ Kdown = (function ($, window, undefined) {
              *
              * @returns {object} the new object created. 
              */
-            self.Display_obj = function (tag, Construct) {
+            main_self.Display_obj = function (tag, Construct) {
 
                 // the object that all display objects will be derived.
                 var new_obj = {
@@ -78,19 +119,21 @@ Kdown = (function ($, window, undefined) {
              * @arg {function} Construct the function that creates the new object.
              *                  @arg {object} self to edit
              */
-            self.Inherit = function (tag_to_clone, new_tag, Construct) {
+            main_self.Inherit = function (tag_to_clone, new_tag, Construct) {
 
                 if (tag_to_clone in display_objs) {
                     var new_obj = $.extend( true, {}, display_objs[tag_to_clone] );
 
-                    $.extend(true, new_obj, new Construct(new_obj));
+                    var temp_obj = new Construct(new_obj);
+
+                    $.extend(true, new_obj, temp_obj);
 
                     new_obj.parent_tag = new_obj.tag;
                     new_obj.tag = new_tag;
 
                     display_objs[new_tag] = new_obj;
 
-                    console.log("[ main.Inherit ] INHERIT: " + tag_to_clone  + " ++> " + new_tag);
+                    console.log("[ main.Inherit ] INHERIT: " + tag_to_clone  + " ++> " + new_tag, new_obj);
 
                     return new_obj;
                 } else {
@@ -102,23 +145,23 @@ Kdown = (function ($, window, undefined) {
              * @name main.change
              * Change which display object is presenting
              */
-            self.change = function (tag) {
+            main_self.change = function (tag) {
 
                 if (current() !== null) {
                     console.log("[ main.change ]: " + current().tag + " >> " + tag);
                     //call hide object
-                    current().hide();
+                    current().hide( current() );
                 }
 
                 // change current
                 current( display_objs[tag] );
 
                 // run display new one
-                current().show();
+                current().show( current() );
 
             };
 
-            self.log = function () {
+            main_self.log = function () {
 
                 console.log("[ main.display_objects ]");
 
@@ -130,7 +173,7 @@ Kdown = (function ($, window, undefined) {
 
             };
 
-            return self;
+            return main_self;
 
         })();// end of page.main
 
@@ -233,20 +276,35 @@ Kdown = (function ($, window, undefined) {
         //********************
         //  Messages
         //********************
+
+        /***
+         * @name page.message
+         * This is a abstract object that other messages are derived from.
+         */
         main.Display_obj("message", function () {
 
-            return {
-                show : function () {
-                    $ui.show();
-                },
-                hide : function () {
-                    $ui.hide();
-                }
+            var self = {};
+
+            self.$ui = $();
+
+            self.show = function (_this) { 
+                _this.$ui.show();
             };
+
+            self.hide = function (_this) {
+                _this.$ui.hide();
+            };
+
+            return self;
         });
 
         main.Inherit("message", "loading", function (self) {
+
             self.$ui = $('#dl_loading');
+
+            self.$ui.find("#reload_img").click(function (e) {
+                e.preventDefault(); // stop hash change
+            });
         });
         
         main.Inherit("message", "ajax", function (self) {
@@ -268,20 +326,147 @@ Kdown = (function ($, window, undefined) {
             return self;
         };
 
-        var market_DD = function () {
-            var self = {};
-            return self;
-        };
+        /***
+         * @name page.market_DD
+         * handles the market drop down and houses the market list
+         */
+        var market_DD = (function () {
 
-        var lang_DD = function () {
             var self = {};
-            return self;
-        };
+            var $ui = $('#market_select');
 
-        var hash = function () {
+            // this is what market is currently selected
+            self.current = bubpub.obj(
+                "page/DD/market/current", config.DEF_MARKET,
+                function (test) {
+                    return test in self.list();
+            });
+
+            self.list = bubpub.obj("page/DD/market/list");
+
+            bubpub.listen("page/DD/market/list", function () {
+                self.populate();
+                $ui.val( config.DEF_MARKET );
+                $ui.show();
+            });
+
+            // update the drop down when the value changes
+            bubpub.listen("page/DD/market/current", function () {
+                $ui.val( self.current() );
+            });
+
+            // when drop down changes update the var
+            $ui.change(function () {
+                self.current( $(this).val() );
+            });
+
+            /***
+             * @name market_DD.populate
+             * fill the market drop down with markets in db.market_list
+             */
+            self.populate = function market_DD_populate() {
+
+                var list = self.list();
+                var html = "";
+
+                var temp = '<option value="(CODE)">(NAME)</option>';
+                for (var item in list) {
+                    if(list.hasOwnProperty(item)) {
+                        var option = temp.replace('(NAME)', list[item]);
+                        option = option.replace('(CODE)', item);
+                        html += option;
+                    }
+                }
+
+                // update market_DD
+                $ui.html(html);
+            };
+
+            return self;
+        })(); // <-- end of market_DD
+
+        /***
+         * @name page.lang_DD
+         * is the abstraction of the language drop down
+         */
+        var lang_DD = (function () {
+            var self = {};
+
+            var $ui = $('#lang_select');
+
+            // this is what market is currently selected
+            self.current = bubpub.obj(
+                "page/DD/lang/current", config.DEF_LANG,
+                function (test) {
+                    return test in self.list();
+            });
+
+            self.list = bubpub.obj("page/DD/lang/list");
+
+            bubpub.listen("page/DD/market/current", function () {
+                self.populate();
+            });
+
+            bubpub.listen("page/DD/lang/list", function () {
+                self.populate();
+                $ui.val( config.DEF_LANG );
+                $ui.show();
+            });
+
+            // update the drop down when the value changes
+            bubpub.listen("page/DD/lang/current", function () {
+                $ui.val( self.current() );
+            });
+
+            // when drop down changes update the var
+            $ui.change(function () {
+                self.current( $(this).val() );
+            });
+
+            /***
+             * @name lang.current_list
+             * gets the current lang list
+             */
+            self.current_list = function () {
+                return self.list()[ market_DD.current() ];
+            };
+
+            /***
+             * @name lang.populate
+             *
+             * fill the language drop down
+             */
+            self.populate = function () {
+
+                var langs = self.current_list();
+                var temp = '<option value="(VAL)">(NAME)</option>';
+                var option = "";
+                var html;
+
+                // add each lang to the drop down HTML
+                for (var code in langs) {
+                    if(langs.hasOwnProperty(code)) {
+                        var name = langs[code];
+                        option = temp;
+
+                        option = option.replace("(VAL)", code);
+                        option = option.replace("(NAME)", name );
+                        html += option;
+
+                    }
+                }
+
+                $ui.html(html);
+            };
+
+
+            return self;
+        })(); // <-- end of lang_DD
+
+        var hash = (function () {
             var self = {};
             return self;
-        };
+        })();
 
         return {
             main : main,
@@ -298,9 +483,13 @@ Kdown = (function ($, window, undefined) {
         page : page
     };
 
-})($, window);
+};
 
-Kdown.page.main.log();
+var kdown = Kdown({
+    DEF_MARKET : "eu"
+});
 
-Kdown.page.main.change("table_normal");
-Kdown.page.main.change("table_search");
+kdown.api.load_lists();
+kdown.page.main.change("table_normal");
+kdown.page.main.change("loading");
+
