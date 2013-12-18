@@ -8,8 +8,6 @@
 
 /***
  * TODO:
- *      import / export from the hash.
- *      add sidebar loading.
  *      add the cat loading to api.
  *      make table load category view.
  *      change category on click.
@@ -66,8 +64,12 @@ Kdown = function (new_config) {
             });
         };
 
+
         /***
          * @name api.load_file_tree
+         * will load a file tree with the current market / language
+         *
+         * @return {jquery xhr(promise)}
          */
         var load_file_tree = function () {
 
@@ -105,26 +107,68 @@ Kdown = function (new_config) {
                             //****************************
                         }
                     }
-                    
+
                     page.sidebar.cat_list(cat_list);
+
 
                 } else {
                     console.log("AJAX_ERROR:", json);
-
-                    table.file_list(null);
-                    bubpub.say('file_tree/current');
+                    bubpub.say("ajax/cat/error");
                 }
             });
 
             promise.fail(function () {
                 console.log(API_URL, "failed");
             });
+
+            return promise;
+        };
+
+        /***
+         * @name api.check_current_file_tree
+         * This will make sure that we always have an up to date
+         * file_tree.
+         */
+        var check_current_file_tree = function () {
+            var market = page.market_DD.current();
+            var lang = page.lang_DD.current();
+            if (typeof file_tree()[market][lang] === 'undefined') {
+                load_file_tree().done(function () {
+                    page.main.ajax_cat_done();
+                });
+            } else {
+                page.main.ajax_cat_done();
+            }
+        };
+
+        //check every time the page changes
+        bubpub.listen("hash", check_current_file_tree);
+
+        var get_file_list = function(market, lang, cat) {
+            // set defaults if not passed
+            market = market || page.market_DD.current();
+            lang = lang || page.lang_DD.current();
+            cat = cat || page.sidebar.current();
+            var tree = file_tree()[market][lang];
+            var return_list = [];
+
+            if (cat === "search") {
+                // merge every category to get a full list.
+                $.each(tree, function (cat, list) {
+                    $.merge(return_list, list);
+                });
+            } else {
+                return_list = tree[cat];
+            }
+
+            return return_list;
         };
 
         return {
             file_tree : file_tree,
             load_lists : load_lists,
-            load_file_tree : load_file_tree
+            load_file_tree : load_file_tree,
+            get_file_list : get_file_list
         };
 
     })(); // end of api
@@ -259,6 +303,18 @@ Kdown = function (new_config) {
                 return test.tag in display_objs;
             });
 
+            /***
+             * change view after AJAX is done
+             */
+            main_self.ajax_cat_done = function () {
+
+                if (sidebar.current() === "search") {
+                    main_self.change("table_search");
+                } else {
+                    main_self.change("table_normal");
+                }
+            };
+
             // a list of display_objects that will.
             var display_objs = {};
 
@@ -374,6 +430,8 @@ Kdown = function (new_config) {
             var self = {};
             var file_list = new bubpub.obj('table/file_list');
 
+            var table_row = '<tr>' + $('#table_copy').html() + '</tr>';
+
             self.$ui = {
                 all : $('#dl_table_all'),
                 each : $('.dl_table'),
@@ -386,39 +444,52 @@ Kdown = function (new_config) {
             self.show = function () {
                 self.$ui.all.show();
                 self.$ui.first.show();
+                self.prepare();
             };
 
             self.hide = function () {
                 self.$ui.all.hide();
             };
 
+            self.prepare = function () {
+                var file_list = api.get_file_list();
+                self.populate(file_list);
+            };
+
+            self.sort = function (file_list) {
+                var compare = function (a, b) {
+
+                    a = a.name.toLocaleLowerCase();
+                    b = b.name.toLocaleLowerCase();
+
+                    return a.localeCompare(b);
+                };
+
+                return file_list.sort(compare);
+            };
+
+
             self.populate = function(file_list, lang_list) {
 
-                lang_list = lang_list || model.current_lang_list();
-                table_num = table_num || 1;
+                lang_list = lang_list || page.lang_DD.list();
 
                 var copy = "";
                 var $table = "";
                 var table_html = "";
-                var market_list = db.market_list();
-                var lang = lang_list[ db.lang() ];
-                var market = market_list[ db.market() ];
+                var market_list = page.market_DD.list();
+                var lang = page.lang_DD.current_name();
+                var market = page.market_DD.current_name();
                 var row;
                 var i;
                 var l;
 
-                if (table_num === 1) {
-                    $table = self.$ui.first_body;
-                    copy = table_row;
-                } else {
-                    $table = self.$ui.second_body;
-                    copy = table_row_second;
-                }
+                $table = self.$ui.first_body;
+                copy = table_row;
 
                 row = copy;
 
                 // Sort it by name
-                file_list = model.sort_file_list(file_list);
+                file_list = self.sort(file_list);
 
                 //generate each file's HTML
                 for (i=0, l = file_list.length; i < l; i++) {
@@ -633,6 +704,10 @@ Kdown = function (new_config) {
 
             self.list = bubpub.obj("lists/market");
 
+            self.current_name = function () {
+                return self.list()[ self.current() ];
+            };
+
             bubpub.listen("lists/market", function () {
                 self.populate();
                 $ui.val( config.DEF_MARKET );
@@ -651,7 +726,7 @@ Kdown = function (new_config) {
 
             /***
              * @name market_DD.populate
-             * fill the market drop down with markets in db.market_list
+             * fill the market drop down
              */
             self.populate = function market_DD_populate() {
 
@@ -693,6 +768,10 @@ Kdown = function (new_config) {
 
             self.list = bubpub.obj("lists/lang");
 
+            self.current_name = function () {
+                return self.list()[ self.current() ];
+            };
+
             // bubpub events
             bubpub.listen("hash/market", function () {
                 self.pick_default();
@@ -726,9 +805,9 @@ Kdown = function (new_config) {
                     self.current(def);
                 } else {
                     // changes it if it came from the argument
-                    // otherwise just set to the same thing 
+                    // otherwise just set to the same thing
                     // (which doesn't publish an event)
-                    self.current(current); 
+                    self.current(current);
                 }
             };
 

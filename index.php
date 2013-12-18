@@ -32,7 +32,7 @@
 
     <div id="vertical_nav">
         <ul id="copy-cat" style="display:none;">
-            <li id="cat_(CAT)" data-cat="(CAT)"><a href="#">(TITLE)</a></li>
+            <li data-cat="(CAT)"><a href="#">(TITLE)</a></li>
         </ul>
     </div>
     <div id="main_content">
@@ -121,7 +121,7 @@
                 </div> 
 
 
-                <div id="other_options" class="center_text">
+                <div id="other_options" class="center_text" style="display:none;">
                     <h3>Didn't find it?</h3>
                     <p>Here's some more options...</p>
                 </p>
