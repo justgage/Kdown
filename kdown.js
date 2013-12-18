@@ -8,16 +8,17 @@
 
 /***
  * TODO:
- *      add sidebar loading
- *      add the cat loading to api
- *      make table load categorys
- *      change category on click
- *      import / export from the hash
- *      search page
- *      global option
- *      file pane
- *      bug fixes. 
- */ 
+ *      import / export from the hash.
+ *      add sidebar loading.
+ *      add the cat loading to api.
+ *      make table load category view.
+ *      change category on click.
+ *      search page.
+ *      TRANSLATEABLE
+ *      global option on search.
+ *      file pane.
+ *      bug fixes.
+ */
 
 Kdown = function (new_config) {
     "use strict";
@@ -31,8 +32,6 @@ Kdown = function (new_config) {
     // override default config with new_config
     $.extend(true, config, new_config);
 
-
-
     /***
      * @name api
      * this handles all the server requests
@@ -42,7 +41,7 @@ Kdown = function (new_config) {
         var LISTS_URL = 'files/market_lang.json';
         var API_URL = 'api.php';
 
-        var file_tree = new bubpub.obj('file_tree/load', {});
+        var file_tree = new bubpub.obj('file_tree', {});
 
         /***
          * @name api.load_lists
@@ -58,6 +57,8 @@ Kdown = function (new_config) {
                 console.log(page.market_DD);
                 page.market_DD.list(json.markets);
                 page.lang_DD.list(json.langs);
+
+                load_file_tree();
             });
 
             promise.fail(function (error_obj) {
@@ -66,7 +67,7 @@ Kdown = function (new_config) {
         };
 
         /***
-         * @name API.load_file_tree
+         * @name api.load_file_tree
          */
         var load_file_tree = function () {
 
@@ -83,51 +84,35 @@ Kdown = function (new_config) {
             promise.done(function (json) {
                 if (json.error === false) {
 
+                    var cat_list = {};
+                    var code = "";
                     var temp_tree = {};
                     var tree = file_tree();
-                    var cat_list = db.cat_list();
-                    var code = "";
 
+                    // add onto the existing tree
                     temp_tree[market] = {};
                     temp_tree[market][lang] = json.cats;
-
                     $.extend(tree, temp_tree);
 
-                    // make cat_list if needed
-                    if (cat_list === null) {
-                        cat_list = [];
+                    file_tree(tree);
 
-                        for (var cat in json.cats) {
-                            if(json.cats.hasOwnProperty(cat)) {
-                                code = url_safe(cat);
+                    for (var cat in json.cats) {
+                        if(json.cats.hasOwnProperty(cat)) {
+                            cat_list[code] = cat;
 
-                                cat_list[code] = cat;
-                            }
+                            //***************************
+                            // translate cat if needed
+                            //****************************
                         }
-
-                        db.cat_list(cat_list);
                     }
-
-                    db.file_tree(tree);
-
-                    var current = model.get_current_file_list();
-
-                    if ( table.file_list(current)) {
-                        console.log("ajax CHANGED somthing!", current);
-                    } else {
-                        console.log("didn't change anything!", current, db.cat());
-                    }
-
-                    view.hash.url_import();
-                    model.set_defaults();
+                    
+                    page.sidebar.cat_list(cat_list);
 
                 } else {
-
                     console.log("AJAX_ERROR:", json);
 
                     table.file_list(null);
                     bubpub.say('file_tree/current');
-
                 }
             });
 
@@ -144,6 +129,109 @@ Kdown = function (new_config) {
 
     })(); // end of api
 
+
+    /***
+     * This deals with the hash in the URL
+     *
+     * the format is:
+     *
+     * for categorys
+     *     market/lang/page
+     *
+     * or for search
+     *     market/lang/search:uri_encoded_search_term
+     *
+     */
+    var hash = (function () {
+
+        var self = {};
+        var local_hash_str = bubpub.obj("hash_str", "");
+
+        $(window).bind('hashchange', function () {
+            local_hash_str( window.location.hash.slice(1) );
+        });
+
+        bubpub.listen("hash_str", function () {
+            self.url_import();
+        });
+
+        bubpub.listen("hash", function () {
+            self.url_export();
+        });
+
+        /***
+         * @name hash.url_export
+         * export the hash
+         */
+        self.url_export = function () {
+            var hash_str = "";
+
+            hash_str += page.market_DD.current();
+            hash_str += "/" + page.lang_DD.current();
+
+            var page_current = page.sidebar.current();
+
+            if (page_current === "search") {
+
+                hash_str += "/search:";
+                if (page.search.search() !== "") {
+                    hash_str += "/" + page.search.search();
+                }
+                
+            } else {
+                if (page_current !== null) {
+                    hash_str += "/" + page_current;
+                }
+            }
+
+            window.location.hash = hash_str;
+        };
+
+        /***
+         * @name hash.url_import
+         * import the hash
+         */
+        self.url_import = function () {
+                var hash_str = local_hash_str();
+                var hash = hash_str.split('/');
+                var search_term = "";
+                // just in case!
+                hash_str = $.trim(hash_str);
+
+                //make sure we have a hash
+                if (hash_str === '') {
+                    return false;
+
+                }
+
+                if (page.market_DD.current( hash[0] ) === false) {
+                    page.market_DD.current( config.DEF_MARKET );
+                }
+
+                page.lang_DD.pick_default( hash[1] );
+
+
+                if (typeof hash[2] !== 'undefined') {
+                    if (hash_str.indexOf("search:") > -1) {
+                        // this will:
+                        // 1. grab the right part of the URL
+                        // 2. split it at the :
+                        // 3. grab the right half
+                        // 4. decode it.
+                        search_term = decodeURI( hash[2].split(":")[1] );
+
+                        page.sidebar.current("search");
+                    } else {
+                        page.sidebar.current(decodeURI(hash[2]));
+                    }
+                }
+
+                return true;
+        };
+
+
+        return self;
+    })();
 
 
 
@@ -432,7 +520,6 @@ Kdown = function (new_config) {
 
             self.cat_list = bubpub.obj("page/sidebar/cat_list");
             self.current = bubpub.obj("page/sidebar/current");
-            self.page_list = bubpub.obj("page/sidebar/page_list");
 
             return self;
         })();
@@ -448,21 +535,21 @@ Kdown = function (new_config) {
 
             // this is what market is currently selected
             self.current = bubpub.obj(
-                "page/DD/market/current", config.DEF_MARKET,
+                "hash/market", config.DEF_MARKET,
                 function (test) {
                     return test in self.list();
             });
 
-            self.list = bubpub.obj("page/DD/market/list");
+            self.list = bubpub.obj("lists/market");
 
-            bubpub.listen("page/DD/market/list", function () {
+            bubpub.listen("lists/market", function () {
                 self.populate();
                 $ui.val( config.DEF_MARKET );
                 $ui.show();
             });
 
             // update the drop down when the value changes
-            bubpub.listen("page/DD/market/current", function () {
+            bubpub.listen("hash/market", function () {
                 $ui.val( self.current() );
             });
 
@@ -508,32 +595,51 @@ Kdown = function (new_config) {
 
             // this is what market is currently selected
             self.current = bubpub.obj(
-                "page/DD/lang/current", config.DEF_LANG,
+                "hash/lang", config.DEF_LANG,
                 function (test) {
                     return test in self.current_list();
             });
 
-            self.list = bubpub.obj("page/DD/lang/list");
+            self.list = bubpub.obj("lists/lang");
 
-            bubpub.listen("page/DD/market/current", function () {
+            // bubpub events
+            bubpub.listen("hash/market", function () {
                 self.populate();
+                self.pick_default();
             });
 
-            bubpub.listen("page/DD/lang/list", function () {
+            bubpub.listen("lists/lang", function () {
                 self.populate();
                 $ui.val( config.DEF_LANG );
                 $ui.show();
             });
 
             // update the drop down when the value changes
-            bubpub.listen("page/DD/lang/current", function () {
+            bubpub.listen("hash/lang", function () {
                 $ui.val( self.current() );
             });
+
 
             // when drop down changes update the var
             $ui.change(function () {
                 self.current( $(this).val() );
             });
+
+            self.pick_default = function (current) {
+                var list = self.current_list();
+                current = current || self.current(); // optional argument
+
+                if (current in list === false) {
+                    for (var def in list) break;
+
+                    self.current(def);
+                } else {
+                    // changes it if it came from the argument
+                    // otherwise just set to the same thing 
+                    // (which doesn't publish an event)
+                    self.current(current); 
+                }
+            };
 
             /***
              * @name lang.current_list
@@ -569,14 +675,19 @@ Kdown = function (new_config) {
                 }
 
                 $ui.html(html);
+
+                bubpub.say("hash/lang");
             };
 
 
             return self;
         })(); // <-- end of lang_DD
 
-        var hash = (function () {
+        var search = (function () {
             var self = {};
+
+            var search = bubpub.obj("page/search", "");
+
             return self;
         })();
 
@@ -586,6 +697,7 @@ Kdown = function (new_config) {
             market_DD : market_DD,
             lang_DD : lang_DD,
             hash : hash,
+            search : search,
         };
 
     })(); // <--- end of page object
