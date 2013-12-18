@@ -98,7 +98,7 @@ Kdown = function (new_config) {
 
                     for (var cat in json.cats) {
                         if(json.cats.hasOwnProperty(cat)) {
-                            cat_list[code] = cat;
+                            cat_list[cat] = cat;
 
                             //***************************
                             // translate cat if needed
@@ -165,6 +165,7 @@ Kdown = function (new_config) {
          */
         self.url_export = function () {
             var hash_str = "";
+            var search_str = page.search.search_str();
 
             hash_str += page.market_DD.current();
             hash_str += "/" + page.lang_DD.current();
@@ -174,13 +175,12 @@ Kdown = function (new_config) {
             if (page_current === "search") {
 
                 hash_str += "/search:";
-                if (page.search.search() !== "") {
-                    hash_str += "/" + page.search.search();
+                if (search_str !== "") {
+                    hash_str += encodeURI(search_str);
                 }
-                
             } else {
                 if (page_current !== null) {
-                    hash_str += "/" + page_current;
+                    hash_str += "/" + encodeURI(page_current);
                 }
             }
 
@@ -219,6 +219,7 @@ Kdown = function (new_config) {
                         // 3. grab the right half
                         // 4. decode it.
                         search_term = decodeURI( hash[2].split(":")[1] );
+                        page.search.search_str(search_term);
 
                         page.sidebar.current("search");
                     } else {
@@ -254,7 +255,7 @@ Kdown = function (new_config) {
         var main = (function () {
             var main_self = {};
 
-            var current = bubpub.obj("page/main/current", null, function (test) {
+            var current = bubpub.obj("main/current", null, function (test) {
                 return test.tag in display_objs;
             });
 
@@ -518,8 +519,98 @@ Kdown = function (new_config) {
         var sidebar = (function () {
             var self = {};
 
-            self.cat_list = bubpub.obj("page/sidebar/cat_list");
-            self.current = bubpub.obj("page/sidebar/current");
+
+            var copy = $('#copy-cat').html();
+            var current_class = 'current_page_item';
+
+            var $ui = {
+
+                cat_links : $('.cat_link a'),
+                cats : $('.cat_link'),
+                ul: $('#vertical_nav ul')
+            };
+
+            self.cat_list = bubpub.obj("sidebar/cat_list");
+            self.page_list = bubpub.obj("sidebar/page_list", {
+                "search" : "Search",
+            });
+
+            self.current = bubpub.obj("hash/sidebar");
+
+            bubpub.listen("hash/sidebar", function () {
+                self.set_current();
+            });
+
+            bubpub.listen("sidebar/cat_list", function () {
+                self.populate();
+            });
+
+
+            $ui.ul.on('click', 'a', function (e) {
+                e.preventDefault(); // stop hash change
+                var $this = $(this).parent();
+
+                if ( self.current( $this.data('cat') )) {
+                    page.main.change("loading");
+                }
+            });
+
+            /***
+             * @name sidebar.set_current
+             * this will change the sidebar link to the current page
+             */
+            self.set_current = function () {
+                var sidebar = $ui;
+                //remove current one
+                $("." + current_class).removeClass(current_class);
+
+                $ui.ul.find("[data-cat='" + self.current() + "']" ).
+                    addClass(current_class);
+            };
+
+            /***
+             * @name sidebar.populate
+             * this will fill the sidebar with categorys and other pages
+             */
+            self.populate = function () {
+
+                var copy_cat = copy,
+                    pages = self.page_list(),
+                    cat_list = self.cat_list(),
+                    html = '';
+
+                /***
+                 * will replace the appropriate fields.
+                 */
+                var make_page = function(copy, cat, title) {
+                    var li = copy;
+
+                    li = li.replace(/\(CAT\)/g, cat);
+                    li = li.replace('(TITLE)', title);
+
+                    return li;
+                };
+
+                // make a page for each category
+                for (var cat in cat_list) {
+                    if(cat_list.hasOwnProperty(cat)) {
+                        var cat_name = cat_list[cat];
+                        html += make_page(copy_cat, cat, cat_name);
+                    }
+                }
+
+                // add all other page.
+                for (var page_code in pages) {
+                    if(pages.hasOwnProperty(page_code)) {
+                        var page_name = pages[page_code];
+                        html += make_page(copy_cat, page_code, page_name);
+                    }
+                }
+
+                //set the sidebar
+                $ui.ul.html(html).show();
+                this.set_current();
+            };
 
             return self;
         })();
@@ -604,8 +695,8 @@ Kdown = function (new_config) {
 
             // bubpub events
             bubpub.listen("hash/market", function () {
-                self.populate();
                 self.pick_default();
+                self.populate();
             });
 
             bubpub.listen("lists/lang", function () {
@@ -661,6 +752,8 @@ Kdown = function (new_config) {
                 var option = "";
                 var html;
 
+                $ui.hide();
+
                 // add each lang to the drop down HTML
                 for (var code in langs) {
                     if(langs.hasOwnProperty(code)) {
@@ -674,7 +767,7 @@ Kdown = function (new_config) {
                     }
                 }
 
-                $ui.html(html);
+                $ui.html(html).fadeIn();
 
                 bubpub.say("hash/lang");
             };
@@ -683,10 +776,29 @@ Kdown = function (new_config) {
             return self;
         })(); // <-- end of lang_DD
 
+        /***
+         * @name page.search
+         * this is the object that handles the searchbox.
+         */
         var search = (function () {
             var self = {};
 
-            var search = bubpub.obj("page/search", "");
+            self.search_str = bubpub.obj("hash/search", "");
+
+            var $ui = {
+                search_box : $('#dl_search_box'),
+                form : $('#dl_search_form')
+            };
+
+            bubpub.listen("hash/search", function () {
+                $ui.search_box.val( self.search_str() );
+            });
+
+            $ui.form.submit(function (e) {
+                e.preventDefault();
+                self.search_str( $ui.search_box.val() );
+                page.sidebar.current("search");
+            });
 
             return self;
         })();
@@ -704,6 +816,7 @@ Kdown = function (new_config) {
 
     return {
         api : api,
+        hash : hash,
         page : page
     };
 

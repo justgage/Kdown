@@ -7,6 +7,22 @@
 </head>
 <body>
 <center><img alt="header image" src="files/header.png" /></center>
+
+<div id="translations">
+    <div class="cat_trans">
+        <p data-cat_name="Category 1">
+            Translated cat name
+        </p>
+        <p data-cat_name="Category 2">
+            Translated Category 2
+        </p>
+        <p data-cat_name="Category 3">
+            Translated Category 3
+        </p>
+    </div>
+</div>
+
+
 <div class="center">
     <!-- <a name="top"></a> -->
     <!-- for the link to go back to the top -->
@@ -16,7 +32,7 @@
 
     <div id="vertical_nav">
         <ul id="copy-cat" style="display:none;">
-            <li id="(PAGE)_(CAT)" data-page="(PAGE)" data-cat="(CAT)" class="(PAGE)_link" ><a href="(HREF)">(TITLE)</a></li>
+            <li id="cat_(CAT)" data-cat="(CAT)"><a href="#">(TITLE)</a></li>
         </ul>
     </div>
     <div id="main_content">

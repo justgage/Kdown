@@ -248,3 +248,7 @@ a.favd {
 button span {
     color: white;
 }
+
+#translations {
+    display: none;
+}
