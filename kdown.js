@@ -122,7 +122,7 @@ Kdown = function (new_config) {
             });
 
             return promise;
-        };
+        }; // api.load_file_tree
 
         /***
          * @name api.check_current_file_tree
@@ -132,7 +132,8 @@ Kdown = function (new_config) {
         var check_current_file_tree = function () {
             var market = page.market_DD.current();
             var lang = page.lang_DD.current();
-            if (typeof file_tree()[market][lang] === 'undefined') {
+            var tree = file_tree()[market];
+            if (typeof tree === 'undefined' || typeof tree[lang] === 'undefined') {
                 load_file_tree().done(function () {
                     page.main.ajax_cat_done();
                 });
@@ -442,9 +443,9 @@ Kdown = function (new_config) {
             };
 
             self.show = function () {
-                self.$ui.all.show();
+                self.$ui.all.stop().fadeIn();
                 self.$ui.first.show();
-                self.prepare();
+                this.prepare();
             };
 
             self.hide = function () {
@@ -453,7 +454,7 @@ Kdown = function (new_config) {
 
             self.prepare = function () {
                 var file_list = api.get_file_list();
-                self.populate(file_list);
+                this.populate(file_list);
             };
 
             self.sort = function (file_list) {
@@ -523,9 +524,9 @@ Kdown = function (new_config) {
         var table_search = main.Inherit("table_normal", "table_search", function (self) {
 
             self.show = function () {
-                self.$ui.all.show();
-                self.$ui.first.show();
-                self.$ui.second.show();
+                this.$ui.all.stop().fadeIn();
+                this.$ui.first.show();
+                this.$ui.second.show();
             };
 
             self.hide = function () {
@@ -906,6 +907,4 @@ var kdown = Kdown({
 });
 
 kdown.api.load_lists();
-kdown.page.main.change("table_normal");
-kdown.page.main.change("loading");
 
