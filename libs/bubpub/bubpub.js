@@ -202,6 +202,7 @@ var bubpub = {
                 
                 var is_different = null;
 
+                // Check to see if it's a easy to check object
                 if ($.type(value) !== 'number' && $.type(value) !== 'string') {
                     is_different = true; // just assume it's different
                     console.log($.type(value));
