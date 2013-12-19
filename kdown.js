@@ -8,14 +8,9 @@
 
 /***
  * TODO:
- *      add the cat loading to api.
- *      make table load category view.
- *      change category on click.
- *      search page.
  *      TRANSLATEABLE
  *      global option on search.
- *      file pane.
- *      bug fixes.
+ *      file pane loading.
  */
 
 Kdown = function (new_config) {
@@ -39,6 +34,10 @@ Kdown = function (new_config) {
         var LISTS_URL = 'files/market_lang.json';
         var API_URL = 'api.php';
 
+        /***
+         * tree of files
+         * market > lang > file_array
+         */
         var file_tree = new bubpub.obj('file_tree', {});
 
         /***
@@ -490,7 +489,11 @@ Kdown = function (new_config) {
 
             self.prepare = function () {
                 var file_list = api.get_file_list();
-                this.populate(file_list);
+                if (file_list.length > 0) {
+                    this.populate(file_list);
+                } else {
+                    page.main.change("none_found");
+                }
             };
 
             self.sort = function (file_list) {
@@ -651,6 +654,9 @@ Kdown = function (new_config) {
         main.Inherit("message", "ajax", function (self) {
             self.$ui = $('#ajax_error');
             $("#reload_img").click(function (e) {
+                /***
+                 * LOAD FROM API!
+                 */
                 e.preventDefault(); // stop hash change
             });
         });
@@ -671,6 +677,10 @@ Kdown = function (new_config) {
         //////////////////////
 
 
+        /***
+         * @name page.other_options
+         * this will display other options in the search for them to choose. 
+         */
         var other_options = (function () {
             var self = {};
 
@@ -823,8 +833,8 @@ Kdown = function (new_config) {
             var $ui = $('#market_select');
 
             // this is what market is currently selected
-            self.current = bubpub.obj(
-                "hash/market", config.DEF_MARKET,
+            self.current = bubpub.obj( "hash/market",
+                config.DEF_MARKET,
                 function (test) {
                     return test in self.list();
             });
