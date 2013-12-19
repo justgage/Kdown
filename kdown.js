@@ -131,14 +131,19 @@ Kdown = function (new_config) {
          * file_tree.
          */
         var check_current_file_tree = function () {
-                console.log("CHECK_FILE_LIST");
+            console.log("CHECK_FILE_LIST");
             var market = page.market_DD.current();
             var lang = page.lang_DD.current();
             var tree = file_tree()[market];
+
+            page.sidebar.pick_default();
+
             if (typeof tree === 'undefined' || typeof tree[lang] === 'undefined') {
+
                 load_file_tree().done(function () {
                     page.main.ajax_cat_done();
                 });
+
             } else {
                 page.main.ajax_cat_done();
             }
@@ -213,13 +218,19 @@ Kdown = function (new_config) {
          * export the hash
          */
         self.url_export = function () {
+
             var hash_str = "";
             var search_str = page.search.search_str();
+            var page_current = page.sidebar.current();
+
+            if (page_current === null) {
+                console.log("not exporting URL due to no cat chosen");
+                return false;
+            }
 
             hash_str += page.market_DD.current();
             hash_str += "/" + page.lang_DD.current();
 
-            var page_current = page.sidebar.current();
 
             if (page_current === "search") {
 
@@ -272,8 +283,10 @@ Kdown = function (new_config) {
 
                         page.sidebar.current("search");
                     } else {
-                        page.sidebar.current(decodeURI(hash[2]));
+                        page.sidebar.pick_default(decodeURI(hash[2]));
                     }
+                } else {
+                    page.sidebar.pick_default(null);
                 }
 
                 return true;
@@ -291,6 +304,8 @@ Kdown = function (new_config) {
      * this handles all the VIEW parts of the application.
      */
     var page = (function () {
+
+
 
         /***
          * @name page.main
@@ -426,6 +441,7 @@ Kdown = function (new_config) {
 
             };
 
+
             return main_self;
 
         })();// end of page.main
@@ -449,6 +465,18 @@ Kdown = function (new_config) {
                 second : $('#dl_table_second'),
                 second_body : $('#dl_table_second').find('tbody')
             };
+
+
+            self.$ui.all.delegate(".table_name a", "click", function (e) {
+                // check the bug where click doesn't always register
+                console.log("delegate click");
+                e.preventDefault();
+                var id = $(this).data("id");
+                page.file_pane.open(id);
+
+                e.stopPropagation();
+
+            });
 
             self.show = function () {
                 self.$ui.all.stop().fadeIn();
@@ -525,22 +553,72 @@ Kdown = function (new_config) {
             return self;
         }); // table_normal end
 
+
+
         /***
          * @name table_search
          * this is the display_obj for table searching
          */
         var table_search = main.Inherit("table_normal", "table_search", function (self) {
 
+            self.$ui.search_mess = $("#search_mess");
+            self.$ui.clear_search = $(".clear_search");
+
+            self.$ui.clear_search.click(function (e) {
+                e.preventDefault(); // stop hash change
+
+                page.search.search_str("");
+            });
+
             self.show = function () {
                 this.$ui.all.stop().fadeIn();
-                this.$ui.first.show();
-                this.$ui.second.show();
+
+                page.search.big();
+
+                this.prepare();
             };
 
             self.hide = function () {
-                self.$ui.all.hide();
-                self.$ui.second.hide();
+                this.$ui.all.hide();
+                this.$ui.search_mess.hide();
+                this.$ui.first.show();
+
+                page.search.small();
             };
+
+            self.prepare = function () {
+                var file_list = api.get_file_list();
+                var search_str = page.search.search_str().toLocaleLowerCase();
+                if (search_str !== "") {
+
+                    file_list = $.map(file_list, function (file) {
+
+                        if (file.name.
+                            toLocaleLowerCase().
+                                indexOf(search_str)!== -1) {
+                            return file; // add to the list
+                        }
+
+                    });
+
+                    if (file_list.length === 0) {
+                        this.$ui.first.hide();
+                    } else {
+                        this.$ui.first.show();
+                        this.$ui.search_mess.show().
+                            find("span").text(search_str);
+                    }
+
+                    page.other_options.show();
+
+                } else {
+                    this.$ui.search_mess.hide();
+                    page.other_options.hide();
+                }
+
+                this.populate(file_list);
+            };
+
 
             return self;
         });
@@ -560,18 +638,14 @@ Kdown = function (new_config) {
             self.$ui = $();
 
             self.show = function (_this) {
-                _this.$ui.show();
+                this.$ui.show();
             };
 
             self.hide = function (_this) {
-                _this.$ui.hide();
+                this.$ui.hide();
             };
 
             return self;
-        });
-
-        main.Inherit("message", "loading", function (self) {
-            self.$ui = $('#dl_loading');
         });
 
         main.Inherit("message", "ajax", function (self) {
@@ -580,6 +654,11 @@ Kdown = function (new_config) {
                 e.preventDefault(); // stop hash change
             });
         });
+
+        main.Inherit("message", "loading", function (self) {
+            self.$ui = $('#dl_loading');
+        });
+
 
         main.Inherit("message", "none_found", function (self) {
             self.$ui = $('#none_found');
@@ -590,6 +669,34 @@ Kdown = function (new_config) {
         // end of Display_obj
         //
         //////////////////////
+
+
+        var other_options = (function () {
+            var self = {};
+
+            self.$ui =  {
+               all :  $("#other_options"),
+               clear_search :  $("#clear_search"),
+            };
+
+            self.show = function () {
+                var $ui = this.$ui;
+
+                $ui.all.show();
+
+                if (page.search.search_str() === "") {
+                    $ui.clear_search.hide();
+                } else {
+                    $ui.clear_search.show();
+                }
+            };
+
+            self.hide = function () {
+                this.$ui.all.hide();
+            };
+
+            return self;
+        })();
 
         /***
          * @name page.sidebar
@@ -610,7 +717,7 @@ Kdown = function (new_config) {
 
             self.cat_list = bubpub.obj("sidebar/cat_list");
             self.page_list = bubpub.obj("sidebar/page_list", {
-                "search" : "Search",
+                "search" : "All categorys",
             });
 
             self.current = bubpub.obj("hash/sidebar");
@@ -632,6 +739,19 @@ Kdown = function (new_config) {
                     page.main.change("loading");
                 }
             });
+
+            self.pick_default = function (current) {
+                current = current || self.current();
+                var cat_list = self.cat_list();
+                var def = "";
+
+                if (current === null) {
+                    for (def in cat_list) break;
+                    self.current(def);
+                } else {
+                    self.current(current);
+                }
+            };
 
             /***
              * @name sidebar.set_current
@@ -776,7 +896,7 @@ Kdown = function (new_config) {
             self.list = bubpub.obj("lists/lang");
 
             self.current_name = function () {
-                return self.list()[ self.current() ];
+                return self.list()[ page.market_DD.current() ][ self.current() ];
             };
 
             // bubpub events
@@ -807,9 +927,13 @@ Kdown = function (new_config) {
                 current = current || self.current(); // optional argument
 
                 if (current in list === false) {
-                    for (var def in list) break;
+                    if (config.DEF_LANG in list === false) {
+                        for (var def in list) break;
 
-                    self.current(def);
+                        self.current(def);
+                    } else {
+                        self.current(config.DEF_LANG);
+                    }
                 } else {
                     // changes it if it came from the argument
                     // otherwise just set to the same thing
@@ -885,9 +1009,68 @@ Kdown = function (new_config) {
                 self.search_str( $ui.search_box.val() );
                 page.sidebar.current("search");
             });
+            
+            self.big = function () {
+                $ui.search_box.
+                        removeClass('dl_search_small').
+                        addClass('dl_search_big').
+                        focus();
+            };
+
+            self.small = function () {
+                $ui.search_box.
+                        removeClass('dl_search_big').
+                        addClass('dl_search_small');
+            };
 
             return self;
-        })();
+        })(); // end of page.search
+
+        var file_pane = (function () {
+            var self = {};
+
+            var $ui = $('.file_pane');
+
+
+            /***
+             * @name file_pane.open
+             * this will load the file info and open the file pane
+             *
+             * @arg {num} id the id of the file to look up.
+             */
+            self.open = function (id) {
+
+                //close it
+                this.close();
+                // reopen it in a second
+                // to show that it's changed
+                window.setTimeout(function () {
+                    $ui.addClass("file_pane_show").
+                        scrollTop(0).
+                        removeClass("file_pane_hide");
+                }, 200);
+            };
+
+            /***
+             * @name file_pane.close
+             * will close the file pane.
+             */
+            self.close = function () {
+                $ui.removeClass("file_pane_show").
+                    addClass("file_pane_hide");
+            };
+            
+            // click anywhere on the page (inside of .center)
+            // will close the file pane. 
+            $(".center").click(function () {
+                self.close();
+            });
+
+            return self;
+
+        })(); // end of page.file_pane
+
+
 
         return {
             main : main,
@@ -896,6 +1079,8 @@ Kdown = function (new_config) {
             lang_DD : lang_DD,
             hash : hash,
             search : search,
+            other_options : other_options,
+            file_pane : file_pane,
         };
 
     })(); // <--- end of page object

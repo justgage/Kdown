@@ -72,7 +72,7 @@
                 <h3>
                     Searching for 
                     "<span>...</span>" 
-                        <a href="#">clear search</a> 
+                        <a class="clear_search" href="#">clear search</a> 
                 </h3>
             </div>
 
@@ -124,11 +124,14 @@
                 <div id="other_options" class="center_text" style="display:none;">
                     <h3>Didn't find it?</h3>
                     <p>Here's some more options...</p>
-                </p>
-                <p id="second_link">
-                    <a href="#" id="second_link">
-                        See <span>...</span> more results.
-                    </a>
+                    <ul>
+                        <li>
+                            <a class="clear_search" href="#">
+                                Clear Search to see all files.
+                            </a>
+                        </li>
+                        <li>Change the market or language in the drop downs</li>
+                    </ul>
                 </p>
                 <hr />
             </div>
