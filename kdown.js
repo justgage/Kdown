@@ -109,6 +109,7 @@ Kdown = function (new_config) {
                     }
 
                     page.sidebar.cat_list(cat_list);
+                    hash.url_import();
 
 
                 } else {
@@ -130,6 +131,7 @@ Kdown = function (new_config) {
          * file_tree.
          */
         var check_current_file_tree = function () {
+                console.log("CHECK_FILE_LIST");
             var market = page.market_DD.current();
             var lang = page.lang_DD.current();
             var tree = file_tree()[market];
@@ -146,6 +148,7 @@ Kdown = function (new_config) {
         bubpub.listen("hash", check_current_file_tree);
 
         var get_file_list = function(market, lang, cat) {
+            console.log("GET_FILE_LIST");
             // set defaults if not passed
             market = market || page.market_DD.current();
             lang = lang || page.lang_DD.current();
@@ -196,6 +199,7 @@ Kdown = function (new_config) {
             local_hash_str( window.location.hash.slice(1) );
         });
 
+
         bubpub.listen("hash_str", function () {
             self.url_import();
         });
@@ -237,7 +241,7 @@ Kdown = function (new_config) {
          * import the hash
          */
         self.url_import = function () {
-                var hash_str = local_hash_str();
+                var hash_str = window.location.hash.slice(1);
                 var hash = hash_str.split('/');
                 var search_term = "";
                 // just in case!
@@ -315,6 +319,10 @@ Kdown = function (new_config) {
                     main_self.change("table_normal");
                 }
             };
+
+            bubpub.listen("ajax/cat/error", function () {
+                main_self.change("ajax");
+            });
 
             // a list of display_objects that will.
             var display_objs = {};
@@ -563,16 +571,14 @@ Kdown = function (new_config) {
         });
 
         main.Inherit("message", "loading", function (self) {
-
             self.$ui = $('#dl_loading');
-
-            self.$ui.find("#reload_img").click(function (e) {
-                e.preventDefault(); // stop hash change
-            });
         });
 
         main.Inherit("message", "ajax", function (self) {
             self.$ui = $('#ajax_error');
+            $("#reload_img").click(function (e) {
+                e.preventDefault(); // stop hash change
+            });
         });
 
         main.Inherit("message", "none_found", function (self) {
