@@ -199,7 +199,17 @@ var bubpub = {
             // and is valid
             if (validator === null || validator(new_val) === true) {
                 // make sure we're changing it
-                if (value !== new_val) {
+                
+                var is_different = null;
+
+                if ($.type(value) !== 'number' && $.type(value) !== 'string') {
+                    is_different = true; // just assume it's different
+                    console.log($.type(value));
+                } else {
+                    is_different = value !== new_val;
+                }
+                
+                if (is_different) {
                     console.groupCollapsed('SET' , publish_name);
                     console.log(value, ' >> ', new_val);
                     console.trace();
