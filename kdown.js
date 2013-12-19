@@ -716,7 +716,7 @@ Kdown = function (new_config) {
         })();
 
         /***
-         * @name page.sidebar
+         * @name page.sidebar (category list)
          */
         var sidebar = (function () {
             var self = {};
