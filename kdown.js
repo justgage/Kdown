@@ -262,14 +262,14 @@ Kdown = function (new_config) {
                     return false;
 
                 }
-
+                // check for valid market id
                 if (page.market_DD.current( hash[0] ) === false) {
                     page.market_DD.current( config.DEF_MARKET );
                 }
-
+                // what language to use on change market
                 page.lang_DD.pick_default( hash[1] );
 
-
+                // handle missing category
                 if (typeof hash[2] !== 'undefined') {
                     if (hash_str.indexOf("search:") > -1) {
                         // this will:
