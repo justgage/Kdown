@@ -1,8 +1,10 @@
 /***
- * @name Kdown ~ Kyani download interface
+ * Writen by:   Gage Peterson
+ *              justgage@gmail.com
  *
- * @constructor
+ * For:         Kyani Inc.
  *
+ * Date:        December 2013
  */
 
 
@@ -13,6 +15,11 @@
  *      file pane loading.
  */
 
+/***
+ * @name Kdown ~ Kyani download interface
+ *
+ * @constructor
+ */
 Kdown = function (new_config) {
     "use strict";
 

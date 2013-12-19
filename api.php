@@ -17,18 +17,22 @@ if ($market_lang === null) { // invalid json
 
     if ( isset($_POST["market"]) && $_POST["lang"] ) {
 
-        // make sure it exists in the JSON
-        if (isset($market_lang[ $_POST["market"] ][ $_POST["lang"] ])) {
+        if (isset($_POST["file_id"])) {
+            // code...
+        } else {
 
-            
-            $respond['market'] = $_POST["market"];
-            $respond['lang'] = $_POST["lang"];
-            $respond['error'] = false;
-            $respond['mess'] = "returning list of categorys in " . $_POST["market"] . " " . $_POST["lang"];
+            // make sure it exists in the JSON
+            if (isset($market_lang[ $_POST["market"] ][ $_POST["lang"] ])) {
 
-            $respond['cats'] = $market_lang[ $_POST["market"] ][ $_POST["lang"] ];
 
-        } else { // invalid market / lang
+                $respond['market'] = $_POST["market"];
+                $respond['lang'] = $_POST["lang"];
+                $respond['error'] = false;
+                $respond['mess'] = "returning list of categorys in " . $_POST["market"] . " " . $_POST["lang"];
+
+                $respond['cats'] = $market_lang[ $_POST["market"] ][ $_POST["lang"] ];
+
+            } else { // invalid market / lang
             $respond = array(
                 "error" => true,
                 "mess" => "invalid market OR lang sent!",
@@ -38,6 +42,7 @@ if ($market_lang === null) { // invalid json
             );
         }
 
+    }
     } else { // market OR lang not set
     $respond = array(
         "error" => true,
