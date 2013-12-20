@@ -8,12 +8,11 @@
  */
 
 
-/***
- * TODO:
- *      TRANSLATEABLE
- *      global option on search.
- *      file pane loading.
- */
+//TODO:
+//     TRANSLATEABLE
+//     global option on search.
+//     file pane loading.
+
 
 /***
  * @name Kdown ~ Kyani download interface
