@@ -32,17 +32,15 @@ __To Do__
 
 The downloads page is made of different parts.
 
-- API - this is the object that works with the API.
-- Hash - This deals with the hash in the URL. 
+- __API__ - this is the object that works with the API.
+- __Hash__ - This deals with the hash in the URL. 
 
-- Page - anything that relates to the view
-    - Sidebar - The place at the left where the categories are held and the "all categories / search link." This is handled by the `page.sidebar` object.
-    - Main - the center part of the page that's usually occupied by the table but also home to messages such as "no files are found" and such. 
+- __Page__ - anything that relates to the view
+    - __Sidebar__ - The place at the left where the categories are held and the "all categories / search link." This is handled by the `page.sidebar` object.
+    - __Main__ - the center part of the page that's usually occupied by the table but also home to messages such as "no files are found" and such. 
         - `table_normal` this is the normal category view of the table. 
         - `table_search` this is another table that is filtered when there's a search term. 
         - `none_found` a message saying there's no files found in a category (displayed when the `table_normal` is passed a empty array)
         - `ajax` this is the Ajax error having a button that allows you to reload the page. 
-    - File Pane - this is the slide out drawer that is displayed when you click on a file's name in the table. 
-    - Search - this is the search bar and also houses the search text.
-
-
+    - __File__ Pane - this is the slide out drawer that is displayed when you click on a file's name in the table. 
+    - __Search__ - this is the search bar and also houses the search text.
