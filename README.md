@@ -1,7 +1,10 @@
 #Kdown
 _Kyani download interface_
 
-__status__: stable.
+Created: December 2013
+By:      Gage Peterson (@justgage on github / twitter)
+
+__status__: Beta.
 
 ##To Do
 - make individual file page.
@@ -10,11 +13,14 @@ __status__: stable.
 #Things to know
 
 ##Files
+- `kdown.js` the place where the bulk of the application is held
 - `index.php` the main page
-- `kdown.js` mainpage
-- `bubpub/bubpub.js` JavaScript library for pubsubish system.
-- `dl.css` some styles needed for the page
+- `api.php` my mock api for looking up files.
 - `console_fix.js` fixes the console errors in IE.
+- `dl.css` some styles needed for the page (including css3 animations for sidebar / search bar.)
+- `libs/` all the JS librarys are held.
+- `libs/bubpub/bubpub.js` JavaScript library for pubsubish system. <https://github.com/justgage/bubpub.js>
+- `files/` all files 
 
 ##bubpub
 _bubpbub is a pub sub system with the twist that it uses the setTimout to make it non-blocking and a que that doesn't duplicate events._
