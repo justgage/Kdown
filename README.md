@@ -29,12 +29,12 @@ __To Do__
 
 The downloads page is made of different parts.
 
-1. Sidebar - The place at the left where the categories are held and the "all categories / search link." This is handled by the `page.sidebar` object.
-1. Main - the center part of the page that's usually occupied by the table but also home to messages such as "no files are found" and such. 
-    1. `table_normal` this is the normal category view of the table. 
-    1. `table_search` this is another table that is filtered when there's a search term. 
-    1. `none_found` a message saying there's no files found in a category (displayed when the `table_normal` is passed a empty array)
-    1. `ajax` this is the Ajax error having a button that allows you to reload the page. 
-1. File Pane - this is the slide out drawer that is displayed when you click on a file's name in the table. 
+- Sidebar - The place at the left where the categories are held and the "all categories / search link." This is handled by the `page.sidebar` object.
+- Main - the center part of the page that's usually occupied by the table but also home to messages such as "no files are found" and such. 
+    - `table_normal` this is the normal category view of the table. 
+    - `table_search` this is another table that is filtered when there's a search term. 
+    - `none_found` a message saying there's no files found in a category (displayed when the `table_normal` is passed a empty array)
+    - `ajax` this is the Ajax error having a button that allows you to reload the page. 
+- File Pane - this is the slide out drawer that is displayed when you click on a file's name in the table. 
 
 
