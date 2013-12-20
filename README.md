@@ -28,12 +28,15 @@ __To Do__
 - `cat` refers to the categories in the left hand tabs.
 - `market` is the Kyani market (usually a country but not always).
 
-#Intro
+#How is the application structured?
 
 The downloads page is made of different parts.
 
-- Sidebar - The place at the left where the categories are held and the "all categories / search link." This is handled by the `page.sidebar` object.
+- API - this is the object that works with the API.
+- Hash - This deals with the hash in the URL. 
+
 - Page - anything that relates to the view
+    - Sidebar - The place at the left where the categories are held and the "all categories / search link." This is handled by the `page.sidebar` object.
     - Main - the center part of the page that's usually occupied by the table but also home to messages such as "no files are found" and such. 
         - `table_normal` this is the normal category view of the table. 
         - `table_search` this is another table that is filtered when there's a search term. 
