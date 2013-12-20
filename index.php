@@ -7,6 +7,22 @@
 </head>
 <body>
 <center><img alt="header image" src="files/header.png" /></center>
+
+<div id="translations">
+    <div class="cat_trans">
+        <p data-cat_name="Category 1">
+            Translated cat name
+        </p>
+        <p data-cat_name="Category 2">
+            Translated Category 2
+        </p>
+        <p data-cat_name="Category 3">
+            Translated Category 3
+        </p>
+    </div>
+</div>
+
+
 <div class="center">
     <!-- <a name="top"></a> -->
     <!-- for the link to go back to the top -->
@@ -16,7 +32,7 @@
 
     <div id="vertical_nav">
         <ul id="copy-cat" style="display:none;">
-            <li id="(PAGE)_(CAT)" data-page="(PAGE)" data-cat="(CAT)" class="(PAGE)_link" ><a href="(HREF)">(TITLE)</a></li>
+            <li data-cat="(CAT)"><a href="#">(TITLE)</a></li>
         </ul>
     </div>
     <div id="main_content">
@@ -56,7 +72,7 @@
                 <h3>
                     Searching for 
                     "<span>...</span>" 
-                        <a href="#">clear search</a> 
+                        <a class="clear_search" href="#">clear search</a> 
                 </h3>
             </div>
 
@@ -105,14 +121,17 @@
                 </div> 
 
 
-                <div id="other_options" class="center_text">
+                <div id="other_options" class="center_text" style="display:none;">
                     <h3>Didn't find it?</h3>
                     <p>Here's some more options...</p>
-                </p>
-                <p id="second_link">
-                    <a href="#" id="second_link">
-                        See <span>...</span> more results.
-                    </a>
+                    <ul>
+                        <li>
+                            <a class="clear_search" href="#">
+                                Clear Search to see all files.
+                            </a>
+                        </li>
+                        <li>Change the market or language in the drop downs</li>
+                    </ul>
                 </p>
                 <hr />
             </div>

@@ -248,3 +248,13 @@ a.favd {
 button span {
     color: white;
 }
+
+#translations {
+    display: none;
+}
+
+#other_options ul {
+    width: 250px;
+    text-align: left;
+    margin:0 auto;
+}
