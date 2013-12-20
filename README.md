@@ -22,12 +22,13 @@ __To Do__
 - `files/market_lang` this is a standardised way (stole form front website) to figure out 
 
 #Terms
-`cat` refers to the categories in the left hand tabs.
-`market` is the Kyani market (usually a country but not always).
+- `cat` refers to the categories in the left hand tabs.
+- `market` is the Kyani market (usually a country but not always).
 
 #Intro
 
 The downloads page is made of different parts.
+
 1. Sidebar - The place at the left where the categories are held and the "all categories / search link." This is handled by the `page.sidebar` object.
 1. Main - the center part of the page that's usually occupied by the table but also home to messages such as "no files are found" and such. 
     1. `table_normal` this is the normal category view of the table. 
